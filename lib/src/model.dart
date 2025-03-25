@@ -20,6 +20,11 @@ class Chrono {
   String get paddedMinutes => minutes.toString().padLeft(2, '0');
   String get paddedSeconds => seconds.toString().padLeft(2, '0');
 
+  int get inDays => days;
+  int get inHours => days * 24 + hours;
+  int get inMinutes => inHours * 60 + minutes;
+  int get inSeconds => inMinutes * 60 + seconds;
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
