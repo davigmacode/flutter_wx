@@ -2,25 +2,21 @@ import 'package:flutter/widgets.dart';
 import 'model.dart';
 import 'graph.dart';
 
-typedef ChronoBuilder = Widget Function(Chrono info);
+typedef ChronoBuilder = Widget Function(BuildContext context, Chrono info);
 
 class ChronoView extends StatelessWidget {
-  final ChronoGraph controller;
+  final ChronoGraph graph;
   final ChronoBuilder builder;
 
-  const ChronoView({
-    super.key,
-    required this.controller,
-    required this.builder,
-  });
+  const ChronoView({super.key, required this.graph, required this.builder});
 
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<Chrono>(
-      stream: controller.stream,
-      initialData: Chrono(),
+      stream: graph.stream,
+      initialData: Chrono.initial,
       builder: (context, snapshot) {
-        return builder(snapshot.data!);
+        return builder(context, snapshot.data!);
       },
     );
   }

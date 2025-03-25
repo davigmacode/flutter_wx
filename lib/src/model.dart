@@ -11,7 +11,7 @@ class Chrono {
     this.level = ChronoLevel.seconds,
   });
 
-  static const zero = Chrono();
+  static const initial = Chrono();
 
   final int days, hours, minutes, seconds;
   final bool running, completed;
