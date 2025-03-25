@@ -2,37 +2,51 @@ import 'dart:async';
 import 'model.dart';
 
 class ChronoGraph {
-  final Duration interval;
+  ChronoGraph({
+    this.level = ChronoLevel.seconds,
+    this.interval = const Duration(seconds: 1),
+    DateTime? date,
+  }) : assert(
+         date == null || date.isAfter(DateTime.now()),
+         'Date must be in the future',
+       ),
+       duration =
+           date != null ? date.difference(DateTime.now()) : Duration.zero {
+    _stopwatch = Stopwatch();
+    _streamController = StreamController<Chrono>.broadcast();
+  }
+
+  ChronoGraph.timer({
+    this.level = ChronoLevel.seconds,
+    this.interval = const Duration(seconds: 1),
+    required this.duration,
+  }) {
+    _stopwatch = Stopwatch();
+    _streamController = StreamController<Chrono>.broadcast();
+  }
+
   final ChronoLevel level;
-  final DateTime? date;
+  final Duration interval;
+  final Duration duration;
 
   late final StreamController<Chrono> _streamController;
   late final Stopwatch _stopwatch;
   bool _isRunning = false;
   Timer? _timer;
 
-  ChronoGraph({
-    this.interval = const Duration(seconds: 1),
-    this.level = ChronoLevel.seconds,
-    this.date,
-  }) {
-    _stopwatch = Stopwatch();
-    _streamController = StreamController<Chrono>.broadcast();
-  }
-
   Stream<Chrono> get stream => _streamController.stream;
 
   void _updateTime() {
     int totalSeconds;
 
-    if (date == null) {
+    if (duration == Duration.zero) {
       totalSeconds = _stopwatch.elapsed.inSeconds;
     } else {
-      int remaining = date!.difference(DateTime.now()).inSeconds;
+      int remaining = duration.inSeconds - _stopwatch.elapsed.inSeconds;
       totalSeconds = remaining > 0 ? remaining : 0;
     }
 
-    bool isCompleted = date != null && totalSeconds == 0;
+    bool isCompleted = duration != Duration.zero && totalSeconds == 0;
     if (isCompleted) {
       pause();
     }
