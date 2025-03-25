@@ -1,11 +1,7 @@
 enum ChronoLevel { days, hours, minutes, seconds }
 
 class Chrono {
-  final int days, hours, minutes, seconds;
-  final bool running, completed;
-  final ChronoLevel level;
-
-  Chrono({
+  const Chrono({
     this.days = 0,
     this.hours = 0,
     this.minutes = 0,
@@ -14,6 +10,12 @@ class Chrono {
     this.completed = false,
     this.level = ChronoLevel.seconds,
   });
+
+  static const zero = Chrono();
+
+  final int days, hours, minutes, seconds;
+  final bool running, completed;
+  final ChronoLevel level;
 
   String get paddedDays => days.toString().padLeft(2, '0');
   String get paddedHours => hours.toString().padLeft(2, '0');
