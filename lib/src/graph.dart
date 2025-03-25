@@ -4,7 +4,7 @@ import 'model.dart';
 class ChronoGraph {
   final Duration interval;
   final ChronoLevel level;
-  final DateTime? date; // Jika null -> count-up, Jika diisi -> count-down
+  final DateTime? date;
 
   late final StreamController<Chrono> _streamController;
   late final Stopwatch _stopwatch;
@@ -14,7 +14,7 @@ class ChronoGraph {
   ChronoGraph({
     this.interval = const Duration(seconds: 1),
     this.level = ChronoLevel.seconds,
-    this.date, // Digunakan untuk count-down
+    this.date,
   }) {
     _stopwatch = Stopwatch();
     _streamController = StreamController<Chrono>.broadcast();
@@ -26,17 +26,15 @@ class ChronoGraph {
     int totalSeconds;
 
     if (date == null) {
-      // Mode Count-Up (Menghitung maju)
       totalSeconds = _stopwatch.elapsed.inSeconds;
     } else {
-      // Mode Count-Down (Menghitung mundur ke `date`)
       int remaining = date!.difference(DateTime.now()).inSeconds;
       totalSeconds = remaining > 0 ? remaining : 0;
     }
 
     bool isCompleted = date != null && totalSeconds == 0;
     if (isCompleted) {
-      pause(); // Hentikan otomatis jika count-down selesai
+      pause();
     }
 
     int d = totalSeconds ~/ 86400;
@@ -44,7 +42,6 @@ class ChronoGraph {
     int m = (totalSeconds % 3600) ~/ 60;
     int s = totalSeconds % 60;
 
-    // Atur format berdasarkan `level`
     switch (level) {
       case ChronoLevel.days:
         h += d * 24;
@@ -60,7 +57,15 @@ class ChronoGraph {
     }
 
     _streamController.add(
-      Chrono(days: d, hours: h, minutes: m, seconds: s, completed: isCompleted),
+      Chrono(
+        days: d,
+        hours: h,
+        minutes: m,
+        seconds: s,
+        completed: isCompleted,
+        running: _isRunning,
+        level: level,
+      ),
     );
   }
 
