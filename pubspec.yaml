@@ -1,10 +1,20 @@
 name: gacha
-description: "A new Flutter package project."
-version: 0.0.1
-homepage:
+description: A lightweight Dart library for generating random data with high flexibility. Use it as a singleton or create a new instance with a custom seed.
+version: 1.0.0
+homepage: https://github.com/davigmacode/flutter_gacha
+
+topics:
+  - random
+  - generation
+  - widgetarian
+
+funding:
+  - https://github.com/sponsors/davigmacode
+  - https://buymeacoffee.com/davigmacode
+  - https://ko-fi.com/davigmacode
 
 environment:
-  sdk: ^3.7.0
+  sdk: ">=3.6.0 <4.0.0"
   flutter: ">=1.17.0"
 
 dependencies:

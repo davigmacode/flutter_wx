@@ -1,39 +1,34 @@
-<!--
-This README describes the package. If you publish this package to pub.dev,
-this README's contents appear on the landing page for your package.
+[![Pub Version](https://img.shields.io/pub/v/gacha)](https://pub.dev/packages/gacha) ![GitHub](https://img.shields.io/github/license/davigmacode/flutter_gacha) [![GitHub](https://badgen.net/badge/icon/buymeacoffee?icon=buymeacoffee&color=yellow&label)](https://www.buymeacoffee.com/davigmacode) [![GitHub](https://badgen.net/badge/icon/ko-fi?icon=kofi&color=red&label)](https://ko-fi.com/davigmacode)
 
-For information about how to write a good package README, see the guide for
-[writing package pages](https://dart.dev/tools/pub/writing-package-pages).
+🚀 **Gacha** is a lightweight Dart library for generating random data with high flexibility! Whether for testing, dummy data generation, or other use cases, `gacha` provides various generators such as emails, phone numbers, numbers, text, random lists, and more.
 
-For general information about developing packages, see the Dart guide for
-[creating packages](https://dart.dev/guides/libraries/create-packages)
-and the Flutter guide for
-[developing packages and plugins](https://flutter.dev/to/develop-packages).
--->
+## ✨ Key Features
+- **Flexible Access**: Use it as a **singleton** with `Gacha.instance` or create a new instance with a **custom seed** using `Gacha.create(seed)`.
+- **Random Data Generators**:
+  - 📧 **Email**: `gacha.email()`
+  - 📱 **Phone Number**: `gacha.phone()`
+  - 🔢 **Integer & Double Numbers**: `gacha.integer()`, `gacha.decimal()`
+  - ⏳ **Date & Time**: `gacha.datetime()`
+  - 🔤 **Random Text**: `gacha.chars()`, `gacha.words()`, `gacha.paragraphs()`
+  - 🎰 **Pick Random Item from List**: `gacha.pick(list)`
 
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
+## 🚀 Usage
 
-## Features
-
-TODO: List what your package can do. Maybe include images, gifs, or videos.
-
-## Getting started
-
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
-
-## Usage
-
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder.
-
+### Using Singleton (default instance)
 ```dart
-const like = 'sample';
+import 'package:gacha/gacha.dart';
+
+void main() {
+  print(Gacha.instance.email()); // example: `qwerty123@mail.com`
+}
 ```
 
-## Additional information
+### Creating an Instance with a Custom Seed
+```dart
+import 'package:gacha/gacha.dart';
 
-TODO: Tell users more about the package: where to find more information, how to
-contribute to the package, how to file issues, what response they can expect
-from the package authors, and more.
+void main() {
+  final gacha = Gacha.create(9999);
+  print(gacha.email()); // Will always generate the same email for the same seed
+}
+```
