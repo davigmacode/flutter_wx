@@ -73,12 +73,7 @@ class ChronoProvider extends StatefulWidget {
     required this.graph,
     required ValueWidgetBuilder<ChronoGraph> builder,
     Widget? child,
-  }) : child = Builder(
-         builder: (context) {
-           final graph = ChronoProvider.of(context);
-           return builder(context, graph, child);
-         },
-       );
+  }) : child = ChronoConsumer(builder: builder, child: child);
 
   /// Obtain the provided [ChronoGraph] from the nearest ancestor provider.
   static ChronoGraph of(BuildContext context) {
@@ -123,4 +118,23 @@ class _ChronoInherited extends InheritedNotifier<ChronoGraph> {
 
   final ChronoGraph _graph;
   ChronoGraph get graph => _graph;
+}
+
+/// Consumes a [ChronoGraph] from the nearest [ChronoProvider] and rebuilds
+/// when it changes.
+class ChronoConsumer extends StatelessWidget {
+  const ChronoConsumer({
+    super.key,
+    required this.builder,
+    this.child,
+  });
+
+  final ValueWidgetBuilder<ChronoGraph> builder;
+  final Widget? child;
+
+  @override
+  Widget build(BuildContext context) {
+    final graph = ChronoProvider.of(context);
+    return builder(context, graph, child);
+  }
 }
