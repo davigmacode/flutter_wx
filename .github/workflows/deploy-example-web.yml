@@ -46,7 +46,7 @@ jobs:
         flutter pub get
         flutter build web --release --base-href="/flutter_chronograph/"
     - name: Upload production-ready build example
-      uses: actions/upload-pages-artifact@v2
+      uses: actions/upload-pages-artifact@v3
       with:
         path: ./example/build/web
 
