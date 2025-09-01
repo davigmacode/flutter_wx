@@ -234,7 +234,6 @@ class ChronoGraph extends ValueNotifier<Chrono> {
   /// - Stopwatch: returns to zero.
   void reset() {
     _stopwatch.reset();
-    _timer?.cancel();
     if (mode.isReverse) {
       // Return to the initial countdown time
       value = Chrono.fromDuration(
