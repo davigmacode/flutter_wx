@@ -1,7 +1,18 @@
 name: chronograph
-description: "A new Flutter package project."
-version: 0.0.1
-homepage:
+description: "Lightweight reactive stopwatch/countdown for Flutter. ChronoGraph provides ValueListenable for stopwatch, timer, and DateTime countdown, plus a tiny ChronoView."
+version: 1.0.0
+homepage: https://davigmacode.github.io/flutter_chronograph
+repository: https://github.com/davigmacode/flutter_chronograph
+
+topics:
+  - chronograph
+  - countdown
+  - stopwatch
+  - timer
+
+funding:
+ - https://buymeacoffee.com/davigmacode
+ - https://ko-fi.com/davigmacode
 
 environment:
   sdk: ^3.7.0

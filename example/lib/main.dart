@@ -57,7 +57,6 @@ class _MyHomePageState extends State<MyHomePage> {
     // Example: 30 seconds from now; replace with any future date/time
     dateCountdown = ChronoGraph(
       date: DateTime.now().add(const Duration(seconds: 30)),
-      autostart: false,
       onCompleted: () {
         debugPrint("Countdown reached target datetime!");
         ScaffoldMessenger.of(context).showSnackBar(
