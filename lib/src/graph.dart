@@ -42,13 +42,6 @@ class ChronoGraph extends ValueNotifier<Chrono> {
   late final Stopwatch _stopwatch;
   Timer? _timer;
 
-  /// Whether this instance is running a countdown (as opposed to a stopwatch).
-  /// Whether the graph is in reverse mode (countdown).
-  bool get isReverse => mode == ChronoMode.reverse;
-
-  /// Whether the graph is in forward mode (stopwatch).
-  bool get isForward => mode == ChronoMode.forward;
-
   /// Private constructor shared by all public factories.
   ChronoGraph._internal({
     ChronoLevel? level,
@@ -102,8 +95,12 @@ class ChronoGraph extends ValueNotifier<Chrono> {
     final raw = date.difference(now);
     final d = raw.isNegative ? Duration.zero : raw;
     final initial = raw.isNegative
-        ? Chrono.fromDuration(Duration.zero,
-            running: false, completed: true, level: level)
+        ? Chrono.fromDuration(
+            Duration.zero,
+            running: false,
+            completed: true,
+            level: level,
+          )
         : Chrono.fromDuration(d, level: level);
     return ChronoGraph._internal(
       level: level,
@@ -189,7 +186,7 @@ class ChronoGraph extends ValueNotifier<Chrono> {
   void reset() {
     _stopwatch.reset();
     _timer?.cancel();
-    if (isReverse) {
+    if (mode.isReverse) {
       // Return to the initial countdown time
       value = Chrono.fromDuration(
         duration,
@@ -204,7 +201,7 @@ class ChronoGraph extends ValueNotifier<Chrono> {
   }
 
   void _tick() {
-    if (isReverse) {
+    if (mode.isReverse) {
       final remaining = duration - _stopwatch.elapsed;
       if (remaining <= Duration.zero) {
         // Completed

@@ -12,7 +12,16 @@ enum ChronoLevel { days, hours, minutes, seconds }
 ///
 /// - [forward]: count up (stopwatch behavior).
 /// - [reverse]: count down (timer/countdown behavior).
-enum ChronoMode { forward, reverse }
+enum ChronoMode {
+  forward,
+  reverse;
+
+  /// Whether this mode represents a countdown (reverse).
+  bool get isReverse => this == ChronoMode.reverse;
+
+  /// Whether this mode represents a stopwatch (forward).
+  bool get isForward => this == ChronoMode.forward;
+}
 
 /// Immutable snapshot of a time breakdown for stopwatch/timer displays.
 ///
