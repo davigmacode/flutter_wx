@@ -18,73 +18,100 @@ class ChronoGraph extends ValueNotifier<Chrono> {
 
   bool get _isCountDown => duration != Duration.zero;
 
-  ChronoGraph({
-    ChronoLevel? level,
-    Duration? interval,
-    DateTime? date,
-    this.onCompleted,
-    this.autostart,
-  }) : assert(
-         date == null || date.isAfter(DateTime.now()),
-         'Date must be in the future',
-       ),
-       level = level ?? defaultLevel,
-       interval = interval ?? defaultInterval,
-       duration =
-           date != null ? date.difference(DateTime.now()) : Duration.zero,
-       super(
-         date != null
-             ? Chrono.fromDuration(
-               date.difference(DateTime.now()),
-               level: level,
-             )
-             : Chrono.zero,
-       ) {
-    _stopwatch = Stopwatch();
-    if (autostart != false) start();
-  }
-
-  ChronoGraph.stopwatch({
-    ChronoLevel? level,
-    Duration? interval,
-    this.onCompleted,
-    this.autostart,
-  }) : level = level ?? defaultLevel,
-       interval = interval ?? defaultInterval,
-       duration = Duration.zero,
-       super(Chrono.zero) {
-    _stopwatch = Stopwatch();
-    if (autostart != false) start();
-  }
-
-  ChronoGraph.countdown({
-    ChronoLevel? level,
-    Duration? interval,
-    required DateTime date,
-    this.onCompleted,
-    this.autostart,
-  }) : assert(date.isAfter(DateTime.now()), 'Date must be in the future'),
-       level = level ?? defaultLevel,
-       interval = interval ?? defaultInterval,
-       duration = date.difference(DateTime.now()),
-       super(
-         Chrono.fromDuration(date.difference(DateTime.now()), level: level),
-       ) {
-    _stopwatch = Stopwatch();
-    if (autostart != false) start();
-  }
-
-  ChronoGraph.timer({
+  /// 🔑 Private constructor -> shared init
+  ChronoGraph._internal({
     ChronoLevel? level,
     Duration? interval,
     required this.duration,
+    required Chrono initialValue,
     this.onCompleted,
     this.autostart,
   }) : level = level ?? defaultLevel,
        interval = interval ?? defaultInterval,
-       super(Chrono.fromDuration(duration, level: level)) {
+       super(initialValue) {
     _stopwatch = Stopwatch();
     if (autostart != false) start();
+  }
+
+  /// Stopwatch → count up from zero
+  factory ChronoGraph.stopwatch({
+    ChronoLevel? level,
+    Duration? interval,
+    void Function()? onCompleted,
+    bool? autostart,
+  }) {
+    return ChronoGraph._internal(
+      level: level,
+      interval: interval,
+      duration: Duration.zero,
+      initialValue: Chrono.zero,
+      onCompleted: onCompleted,
+      autostart: autostart,
+    );
+  }
+
+  /// Countdown → target date
+  factory ChronoGraph.countdown({
+    ChronoLevel? level,
+    Duration? interval,
+    required DateTime date,
+    void Function()? onCompleted,
+    bool? autostart,
+  }) {
+    assert(date.isAfter(DateTime.now()), 'Date must be in the future');
+    final d = date.difference(DateTime.now());
+    return ChronoGraph._internal(
+      level: level,
+      interval: interval,
+      duration: d,
+      initialValue: Chrono.fromDuration(d, level: level),
+      onCompleted: onCompleted,
+      autostart: autostart,
+    );
+  }
+
+  /// Timer → fixed duration
+  factory ChronoGraph.timer({
+    ChronoLevel? level,
+    Duration? interval,
+    required Duration duration,
+    void Function()? onCompleted,
+    bool? autostart,
+  }) {
+    return ChronoGraph._internal(
+      level: level,
+      interval: interval,
+      duration: duration,
+      initialValue: Chrono.fromDuration(duration, level: level),
+      onCompleted: onCompleted,
+      autostart: autostart,
+    );
+  }
+
+  /// Optional: constructor "auto" (date → countdown, null → stopwatch)
+  factory ChronoGraph({
+    ChronoLevel? level,
+    Duration? interval,
+    DateTime? date,
+    void Function()? onCompleted,
+    bool? autostart,
+  }) {
+    if (date != null) {
+      return ChronoGraph.countdown(
+        level: level,
+        interval: interval,
+        date: date,
+        onCompleted: onCompleted,
+        autostart: autostart,
+      );
+    } else {
+      return ChronoGraph.stopwatch(
+        level: level,
+        interval: interval,
+        onCompleted: onCompleted,
+        autostart: autostart,
+      );
+    }
   }
 
   void start() {
