@@ -32,7 +32,16 @@ class ChronoGraph extends ValueNotifier<Chrono> {
   final ChronoMode mode;
 
   /// Callback invoked once when a reverse countdown reaches zero.
-  final void Function()? onCompleted;
+  final VoidCallback? onCompleted;
+
+  /// Callback invoked when [start] is called and the graph begins running.
+  final ValueChanged<Chrono>? onStart;
+
+  /// Callback invoked when [pause] is called and the graph stops running.
+  final ValueChanged<Chrono>? onPause;
+
+  /// Callback invoked when [reset] is called.
+  final ValueChanged<Chrono>? onReset;
 
   /// Whether to automatically start on creation; `null/true` = auto, `false` = manual.
   final bool? autostart;
@@ -57,6 +66,9 @@ class ChronoGraph extends ValueNotifier<Chrono> {
     required this.mode,
     required Chrono initialValue,
     this.onCompleted,
+    this.onStart,
+    this.onPause,
+    this.onReset,
     this.autostart,
   }) : level = level ?? defaultLevel,
        interval = interval ?? defaultInterval,
@@ -74,7 +86,10 @@ class ChronoGraph extends ValueNotifier<Chrono> {
   factory ChronoGraph.stopwatch({
     ChronoLevel? level,
     Duration? interval,
-    void Function()? onCompleted,
+    VoidCallback? onCompleted,
+    ValueChanged<Chrono>? onStart,
+    ValueChanged<Chrono>? onPause,
+    ValueChanged<Chrono>? onReset,
     bool? autostart,
   }) {
     return ChronoGraph._internal(
@@ -84,6 +99,9 @@ class ChronoGraph extends ValueNotifier<Chrono> {
       mode: ChronoMode.forward,
       initialValue: Chrono.zero,
       onCompleted: onCompleted,
+      onStart: onStart,
+      onPause: onPause,
+      onReset: onReset,
       autostart: autostart,
     );
   }
@@ -95,7 +113,10 @@ class ChronoGraph extends ValueNotifier<Chrono> {
     ChronoLevel? level,
     Duration? interval,
     required DateTime date,
-    void Function()? onCompleted,
+    VoidCallback? onCompleted,
+    ValueChanged<Chrono>? onStart,
+    ValueChanged<Chrono>? onPause,
+    ValueChanged<Chrono>? onReset,
     bool? autostart,
   }) {
     final now = DateTime.now();
@@ -116,6 +137,9 @@ class ChronoGraph extends ValueNotifier<Chrono> {
       mode: ChronoMode.reverse,
       initialValue: initial,
       onCompleted: onCompleted,
+      onStart: onStart,
+      onPause: onPause,
+      onReset: onReset,
       autostart: autostart,
     );
   }
@@ -125,7 +149,10 @@ class ChronoGraph extends ValueNotifier<Chrono> {
     ChronoLevel? level,
     Duration? interval,
     required Duration duration,
-    void Function()? onCompleted,
+    VoidCallback? onCompleted,
+    ValueChanged<Chrono>? onStart,
+    ValueChanged<Chrono>? onPause,
+    ValueChanged<Chrono>? onReset,
     bool? autostart,
   }) {
     return ChronoGraph._internal(
@@ -135,6 +162,9 @@ class ChronoGraph extends ValueNotifier<Chrono> {
       mode: ChronoMode.reverse,
       initialValue: Chrono.fromDuration(duration, level: level),
       onCompleted: onCompleted,
+      onStart: onStart,
+      onPause: onPause,
+      onReset: onReset,
       autostart: autostart,
     );
   }
@@ -145,7 +175,10 @@ class ChronoGraph extends ValueNotifier<Chrono> {
     ChronoLevel? level,
     Duration? interval,
     DateTime? date,
-    void Function()? onCompleted,
+    VoidCallback? onCompleted,
+    ValueChanged<Chrono>? onStart,
+    ValueChanged<Chrono>? onPause,
+    ValueChanged<Chrono>? onReset,
     bool? autostart,
   }) {
     if (date != null) {
@@ -154,6 +187,9 @@ class ChronoGraph extends ValueNotifier<Chrono> {
         interval: interval,
         date: date,
         onCompleted: onCompleted,
+        onStart: onStart,
+        onPause: onPause,
+        onReset: onReset,
         autostart: autostart,
       );
     } else {
@@ -161,6 +197,9 @@ class ChronoGraph extends ValueNotifier<Chrono> {
         level: level,
         interval: interval,
         onCompleted: onCompleted,
+        onStart: onStart,
+        onPause: onPause,
+        onReset: onReset,
         autostart: autostart,
       );
     }
@@ -175,6 +214,7 @@ class ChronoGraph extends ValueNotifier<Chrono> {
     // Push an immediate update so the UI reflects the start without delay.
     _tick();
     _timer = Timer.periodic(interval, (_) => _tick());
+    onStart?.call(value);
   }
 
   /// Pauses the progression and stops ticking.
@@ -185,6 +225,7 @@ class ChronoGraph extends ValueNotifier<Chrono> {
     _stopwatch.stop();
     _timer?.cancel();
     _updateFlags(running: false);
+    onPause?.call(value);
   }
 
   /// Resets to the initial value and cancels active ticks.
@@ -206,6 +247,7 @@ class ChronoGraph extends ValueNotifier<Chrono> {
       // Reset count-up to 0
       value = Chrono.zero;
     }
+    onReset?.call(value);
   }
 
   void _tick() {
