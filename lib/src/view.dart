@@ -45,6 +45,12 @@ class ChronoView extends ValueListenableBuilder<Chrono> {
 /// accessible and listenable to descendants. The provider owns the given
 /// [graph] and calls `dispose()` when unmounted.
 class ChronoProvider extends StatefulWidget {
+  /// Whether this provider should manage the lifetime of [graph].
+  ///
+  /// If `null` or `true`, the provider calls `graph.dispose()` when unmounted.
+  /// If `false`, the graph is not disposed here (external owner is responsible).
+  final bool? maintainLifetime;
+
   /// The chronograph instance to expose to descendants.
   final ChronoGraph graph;
 
@@ -53,6 +59,7 @@ class ChronoProvider extends StatefulWidget {
 
   const ChronoProvider({
     super.key,
+    this.maintainLifetime,
     required this.graph,
     required this.child,
   });
@@ -62,6 +69,7 @@ class ChronoProvider extends StatefulWidget {
   /// Rebuilds when the underlying [graph] value changes.
   ChronoProvider.builder({
     super.key,
+    this.maintainLifetime,
     required this.graph,
     required ValueWidgetBuilder<Chrono> builder,
     Widget? child,
@@ -84,10 +92,15 @@ class ChronoProvider extends StatefulWidget {
 }
 
 class _ChronoProviderState extends State<ChronoProvider> {
+  // default true
+  bool get maintainLifetime => widget.maintainLifetime != false;
+
   @override
   void dispose() {
-    // Manage the lifetime of the provided graph.
-    widget.graph.dispose();
+    // Manage the lifetime when enabled (default true).
+    if (maintainLifetime) {
+      widget.graph.dispose();
+    }
     super.dispose();
   }
 
