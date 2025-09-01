@@ -8,6 +8,12 @@
 /// - [ChronoLevel.seconds]: fold everything → seconds.
 enum ChronoLevel { days, hours, minutes, seconds }
 
+/// Execution direction of a chronograph.
+///
+/// - [forward]: count up (stopwatch behavior).
+/// - [reverse]: count down (timer/countdown behavior).
+enum ChronoMode { forward, reverse }
+
 /// Immutable snapshot of a time breakdown for stopwatch/timer displays.
 ///
 /// A [Chrono] represents a split form of a duration into days, hours, minutes
