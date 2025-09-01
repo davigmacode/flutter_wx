@@ -11,7 +11,49 @@ class Chrono {
     this.level = ChronoLevel.seconds,
   });
 
-  static const initial = Chrono();
+  static const zero = Chrono();
+
+  factory Chrono.fromDuration(
+    Duration d, {
+    bool? running,
+    bool? completed,
+    ChronoLevel? level,
+  }) {
+    int totalSeconds = d.inSeconds;
+    int days = totalSeconds ~/ 86400;
+    int hours = (totalSeconds % 86400) ~/ 3600;
+    int minutes = (totalSeconds % 3600) ~/ 60;
+    int seconds = totalSeconds % 60;
+
+    // Fold units according to the requested level
+    level ??= ChronoLevel.seconds;
+    switch (level) {
+      case ChronoLevel.days:
+        hours += days * 24;
+        days = 0;
+      // continue
+      case ChronoLevel.hours:
+        minutes += hours * 60;
+        hours = 0;
+      // continue
+      case ChronoLevel.minutes:
+        seconds += minutes * 60;
+        minutes = 0;
+      // continue
+      case ChronoLevel.seconds:
+        break;
+    }
+
+    return Chrono(
+      days: days,
+      hours: hours,
+      minutes: minutes,
+      seconds: seconds,
+      running: running ?? false,
+      completed: completed ?? false,
+      level: level,
+    );
+  }
 
   final int days, hours, minutes, seconds;
   final bool running, completed;

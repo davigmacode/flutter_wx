@@ -9,14 +9,18 @@ class ChronoGraph extends ValueNotifier<Chrono> {
   final void Function()? onCompleted;
   final bool? autostart; // null/true => auto start, false => manual
 
+  static const defaultLevel = ChronoLevel.seconds;
+  static const defaultInterval = Duration(seconds: 1);
+  static const defaultAutostart = true;
+
   late final Stopwatch _stopwatch;
   Timer? _timer;
 
   bool get _isCountDown => duration != Duration.zero;
 
   ChronoGraph({
-    this.level = ChronoLevel.seconds,
-    this.interval = const Duration(seconds: 1),
+    ChronoLevel? level,
+    Duration? interval,
     DateTime? date,
     this.onCompleted,
     this.autostart,
@@ -24,20 +28,61 @@ class ChronoGraph extends ValueNotifier<Chrono> {
          date == null || date.isAfter(DateTime.now()),
          'Date must be in the future',
        ),
+       level = level ?? defaultLevel,
+       interval = interval ?? defaultInterval,
        duration =
            date != null ? date.difference(DateTime.now()) : Duration.zero,
-       super(Chrono.initial) {
+       super(
+         date != null
+             ? Chrono.fromDuration(
+               date.difference(DateTime.now()),
+               level: level,
+             )
+             : Chrono.zero,
+       ) {
+    _stopwatch = Stopwatch();
+    if (autostart != false) start();
+  }
+
+  ChronoGraph.stopwatch({
+    ChronoLevel? level,
+    Duration? interval,
+    this.onCompleted,
+    this.autostart,
+  }) : level = level ?? defaultLevel,
+       interval = interval ?? defaultInterval,
+       duration = Duration.zero,
+       super(Chrono.zero) {
+    _stopwatch = Stopwatch();
+    if (autostart != false) start();
+  }
+
+  ChronoGraph.countdown({
+    ChronoLevel? level,
+    Duration? interval,
+    required DateTime date,
+    this.onCompleted,
+    this.autostart,
+  }) : assert(date.isAfter(DateTime.now()), 'Date must be in the future'),
+       level = level ?? defaultLevel,
+       interval = interval ?? defaultInterval,
+       duration = date.difference(DateTime.now()),
+       super(
+         Chrono.fromDuration(date.difference(DateTime.now()), level: level),
+       ) {
     _stopwatch = Stopwatch();
     if (autostart != false) start();
   }
 
   ChronoGraph.timer({
-    this.level = ChronoLevel.seconds,
-    this.interval = const Duration(seconds: 1),
+    ChronoLevel? level,
+    Duration? interval,
     required this.duration,
     this.onCompleted,
     this.autostart,
-  }) : super(Chrono.initial) {
+  }) : level = level ?? defaultLevel,
+       interval = interval ?? defaultInterval,
+       super(Chrono.fromDuration(duration, level: level)) {
     _stopwatch = Stopwatch();
     if (autostart != false) start();
   }
@@ -61,10 +106,15 @@ class ChronoGraph extends ValueNotifier<Chrono> {
     _timer?.cancel();
     if (_isCountDown) {
       // Return to the initial countdown time
-      value = _toChrono(duration, running: false, completed: false);
+      value = Chrono.fromDuration(
+        duration,
+        running: false,
+        completed: false,
+        level: level,
+      );
     } else {
       // Reset count-up to 0
-      value = Chrono.initial;
+      value = Chrono.zero;
     }
   }
 
@@ -75,23 +125,30 @@ class ChronoGraph extends ValueNotifier<Chrono> {
         // Completed
         _stopwatch.stop();
         _timer?.cancel();
-        value = _toChrono(Duration.zero, running: false, completed: true);
+        value = Chrono.fromDuration(
+          Duration.zero,
+          running: false,
+          completed: true,
+          level: level,
+        );
         onCompleted?.call();
         return;
       }
-      final chrono = _toChrono(
+      final chrono = Chrono.fromDuration(
         remaining,
         running: _stopwatch.isRunning,
         completed: false,
+        level: level,
       );
       if (chrono != value) value = chrono;
     } else {
       // Count-up
       final elapsed = _stopwatch.elapsed;
-      final chrono = _toChrono(
+      final chrono = Chrono.fromDuration(
         elapsed,
         running: _stopwatch.isRunning,
         completed: false,
+        level: level,
       );
       if (chrono != value) value = chrono;
     }
@@ -105,46 +162,6 @@ class ChronoGraph extends ValueNotifier<Chrono> {
       seconds: value.seconds,
       running: running ?? value.running,
       completed: completed ?? value.completed,
-      level: level,
-    );
-  }
-
-  Chrono _toChrono(
-    Duration d, {
-    required bool running,
-    required bool completed,
-  }) {
-    int totalSeconds = d.inSeconds;
-    int days = totalSeconds ~/ 86400;
-    int hours = (totalSeconds % 86400) ~/ 3600;
-    int minutes = (totalSeconds % 3600) ~/ 60;
-    int seconds = totalSeconds % 60;
-
-    // Fold units according to the requested level
-    switch (level) {
-      case ChronoLevel.days:
-        hours += days * 24;
-        days = 0;
-      // continue
-      case ChronoLevel.hours:
-        minutes += hours * 60;
-        hours = 0;
-      // continue
-      case ChronoLevel.minutes:
-        seconds += minutes * 60;
-        minutes = 0;
-      // continue
-      case ChronoLevel.seconds:
-        break;
-    }
-
-    return Chrono(
-      days: days,
-      hours: hours,
-      minutes: minutes,
-      seconds: seconds,
-      running: running,
-      completed: completed,
       level: level,
     );
   }
