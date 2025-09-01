@@ -39,12 +39,21 @@ class _MyHomePageState extends State<MyHomePage> {
   void initState() {
     super.initState();
     // Stopwatch (manual start/stop)
-    stopwatch = ChronoGraph(level: ChronoLevel.seconds, autostart: false);
+    stopwatch = ChronoGraph(
+      level: ChronoLevel.seconds,
+      autostart: false,
+      onStart: (c) => debugPrint("Stopwatch started at ${c.inSeconds}s"),
+      onPause: (c) => debugPrint("Stopwatch paused at ${c.inSeconds}s"),
+      onReset: (c) => debugPrint("Stopwatch reset to ${c.inSeconds}s"),
+    );
 
-    // Timer (auto start, 10 seconds, then trigger callback)
+    // Timer (manual start, 10 seconds, then trigger callback)
     timer = ChronoGraph.timer(
       duration: const Duration(seconds: 10),
-      autostart: true,
+      autostart: false,
+      onStart: (c) => debugPrint("Timer started: ${c.inSeconds}s remaining"),
+      onPause: (c) => debugPrint("Timer paused: ${c.inSeconds}s remaining"),
+      onReset: (c) => debugPrint("Timer reset: ${c.inSeconds}s remaining"),
       onCompleted: () {
         debugPrint("Timer finish!");
         ScaffoldMessenger.of(
@@ -57,6 +66,15 @@ class _MyHomePageState extends State<MyHomePage> {
     // Example: 30 seconds from now; replace with any future date/time
     dateCountdown = ChronoGraph(
       date: DateTime.now().add(const Duration(seconds: 30)),
+      onStart: (c) => debugPrint(
+        "Countdown started: ${c.inSeconds}s remaining",
+      ),
+      onPause: (c) => debugPrint(
+        "Countdown paused: ${c.inSeconds}s remaining",
+      ),
+      onReset: (c) => debugPrint(
+        "Countdown reset: ${c.inSeconds}s remaining",
+      ),
       onCompleted: () {
         debugPrint("Countdown reached target datetime!");
         ScaffoldMessenger.of(context).showSnackBar(
@@ -111,7 +129,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 const SizedBox(width: 8),
                 ElevatedButton(
                   onPressed: stopwatch.pause,
-                  child: const Text("Stop"),
+                  child: const Text("Pause"),
                 ),
                 const SizedBox(width: 8),
                 ElevatedButton(
@@ -124,7 +142,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
             // Timer example
             const Text(
-              "Timer 10s (autostart)",
+              "Timer 10s (manual)",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             ChronoView(
@@ -136,12 +154,32 @@ class _MyHomePageState extends State<MyHomePage> {
                 );
               },
             ),
+            const SizedBox(height: 8),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  onPressed: timer.start,
+                  child: const Text("Start"),
+                ),
+                const SizedBox(width: 8),
+                ElevatedButton(
+                  onPressed: timer.pause,
+                  child: const Text("Pause"),
+                ),
+                const SizedBox(width: 8),
+                ElevatedButton(
+                  onPressed: timer.reset,
+                  child: const Text("Reset"),
+                ),
+              ],
+            ),
 
             const SizedBox(height: 32),
 
             // Countdown to a specific DateTime example
             const Text(
-              "Countdown to a specific DateTime",
+              "Countdown to a specific DateTime (autostart)",
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             ChronoView(
