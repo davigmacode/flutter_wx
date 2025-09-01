@@ -79,34 +79,46 @@ class Chrono {
 
   /// Day component of the time value.
   final int days;
+
   /// Hour component of the time value.
   final int hours;
+
   /// Minute component of the time value.
   final int minutes;
+
   /// Second component of the time value.
   final int seconds;
+
   /// Whether the source stopwatch/timer is currently running.
   final bool running;
+
   /// Whether a countdown has reached completion (i.e., hit zero).
   final bool completed;
+
   /// The granularity level used to compute this breakdown.
   final ChronoLevel level;
 
   /// Two-digit padded day string.
   String get paddedDays => days.toString().padLeft(2, '0');
+
   /// Two-digit padded hour string.
   String get paddedHours => hours.toString().padLeft(2, '0');
+
   /// Two-digit padded minute string.
   String get paddedMinutes => minutes.toString().padLeft(2, '0');
+
   /// Two-digit padded second string.
   String get paddedSeconds => seconds.toString().padLeft(2, '0');
 
   /// Total whole days represented by this value.
   int get inDays => days;
+
   /// Total whole hours represented by this value.
   int get inHours => days * 24 + hours;
+
   /// Total whole minutes represented by this value.
   int get inMinutes => inHours * 60 + minutes;
+
   /// Total whole seconds represented by this value.
   int get inSeconds => inMinutes * 60 + seconds;
 

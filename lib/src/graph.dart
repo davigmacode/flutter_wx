@@ -14,19 +14,25 @@ import 'model.dart';
 class ChronoGraph extends ValueNotifier<Chrono> {
   /// Display granularity used when building [Chrono] values.
   final ChronoLevel level;
+
   /// Tick frequency for periodic updates.
   final Duration interval;
+
   /// Countdown length; [Duration.zero] indicates a stopwatch (count-up).
   final Duration duration;
+
   /// Callback invoked once when a countdown reaches zero.
   final void Function()? onCompleted;
+
   /// Whether to automatically start on creation; `null/true` = auto, `false` = manual.
   final bool? autostart;
 
   /// Default [level] when not specified.
   static const defaultLevel = ChronoLevel.seconds;
+
   /// Default [interval] when not specified.
   static const defaultInterval = Duration(seconds: 1);
+
   /// Default autostart behavior.
   static const defaultAutostart = true;
 
