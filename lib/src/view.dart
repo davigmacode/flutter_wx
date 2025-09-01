@@ -60,18 +60,16 @@ class ChronoProvider extends StatefulWidget {
   /// Builder-style constructor similar to [ChronoView].
   ///
   /// Rebuilds when the underlying [graph] value changes.
-  factory ChronoProvider.builder({
-    Key? key,
-    required ChronoGraph graph,
-    required Widget Function(BuildContext, Chrono, Widget?) builder,
+  ChronoProvider.builder({
+    super.key,
+    required this.graph,
+    required ValueWidgetBuilder<Chrono> builder,
     Widget? child,
-  }) {
-    return ChronoProvider(
-      key: key,
-      graph: graph,
-      child: ChronoView(graph: graph, builder: builder, child: child),
-    );
-  }
+  }) : child = ChronoView(
+         graph: graph,
+         builder: builder,
+         child: child,
+       );
 
   /// Obtain the provided [ChronoGraph] from the nearest ancestor provider.
   static ChronoGraph of(BuildContext context) {
