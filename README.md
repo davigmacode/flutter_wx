@@ -7,6 +7,7 @@ Chronograph is a lightweight, reactive engine for stopwatch and countdown use‑
 - Reactive engine: expose `ValueListenable<Chrono>` for easy UI updates
 - Three modes: `stopwatch`, `timer(duration)`, `countdown(date)`
 - Tiny view helper: `ChronoView` wraps `ValueListenableBuilder<Chrono>`
+- Provider helper: `ChronoProvider` manages lifetime and exposes a shared graph
 - Configurable tick `interval` and display `level` (days/hours/minutes/seconds)
 - Optional `autostart` and `onCompleted` callback for countdowns/timers
 - Immutable `Chrono` value with padded strings and total time helpers
@@ -72,6 +73,86 @@ ChronoView(
   builder: (context, info, _) => Text(
     '${info.paddedMinutes}:${info.paddedSeconds}',
   ),
+);
+```
+
+### Using ChronoProvider and ChronoView.of
+
+Wrap a subtree with `ChronoProvider` to manage a shared graph and dispose it automatically. Use a `Builder` (or a separate widget) so the `context` passed to `ChronoView.of` is below the provider.
+
+```dart
+return ChronoProvider(
+  graph: ChronoGraph.stopwatch(level: ChronoLevel.seconds),
+  child: Builder(
+    builder: (context) => Column(
+      children: [
+        ChronoView.of(
+          context,
+          builder: (ctx, info, _) => Text('${info.paddedMinutes}:${info.paddedSeconds}'),
+        ),
+      ],
+    ),
+  ),
+);
+```
+
+Alternatively, use the builder convenience:
+
+```dart
+ChronoProvider.builder(
+  graph: ChronoGraph.timer(duration: const Duration(seconds: 10)),
+  builder: (ctx, graph, _) => Column(
+    children: [
+      ChronoView(
+        graph: graph,
+        builder: (ctx, info, __) => Text(
+          '${info.paddedMinutes}:${info.paddedSeconds}',
+        ),
+      ),
+      Row(
+        children: [
+          TextButton(onPressed: graph.start, child: const Text('Start')),
+          TextButton(onPressed: graph.pause, child: const Text('Pause')),
+          TextButton(onPressed: graph.reset, child: const Text('Reset')),
+        ],
+      )
+    ],
+  ),
+);
+```
+
+Note: `ChronoProvider` owns the provided graph by default and disposes it on unmount. To keep the graph alive (managed externally), pass `maintainLifetime: false`:
+
+```dart
+ChronoProvider(
+  graph: externalGraph,
+  maintainLifetime: false,
+  child: Builder(
+    builder: (context) => ChronoView.of(
+      context,
+      builder: (ctx, info, _) => Text(info.paddedSeconds),
+    ),
+  ),
+)
+```
+
+### Callbacks on ChronoGraph
+
+You can observe lifecycle events with callbacks:
+
+```dart
+final g1 = ChronoGraph.stopwatch(
+  onStart: (c) => debugPrint('Started at ${c.inSeconds}s'),
+  onPause: (c) => debugPrint('Paused at ${c.inSeconds}s'),
+  onReset: (c) => debugPrint('Reset to ${c.inSeconds}s'),
+);
+
+final g2 = ChronoGraph.timer(
+  duration: const Duration(seconds: 10),
+  onStart: (c) => debugPrint('Timer start: ${c.inSeconds}s remaining'),
+  onPause: (c) => debugPrint('Timer pause: ${c.inSeconds}s remaining'),
+  onReset: (c) => debugPrint('Timer reset: ${c.inSeconds}s remaining'),
+  onCompleted: () => debugPrint('Timer completed'),
 );
 ```
 
