@@ -10,7 +10,8 @@ import 'model.dart';
 /// - [ChronoGraph.timer]: counts down a fixed [Duration].
 /// - [ChronoGraph.countdown]: counts down to a target [DateTime].
 ///
-/// Use [start], [pause], and [reset] to control the progression.
+/// Use [start], [pause], and [reset] to control the progression. Direction is
+/// determined by [mode] (see [ChronoMode]).
 class ChronoGraph extends ValueNotifier<Chrono> {
   /// Display granularity used when building [Chrono] values.
   final ChronoLevel level;
@@ -18,13 +19,19 @@ class ChronoGraph extends ValueNotifier<Chrono> {
   /// Tick frequency for periodic updates.
   final Duration interval;
 
-  /// Countdown length; [Duration.zero] indicates a stopwatch (count-up).
+  /// Base duration associated with this graph.
+  ///
+  /// - For [ChronoMode.forward] (stopwatch) this is always [Duration.zero].
+  /// - For [ChronoMode.reverse] (timer/countdown) this is the starting
+  ///   countdown length. It may also be [Duration.zero] when a past/now
+  ///   `countdown(date)` is created, in which case the initial value is
+  ///   completed and auto-start is suppressed.
   final Duration duration;
 
   /// Mode indicating whether this graph runs forward (stopwatch) or reverse (countdown).
   final ChronoMode mode;
 
-  /// Callback invoked once when a countdown reaches zero.
+  /// Callback invoked once when a reverse countdown reaches zero.
   final void Function()? onCompleted;
 
   /// Whether to automatically start on creation; `null/true` = auto, `false` = manual.
@@ -132,7 +139,8 @@ class ChronoGraph extends ValueNotifier<Chrono> {
     );
   }
 
-  /// Convenience constructor: `date != null` → countdown, else stopwatch.
+  /// Convenience constructor: `date != null` → countdown (reverse), else
+  /// stopwatch (forward).
   factory ChronoGraph({
     ChronoLevel? level,
     Duration? interval,
