@@ -2,23 +2,41 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'model.dart';
 
+/// Reactive graph/engine that drives stopwatch and countdown timers.
+///
+/// Exposes a [ValueListenable] of [Chrono] that widgets can listen to for
+/// updates. It supports three main modes via factory constructors:
+/// - [ChronoGraph.stopwatch]: counts up from zero.
+/// - [ChronoGraph.timer]: counts down a fixed [Duration].
+/// - [ChronoGraph.countdown]: counts down to a target [DateTime].
+///
+/// Use [start], [pause], and [reset] to control the progression.
 class ChronoGraph extends ValueNotifier<Chrono> {
+  /// Display granularity used when building [Chrono] values.
   final ChronoLevel level;
+  /// Tick frequency for periodic updates.
   final Duration interval;
-  final Duration duration; // Duration.zero => count-up
+  /// Countdown length; [Duration.zero] indicates a stopwatch (count-up).
+  final Duration duration;
+  /// Callback invoked once when a countdown reaches zero.
   final void Function()? onCompleted;
-  final bool? autostart; // null/true => auto start, false => manual
+  /// Whether to automatically start on creation; `null/true` = auto, `false` = manual.
+  final bool? autostart;
 
+  /// Default [level] when not specified.
   static const defaultLevel = ChronoLevel.seconds;
+  /// Default [interval] when not specified.
   static const defaultInterval = Duration(seconds: 1);
+  /// Default autostart behavior.
   static const defaultAutostart = true;
 
   late final Stopwatch _stopwatch;
   Timer? _timer;
 
+  /// Whether this instance is running a countdown (as opposed to a stopwatch).
   bool get _isCountDown => duration != Duration.zero;
 
-  /// 🔑 Private constructor -> shared init
+  /// Private constructor shared by all public factories.
   ChronoGraph._internal({
     ChronoLevel? level,
     Duration? interval,
@@ -33,7 +51,12 @@ class ChronoGraph extends ValueNotifier<Chrono> {
     if (autostart != false) start();
   }
 
-  /// Stopwatch → count up from zero
+  /// Stopwatch: counts up from zero.
+  ///
+  /// - [level]: output granularity for emitted [Chrono] values.
+  /// - [interval]: tick frequency for UI updates.
+  /// - [onCompleted]: unused for stopwatch, but accepted for symmetry.
+  /// - [autostart]: start immediately unless set to `false`.
   factory ChronoGraph.stopwatch({
     ChronoLevel? level,
     Duration? interval,
@@ -50,7 +73,9 @@ class ChronoGraph extends ValueNotifier<Chrono> {
     );
   }
 
-  /// Countdown → target date
+  /// Countdown to a specific target [DateTime].
+  ///
+  /// Asserts that [date] is in the future.
   factory ChronoGraph.countdown({
     ChronoLevel? level,
     Duration? interval,
@@ -70,7 +95,7 @@ class ChronoGraph extends ValueNotifier<Chrono> {
     );
   }
 
-  /// Timer → fixed duration
+  /// Timer: counts down a fixed [duration].
   factory ChronoGraph.timer({
     ChronoLevel? level,
     Duration? interval,
@@ -88,7 +113,7 @@ class ChronoGraph extends ValueNotifier<Chrono> {
     );
   }
 
-  /// Optional: constructor "auto" (date → countdown, null → stopwatch)
+  /// Convenience constructor: `date != null` → countdown, else stopwatch.
   factory ChronoGraph({
     ChronoLevel? level,
     Duration? interval,
@@ -114,13 +139,20 @@ class ChronoGraph extends ValueNotifier<Chrono> {
     }
   }
 
+  /// Starts the underlying stopwatch and begins emitting ticks.
+  ///
+  /// No-ops if already running.
   void start() {
     if (_stopwatch.isRunning) return;
     _stopwatch.start();
-    _tick(); // update immediately so the UI doesn't wait one interval
+    // Push an immediate update so the UI reflects the start without delay.
+    _tick();
     _timer = Timer.periodic(interval, (_) => _tick());
   }
 
+  /// Pauses the progression and stops ticking.
+  ///
+  /// No-ops if already paused.
   void pause() {
     if (!_stopwatch.isRunning) return;
     _stopwatch.stop();
@@ -128,6 +160,10 @@ class ChronoGraph extends ValueNotifier<Chrono> {
     _updateFlags(running: false);
   }
 
+  /// Resets to the initial value and cancels active ticks.
+  ///
+  /// - Countdown: returns to the original countdown length.
+  /// - Stopwatch: returns to zero.
   void reset() {
     _stopwatch.reset();
     _timer?.cancel();
@@ -181,6 +217,7 @@ class ChronoGraph extends ValueNotifier<Chrono> {
     }
   }
 
+  /// Updates only the flags, preserving numeric components and level.
   void _updateFlags({bool? running, bool? completed}) {
     value = Chrono(
       days: value.days,
@@ -194,6 +231,7 @@ class ChronoGraph extends ValueNotifier<Chrono> {
   }
 
   @override
+  /// Cancels timers and stops the internal stopwatch.
   void dispose() {
     _timer?.cancel();
     _stopwatch.stop();
