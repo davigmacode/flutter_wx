@@ -33,6 +33,7 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   late final ChronoGraph stopwatch;
   late final ChronoGraph timer;
+  late final ChronoGraph dateCountdown;
 
   @override
   void initState() {
@@ -51,12 +52,26 @@ class _MyHomePageState extends State<MyHomePage> {
         ).showSnackBar(const SnackBar(content: Text("Timer finish!")));
       },
     );
+
+    // Countdown to a specific DateTime (auto start)
+    // Example: 30 seconds from now; replace with any future date/time
+    dateCountdown = ChronoGraph(
+      date: DateTime.now().add(const Duration(seconds: 30)),
+      autostart: false,
+      onCompleted: () {
+        debugPrint("Countdown reached target datetime!");
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Countdown reached target datetime!")),
+        );
+      },
+    );
   }
 
   @override
   void dispose() {
     stopwatch.dispose();
     timer.dispose();
+    dateCountdown.dispose();
     super.dispose();
   }
 
@@ -119,6 +134,24 @@ class _MyHomePageState extends State<MyHomePage> {
                 return Text(
                   "${info.paddedMinutes}:${info.paddedSeconds}",
                   style: const TextStyle(fontSize: 32, color: Colors.red),
+                );
+              },
+            ),
+
+            const SizedBox(height: 32),
+
+            // Countdown to a specific DateTime example
+            const Text(
+              "Countdown to a specific DateTime",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            ChronoView(
+              graph: dateCountdown,
+              builder: (context, info, _) {
+                // Show in mm:ss for short durations; adjust as needed
+                return Text(
+                  "${info.paddedMinutes}:${info.paddedSeconds}",
+                  style: const TextStyle(fontSize: 32, color: Colors.blue),
                 );
               },
             ),
