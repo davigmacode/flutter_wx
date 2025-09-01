@@ -1,8 +1,11 @@
 /// Granularity level for representing a duration.
 ///
-/// The level determines how smaller units are folded into larger ones when
-/// converting a [Duration] into a [Chrono]. For example, when using
-/// [ChronoLevel.minutes], seconds are folded into minutes.
+/// The level determines how larger units are folded down to the selected level
+/// when converting a [Duration] into a [Chrono]. Examples:
+/// - [ChronoLevel.days]: no folding; keep days/hours/minutes/seconds as-is.
+/// - [ChronoLevel.hours]: fold days → hours; keep minutes/seconds.
+/// - [ChronoLevel.minutes]: fold days and hours → minutes; keep seconds.
+/// - [ChronoLevel.seconds]: fold everything → seconds.
 enum ChronoLevel { days, hours, minutes, seconds }
 
 /// Immutable snapshot of a time breakdown for stopwatch/timer displays.
@@ -25,7 +28,7 @@ class Chrono {
     this.seconds = 0,
     this.running = false,
     this.completed = false,
-    this.level = ChronoLevel.seconds,
+    this.level = ChronoLevel.days,
   });
 
   /// Convenient initial value for a zeroed, idle state.
@@ -47,22 +50,30 @@ class Chrono {
     int minutes = (totalSeconds % 3600) ~/ 60;
     int seconds = totalSeconds % 60;
 
-    // Fold units according to the requested level
-    level ??= ChronoLevel.seconds;
+    // Fold larger units down to the selected display level.
+    // Example: level=minutes -> fold days and hours into minutes (keep seconds).
+    level ??= ChronoLevel.days;
     switch (level) {
       case ChronoLevel.days:
+        // Keep days as the largest unit; no folding needed.
+        break;
+      case ChronoLevel.hours:
+        // Fold days into hours; keep minutes and seconds as-is.
         hours += days * 24;
         days = 0;
-      // continue
-      case ChronoLevel.hours:
-        minutes += hours * 60;
-        hours = 0;
-      // continue
+        break;
       case ChronoLevel.minutes:
-        seconds += minutes * 60;
-        minutes = 0;
-      // continue
+        // Fold days and hours into minutes; keep seconds as-is.
+        minutes += days * 24 * 60 + hours * 60;
+        days = 0;
+        hours = 0;
+        break;
       case ChronoLevel.seconds:
+        // Fold everything down into seconds.
+        seconds += days * 24 * 3600 + hours * 3600 + minutes * 60;
+        days = 0;
+        hours = 0;
+        minutes = 0;
         break;
     }
 

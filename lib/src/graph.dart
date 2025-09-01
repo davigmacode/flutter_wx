@@ -28,7 +28,7 @@ class ChronoGraph extends ValueNotifier<Chrono> {
   final bool? autostart;
 
   /// Default [level] when not specified.
-  static const defaultLevel = ChronoLevel.seconds;
+  static const defaultLevel = ChronoLevel.days;
 
   /// Default [interval] when not specified.
   static const defaultInterval = Duration(seconds: 1);
