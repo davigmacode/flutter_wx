@@ -148,6 +148,44 @@ class Chrono {
   /// Total whole seconds represented by this value.
   int get inSeconds => inMinutes * 60 + seconds;
 
+  /// Returns a copy of this [Chrono] with selectively overridden fields.
+  Chrono copyWith({
+    int? days,
+    int? hours,
+    int? minutes,
+    int? seconds,
+    bool? running,
+    bool? completed,
+    ChronoLevel? level,
+  }) {
+    return Chrono(
+      days: days ?? this.days,
+      hours: hours ?? this.hours,
+      minutes: minutes ?? this.minutes,
+      seconds: seconds ?? this.seconds,
+      running: running ?? this.running,
+      completed: completed ?? this.completed,
+      level: level ?? this.level,
+    );
+  }
+
+  /// Merges values from [other] into this, preferring non-defaults from [other].
+  ///
+  /// - Numeric components: if [other] has non-zero values they override.
+  /// - Flags/level: if they differ, [other]'s values override.
+  Chrono merge(Chrono? other) {
+    if (other == null) return this;
+    return copyWith(
+      days: other.days != 0 ? other.days : null,
+      hours: other.hours != 0 ? other.hours : null,
+      minutes: other.minutes != 0 ? other.minutes : null,
+      seconds: other.seconds != 0 ? other.seconds : null,
+      running: other.running != running ? other.running : null,
+      completed: other.completed != completed ? other.completed : null,
+      level: other.level != level ? other.level : null,
+    );
+  }
+
   @override
   /// Equality based on all fields.
   bool operator ==(Object other) =>

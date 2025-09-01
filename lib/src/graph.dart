@@ -224,7 +224,7 @@ class ChronoGraph extends ValueNotifier<Chrono> {
     if (!_stopwatch.isRunning) return;
     _stopwatch.stop();
     _timer?.cancel();
-    _updateFlags(running: false);
+    value = value.copyWith(running: false);
     onPause?.call(value);
   }
 
@@ -284,19 +284,6 @@ class ChronoGraph extends ValueNotifier<Chrono> {
       );
       if (chrono != value) value = chrono;
     }
-  }
-
-  /// Updates only the flags, preserving numeric components and level.
-  void _updateFlags({bool? running, bool? completed}) {
-    value = Chrono(
-      days: value.days,
-      hours: value.hours,
-      minutes: value.minutes,
-      seconds: value.seconds,
-      running: running ?? value.running,
-      completed: completed ?? value.completed,
-      level: level,
-    );
   }
 
   @override
