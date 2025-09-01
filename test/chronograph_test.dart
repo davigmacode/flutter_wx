@@ -8,9 +8,9 @@ void main() {
     final graph = ChronoGraph();
     final values = <Chrono>[];
 
-    graph.stream.listen((event) {
-      values.add(event);
-      print('⏳ Count Up: ${event.inSeconds}');
+    graph.addListener(() {
+      values.add(graph.value);
+      print('⏳ Count Up: ${graph.value.inSeconds}');
     });
 
     graph.start();
@@ -29,9 +29,11 @@ void main() {
     final graph = ChronoGraph.timer(duration: const Duration(seconds: 5));
     final values = <Chrono>[];
 
-    graph.stream.listen((event) {
-      values.add(event);
-      print('⏳ Count Down: ${event.inSeconds}, completed: ${event.completed}');
+    graph.addListener(() {
+      values.add(graph.value);
+      print(
+        '⏳ Count Down: ${graph.value.inSeconds}, completed: ${graph.value.completed}',
+      );
     });
 
     graph.start();
