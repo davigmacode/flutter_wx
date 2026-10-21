@@ -28,20 +28,23 @@ class WheelController<T> extends FixedExtentScrollController {
     T? value,
     WheelItemDisable<T>? itemDisabled,
     ValueChanged<T>? onChanged,
+    ValueChanged<int>? onIndexChanged,
     bool? loop,
     Duration? animationDuration,
     Curve? animationCurve,
-  }) : _options = List<T>.from(options ?? []),
-       _itemDisabled = itemDisabled,
-       _onChanged = onChanged,
-       _loop = loop ?? false,
-       _animationDuration =
-           animationDuration ?? const Duration(milliseconds: 250),
-       _animationCurve = animationCurve ?? Curves.easeOut,
-       _value = _initialValue(options ?? [], value),
-       _indexNotifier = ValueNotifier<int>(_initialIndex(options ?? [], value)),
-       _valueNotifier = ValueNotifier<T?>(_initialValue(options ?? [], value)),
-       super(initialItem: _initialIndex(options ?? [], value));
+  })  : _options = List<T>.from(options ?? []),
+        _itemDisabled = itemDisabled,
+        _onChanged = onChanged,
+        _onIndexChanged = onIndexChanged,
+        _loop = loop ?? false,
+        _animationDuration =
+            animationDuration ?? const Duration(milliseconds: 250),
+        _animationCurve = animationCurve ?? Curves.easeOut,
+        _value = _initialValue(options ?? [], value),
+        _indexNotifier =
+            ValueNotifier<int>(_initialIndex(options ?? [], value)),
+        _valueNotifier = ValueNotifier<T?>(_initialValue(options ?? [], value)),
+        super(initialItem: _initialIndex(options ?? [], value));
 
   static T? _initialValue<T>(List<T> options, T? value) {
     if (value != null && options.contains(value)) {
@@ -62,6 +65,7 @@ class WheelController<T> extends FixedExtentScrollController {
   T? _value;
   WheelItemDisable<T>? _itemDisabled;
   ValueChanged<T>? _onChanged;
+  ValueChanged<int>? _onIndexChanged;
   bool _loop;
   Duration _animationDuration;
   Curve _animationCurve;
@@ -94,6 +98,56 @@ class WheelController<T> extends FixedExtentScrollController {
 
   /// Predicate to check whether an item is disabled.
   bool isDisabled(T item) => _itemDisabled?.call(item) ?? false;
+
+  /// Updates the onIndexChanged callback.
+  void setOnIndexChanged(ValueChanged<int>? f) => _onIndexChanged = f;
+
+  /// Whether there is a previous item selectable from the current position.
+  bool get hasPrevious => _loop ? _options.isNotEmpty : selectedIndex > 0;
+
+  /// Whether there is a next item selectable from the current position.
+  bool get hasNext => _loop
+      ? _options.isNotEmpty
+      : (_options.isNotEmpty && selectedIndex < _options.length - 1);
+
+  /// Moves selection to the next item if available.
+  Future<bool> next({
+    bool animate = true,
+    Duration? duration,
+    Curve? curve,
+    bool notify = true,
+  }) {
+    if (!hasNext) return Future.value(false);
+    final target =
+        _loop ? (selectedIndex + 1) % _options.length : selectedIndex + 1;
+    return setIndex(
+      target,
+      animate: animate,
+      duration: duration,
+      curve: curve,
+      notify: notify,
+    );
+  }
+
+  /// Moves selection to the previous item if available.
+  Future<bool> previous({
+    bool animate = true,
+    Duration? duration,
+    Curve? curve,
+    bool notify = true,
+  }) {
+    if (!hasPrevious) return Future.value(false);
+    final target = _loop
+        ? (selectedIndex - 1 + _options.length) % _options.length
+        : selectedIndex - 1;
+    return setIndex(
+      target,
+      animate: animate,
+      duration: duration,
+      curve: curve,
+      notify: notify,
+    );
+  }
 
   /// Whether the wheel should wrap around when scrolling by index.
   bool get loop => _loop;
@@ -224,6 +278,7 @@ class WheelController<T> extends FixedExtentScrollController {
       _valueNotifier.value = _value;
       _indexNotifier.value = actualIndex;
       _onChanged?.call(newValue);
+      _onIndexChanged?.call(actualIndex);
     }
   }
 
@@ -243,9 +298,8 @@ class WheelController<T> extends FixedExtentScrollController {
           ? _findNearestEnabledIndexLoop(actualIndex)
           : _findNearestEnabledIndex(actualIndex);
       if (nearestIndex != actualIndex) {
-        final target = _loop
-            ? index + (nearestIndex - actualIndex)
-            : nearestIndex;
+        final target =
+            _loop ? index + (nearestIndex - actualIndex) : nearestIndex;
         Future.microtask(() {
           final d = duration ?? _animationDuration;
           final c = curve ?? _animationCurve;
@@ -287,8 +341,8 @@ class WheelController<T> extends FixedExtentScrollController {
 
   int _findNearestEnabledIndex(int fromIndex) {
     int distance = 1;
-    while (fromIndex - distance >= 0 ||
-        fromIndex + distance < _options.length) {
+    while (
+        fromIndex - distance >= 0 || fromIndex + distance < _options.length) {
       final down = fromIndex + distance;
       if (down < _options.length && !isDisabled(_options[down])) {
         return down;
@@ -347,7 +401,10 @@ class WheelController<T> extends FixedExtentScrollController {
     if (hasClients && selectedItem != targetIndex) {
       jumpToItem(targetIndex);
     }
-    if (notify) _onChanged?.call(_value as T);
+    if (notify) {
+      _onChanged?.call(_value as T);
+      _onIndexChanged?.call(baseIndex);
+    }
     return true;
   }
 
@@ -378,7 +435,10 @@ class WheelController<T> extends FixedExtentScrollController {
       await animateToItem(targetIndex, duration: d, curve: c);
       if (!hasClients) return true;
     }
-    if (notify) _onChanged?.call(_value as T);
+    if (notify) {
+      _onChanged?.call(_value as T);
+      _onIndexChanged?.call(baseIndex);
+    }
     return true;
   }
 
