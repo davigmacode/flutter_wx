@@ -19,7 +19,7 @@ import 'package:flutter/foundation.dart';
 /// - Use [WheelEffect.flat] for a near-flat list look (very large diameter).
 /// - Prefer [merge] to combine defaults with overrides; use [copyWith] for tweaks.
 @immutable
-class WheelEffect implements Comparable<WheelEffect> {
+class WheelEffect {
   const WheelEffect({
     this.useMagnifier,
     this.magnification,
@@ -167,8 +167,4 @@ class WheelEffect implements Comparable<WheelEffect> {
     overAndUnderCenterOpacity,
     squeeze,
   );
-
-  @override
-  /// Provides a stable, deterministic ordering based on [toString].
-  int compareTo(WheelEffect other) => toString().compareTo(other.toString());
 }

@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 /// Typically, you don't construct [WheelItem] directly; it's created internally
 /// when building the list. Use [WheelItem.delegate] to provide a custom builder
 /// for how each row is rendered.
-class WheelItem<T> implements Comparable<WheelItem<T>> {
+class WheelItem<T> {
   /// Creates a wheel item with the given data and states.
   WheelItem({
     required this.data,
@@ -89,12 +89,6 @@ class WheelItem<T> implements Comparable<WheelItem<T>> {
 
   @override
   int get hashCode => Object.hash(data, selected, disabled);
-
-  @override
-  int compareTo(WheelItem other) {
-    // You can customize how these should be ranked if needed.
-    return toString().compareTo(other.toString());
-  }
 
   @override
   String toString() =>
