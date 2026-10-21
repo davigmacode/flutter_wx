@@ -118,6 +118,10 @@ class _ExampleHomePageState extends State<ExampleHomePage> {
   String _selectedTech = 'Dart';
   final _formKey = GlobalKey<FormState>();
 
+  // Section 6: Horizontal Orientation & Explicit Null Option
+  static const _ratings = [null, 1, 2, 3, 4, 5];
+  int? _rating;
+
   @override
   void initState() {
     super.initState();
@@ -456,13 +460,50 @@ class _ExampleHomePageState extends State<ExampleHomePage> {
       ],
     );
 
+    // SECTION 6: Horizontal Orientation & Explicit Null Option
+    final section6 = _Section(
+      title: '6. Horizontal Picker & Explicit Null Option',
+      subtitle:
+          'scrollDirection: Axis.horizontal with nullable options [null, 1..5]',
+      children: [
+        Center(
+          child: SizedBox(
+            height: 70,
+            child: WheelChoice<int?>(
+              options: _ratings,
+              value: _rating,
+              scrollDirection: Axis.horizontal,
+              itemExtent: 80,
+              itemVisible: 5,
+              itemLabel: (v) => v == null ? 'None' : '★ $v',
+              onChanged: (v) => setState(() => _rating = v),
+              overlay: WheelOverlay.outlined(axis: Axis.horizontal, inset: 4),
+            ),
+          ),
+        ),
+        Text(
+          'Selected Rating: ${_rating != null ? '★ $_rating' : 'None (null)'}',
+          style: theme.textTheme.bodyMedium?.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ],
+    );
+
     return Scaffold(
       appBar: AppBar(title: const Text('wheel_choice showcases'), elevation: 1),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           spacing: 16,
-          children: [section1, section2, section3, section4, section5],
+          children: [
+            section1,
+            section2,
+            section3,
+            section4,
+            section5,
+            section6,
+          ],
         ),
       ),
     );
