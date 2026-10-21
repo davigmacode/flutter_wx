@@ -32,6 +32,9 @@ jobs:
       - name: Run tests
         run: flutter test --coverage
 
+      - name: Verify pub publish dry-run
+        run: dart pub publish --dry-run
+
       - name: Analyze example
         working-directory: ./example
         run: |

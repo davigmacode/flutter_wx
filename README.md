@@ -29,6 +29,7 @@ Demo: https://davigmacode.github.io/flutter_wheel_choice
 - Item builder and label resolver (`WheelItem.delegate`, `itemLabel`)
 - Disable items and optionally loop the list (`itemDisabled`, `loop`)
 - Programmatic control (`WheelController.next`, `.previous`, `.setValue`, `.animateToIndex`)
+- Form integration: ready-to-use FormField (`WheelChoiceFormField<T>`)
 - Reactive listeners: `valueListenable`, `indexListenable`
 - Dual callbacks: `onChanged` (value) and `onIndexChanged` (index)
 - Custom scroll `physics` and `clipBehavior`
@@ -80,6 +81,23 @@ WheelChoiceTheme(
     ],
   ),
 );
+```
+
+### Form integration with `WheelChoiceFormField`
+
+Integrate seamlessly with Flutter's `Form`, validation, and `InputDecoration`:
+
+```dart
+WheelChoiceFormField<String>(
+  options: const ['Red', 'Green', 'Blue'],
+  initialValue: 'Red',
+  decoration: const InputDecoration(
+    labelText: 'Favorite Color',
+    border: OutlineInputBorder(),
+  ),
+  validator: (val) => val == null ? 'Please select a color' : null,
+  onSaved: (val) => debugPrint('Saved: $val'),
+)
 ```
 
 ### Programmatic control
@@ -243,6 +261,7 @@ See full docs on pub.dev: https://pub.dev/documentation/wheel_choice/latest/
 Key exports:
 
 - `WheelChoice<T>` — the main widget
+- `WheelChoiceFormField<T>` — form field integration with validation and decoration
 - `WheelChoiceTheme` & `WheelChoiceThemeData` — subtree theming
 - `WheelController<T>` — programmatic controller with `.next()` and `.previous()`
 - `WheelHeader` — header above the viewport

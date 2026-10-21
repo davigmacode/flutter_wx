@@ -1,5 +1,6 @@
 ## 1.3.0
 - Subtree Theming: Added `WheelChoiceTheme` and `WheelChoiceThemeData` with `lerp`, `copyWith`, `merge`, and `toString` to cascade consistent styling down the widget tree.
+- Form Integration: Added `WheelChoiceFormField<T>` extending Flutter's `FormField<T>` with validation, `InputDecoration` error rendering, `onSaved`, and `reset` support.
 - DX & Navigation: Added `next()`, `previous()`, `hasNext`, and `hasPrevious` to `WheelController` for programmatic stepped increments.
 - Callbacks: Added `onIndexChanged` callback to `WheelChoice` and `WheelController`.
 - Performance:
