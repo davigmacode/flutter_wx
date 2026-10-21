@@ -81,6 +81,7 @@ class WheelChoice<T> extends StatefulWidget {
   ///   to resolve indices and values.
   /// - [value]: Initial selected value (if present in [options]).
   /// - [onChanged]: Invoked when selection changes (user or programmatic).
+  /// - [onIndexChanged]: Invoked when selected index changes (user or programmatic).
   /// - [itemDisabled]: Predicate to mark specific values as disabled.
   /// - [loop]: Enables wrap-around semantics and nearest-enabled snapping.
   /// - [animationDuration]/[animationCurve]: Defaults for animated moves
@@ -98,6 +99,10 @@ class WheelChoice<T> extends StatefulWidget {
   /// - [effect]: 3D look and magnifier configuration.
   /// - [physics]: Optional scroll physics.
   /// - [clipBehavior]: Optional viewport clipping.
+  ///
+  /// Theming:
+  /// - If view-related properties are omitted, [WheelChoice] resolves them
+  ///   from the nearest [WheelChoiceTheme] ancestor if available.
   /// - [expanded]: If true, the wheel adapts to the parent height and adjusts
   ///   squeeze/itemExtent accordingly.
   /// - [keyboard] (Experimental): When true, enables basic keyboard navigation
@@ -579,45 +584,45 @@ class _WheelView extends StatelessWidget {
     );
 
     if (keyboardEnabled) {
-      wheel = Focus(
-        focusNode: focusNode,
-        canRequestFocus: true,
-        child: Shortcuts(
-          shortcuts: <LogicalKeySet, Intent>{
-            LogicalKeySet(LogicalKeyboardKey.arrowUp): const _WheelScrollIntent(
-              -1,
+      wheel = Shortcuts(
+        shortcuts: <LogicalKeySet, Intent>{
+          LogicalKeySet(LogicalKeyboardKey.arrowUp): const _WheelScrollIntent(
+            -1,
+          ),
+          LogicalKeySet(LogicalKeyboardKey.arrowDown):
+              const _WheelScrollIntent(1),
+          LogicalKeySet(LogicalKeyboardKey.pageUp): const _WheelScrollIntent(
+            -_pageDelta,
+          ),
+          LogicalKeySet(LogicalKeyboardKey.pageDown):
+              const _WheelScrollIntent(_pageDelta),
+          LogicalKeySet(LogicalKeyboardKey.home): const _WheelHomeEndIntent(
+            true,
+          ),
+          LogicalKeySet(LogicalKeyboardKey.end): const _WheelHomeEndIntent(
+            false,
+          ),
+        },
+        child: Actions(
+          actions: <Type, Action<Intent>>{
+            _WheelScrollIntent: CallbackAction<_WheelScrollIntent>(
+              onInvoke: (intent) {
+                final next = controller.selectedIndex + intent.delta;
+                controller.animateToIndex(next);
+                return null;
+              },
             ),
-            LogicalKeySet(LogicalKeyboardKey.arrowDown):
-                const _WheelScrollIntent(1),
-            LogicalKeySet(LogicalKeyboardKey.pageUp): const _WheelScrollIntent(
-              -_pageDelta,
-            ),
-            LogicalKeySet(LogicalKeyboardKey.pageDown):
-                const _WheelScrollIntent(_pageDelta),
-            LogicalKeySet(LogicalKeyboardKey.home): const _WheelHomeEndIntent(
-              true,
-            ),
-            LogicalKeySet(LogicalKeyboardKey.end): const _WheelHomeEndIntent(
-              false,
+            _WheelHomeEndIntent: CallbackAction<_WheelHomeEndIntent>(
+              onInvoke: (intent) {
+                final idx = intent.home ? 0 : controller.options.length - 1;
+                controller.animateToIndex(idx);
+                return null;
+              },
             ),
           },
-          child: Actions(
-            actions: <Type, Action<Intent>>{
-              _WheelScrollIntent: CallbackAction<_WheelScrollIntent>(
-                onInvoke: (intent) {
-                  final next = controller.selectedIndex + intent.delta;
-                  controller.animateToIndex(next);
-                  return null;
-                },
-              ),
-              _WheelHomeEndIntent: CallbackAction<_WheelHomeEndIntent>(
-                onInvoke: (intent) {
-                  final idx = intent.home ? 0 : controller.options.length - 1;
-                  controller.animateToIndex(idx);
-                  return null;
-                },
-              ),
-            },
+          child: Focus(
+            focusNode: focusNode,
+            canRequestFocus: true,
             child: wheel,
           ),
         ),

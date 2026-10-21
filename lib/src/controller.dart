@@ -17,6 +17,7 @@ class WheelController<T> extends FixedExtentScrollController {
   /// - [onChanged]: Callback invoked when the selection changes, either via
   ///   user scroll or programmatic methods like [setValue], [jumpToValue],
   ///   [animateToValue], [jumpToIndex], or [animateToIndex].
+  /// - [onIndexChanged]: Callback invoked when the selected index changes.
   /// - [loop]: Enables wrap-around semantics for programmatic moves and
   ///   nearest-enabled snapping during settle.
   /// - [animationDuration]: Default duration used by [animateToValue] and
