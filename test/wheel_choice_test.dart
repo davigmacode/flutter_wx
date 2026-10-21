@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:wheel_choice/wheel_choice.dart';
@@ -494,5 +495,375 @@ void main() {
 
     expect(find.byKey(const Key('text-Item1-false')), findsOneWidget);
     expect(find.byKey(const Key('text-Item2-true')), findsOneWidget);
+  });
+
+  group('WheelChoiceThemeData and WheelChoiceTheme', () {
+    test('copyWith and merge', () {
+      const data1 = WheelChoiceThemeData(
+        itemExtent: 40,
+        itemVisible: 5,
+        haptics: true,
+      );
+      final copied = data1.copyWith(itemExtent: 50);
+      expect(copied.itemExtent, 50);
+      expect(copied.itemVisible, 5);
+      expect(copied.haptics, isTrue);
+
+      const data2 = WheelChoiceThemeData(itemVisible: 7, keyboard: true);
+      final merged = data1.merge(data2);
+      expect(merged.itemExtent, 40);
+      expect(merged.itemVisible, 7);
+      expect(merged.keyboard, isTrue);
+      expect(data1.merge(null), equals(data1));
+    });
+
+    test('operator == and hashCode', () {
+      const d1 = WheelChoiceThemeData(itemExtent: 40, itemVisible: 5);
+      const d2 = WheelChoiceThemeData(itemExtent: 40, itemVisible: 5);
+      const d3 = WheelChoiceThemeData(itemExtent: 50, itemVisible: 5);
+
+      expect(d1, equals(d2));
+      expect(d1.hashCode, equals(d2.hashCode));
+      expect(d1, isNot(equals(d3)));
+    });
+
+    testWidgets('WheelChoiceTheme wrap and updateShouldNotify', (tester) async {
+      const themeData = WheelChoiceThemeData(itemExtent: 42);
+      final themeWidget = WheelChoiceTheme(
+        data: themeData,
+        child: const SizedBox(),
+      );
+
+      expect(themeWidget.updateShouldNotify(themeWidget), isFalse);
+      const otherTheme = WheelChoiceTheme(
+        data: WheelChoiceThemeData(itemExtent: 50),
+        child: SizedBox(),
+      );
+      expect(themeWidget.updateShouldNotify(otherTheme), isTrue);
+
+      await tester.pumpWidget(themeWidget);
+      final wrapped = themeWidget.wrap(
+          tester.element(find.byType(SizedBox)), const Text('child'));
+      expect(wrapped, isA<WheelChoiceTheme>());
+    });
+  });
+
+  group('WheelEffect unit tests', () {
+    test('default getters, copyWith, merge, and toString', () {
+      const effect = WheelEffect();
+      expect(effect.useMagnifierX, isFalse);
+      expect(effect.magnificationX, 1.0);
+      expect(effect.diameterRatioX, 2.0);
+      expect(effect.perspectiveX, 0.003);
+      expect(effect.offAxisFractionX, 0.0);
+      expect(effect.overAndUnderCenterOpacityX, 1.0);
+      expect(effect.squeezeX, 1.0);
+
+      const flat = WheelEffect.flat();
+      expect(flat.diameterRatio, 100.0);
+
+      final modified = effect.copyWith(magnification: 1.2, squeeze: 0.8);
+      expect(modified.magnification, 1.2);
+      expect(modified.squeeze, 0.8);
+
+      final merged = effect.merge(const WheelEffect(perspective: 0.005));
+      expect(merged.perspective, 0.005);
+      expect(effect.merge(null), equals(effect));
+
+      expect(effect.toString(), contains('WheelEffect('));
+      expect(effect == const WheelEffect(), isTrue);
+      expect(effect.hashCode == const WheelEffect().hashCode, isTrue);
+      expect(effect == modified, isFalse);
+    });
+  });
+
+  group('WheelHeader unit tests', () {
+    testWidgets('WheelHeader.from and asDefaultFor', (tester) async {
+      const h1 = WheelHeader(
+        extent: 50,
+        align: Alignment.centerLeft,
+        child: Text('H1'),
+      );
+      final h2 = WheelHeader.from(h1, extent: 60);
+      expect(h2.extent, 60);
+      expect(h2.align, Alignment.centerLeft);
+
+      const h3 = WheelHeader(extent: 70, child: Text('H3'));
+      final defaultApplied = h1.asDefaultFor(h3);
+      expect(defaultApplied.extent, 70);
+      expect(defaultApplied.align, Alignment.centerLeft);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: h1,
+          ),
+        ),
+      );
+      expect(find.text('H1'), findsOneWidget);
+    });
+  });
+
+  group('WheelOverlay unit and widget tests', () {
+    testWidgets('WheelOverlay.filled and without builder', (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: WheelOverlay(
+              extent: 40,
+              builder: WheelOverlay.filled(
+                color: Colors.red,
+                cornerRadius: 8,
+                inset: 10,
+              ),
+              child: const Text('WheelContent'),
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('WheelContent'), findsOneWidget);
+
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: WheelOverlay(
+              builder: null,
+              child: Text('NoOverlayContent'),
+            ),
+          ),
+        ),
+      );
+      expect(find.text('NoOverlayContent'), findsOneWidget);
+    });
+
+    testWidgets(
+        'WheelOverlay.delegate, outlined custom color, and offset translation',
+        (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: WheelOverlay(
+              extent: 40,
+              offset: 20,
+              builder: WheelOverlay.outlined(
+                borderColor: Colors.green,
+                inset: 5,
+              ),
+              child: const Text('OutlinedContent'),
+            ),
+          ),
+        ),
+      );
+      expect(find.text('OutlinedContent'), findsOneWidget);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: WheelOverlay(
+              extent: 40,
+              builder: WheelOverlay.delegate(
+                color: Colors.blue,
+                border: Border.all(),
+                borderRadius: BorderRadius.circular(4),
+                margin: const EdgeInsets.all(4),
+              ),
+              child: const Text('DelegateContent'),
+            ),
+          ),
+        ),
+      );
+      expect(find.text('DelegateContent'), findsOneWidget);
+    });
+  });
+
+  group('WheelItem unit tests', () {
+    test('equality, hashCode, toString, and delegate', () {
+      final item1 = WheelItem(
+        data: 'A',
+        label: 'A',
+        selected: true,
+        disabled: false,
+      );
+      final item2 = WheelItem(
+        data: 'A',
+        label: 'A',
+        selected: true,
+        disabled: false,
+      );
+      final item3 = WheelItem(
+        data: 'B',
+        label: 'B',
+        selected: false,
+        disabled: true,
+      );
+
+      expect(item1, equals(item2));
+      expect(item1.hashCode, equals(item2.hashCode));
+      expect(item1, isNot(equals(item3)));
+      expect(item1.toString(), contains('WheelItem(data: A'));
+    });
+
+    testWidgets('WheelItem.delegate renders default and disabled styling',
+        (tester) async {
+      final builder = WheelItem.delegate<String>(
+        alignment: Alignment.centerLeft,
+        padding: const EdgeInsets.all(8),
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Builder(
+              builder: (context) {
+                return Column(
+                  children: [
+                    builder(
+                        context,
+                        WheelItem(
+                            data: '1',
+                            label: 'Item 1',
+                            selected: true,
+                            disabled: false)),
+                    builder(
+                        context,
+                        WheelItem(
+                            data: '2',
+                            label: 'Item 2',
+                            selected: false,
+                            disabled: true)),
+                  ],
+                );
+              },
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('Item 1'), findsOneWidget);
+      expect(find.text('Item 2'), findsOneWidget);
+    });
+  });
+
+  group('WheelController advanced tests', () {
+    test(
+        'syncValueFromIndex, setAnimationDefaults, setOnChanged, setItemDisabled',
+        () {
+      final controller = WheelController<String>(
+        options: ['One', 'Two', 'Three'],
+        value: 'One',
+      );
+
+      controller.syncValueFromIndex(2);
+      expect(controller.value, 'Three');
+
+      controller.setAnimationDefaults(
+        duration: const Duration(seconds: 1),
+        curve: Curves.linear,
+      );
+      expect(controller.animationDuration, const Duration(seconds: 1));
+      expect(controller.animationCurve, Curves.linear);
+
+      String? changed;
+      controller.setOnChanged((v) => changed = v);
+      controller.setValue('Two', animate: false);
+      expect(changed, 'Two');
+
+      controller.setItemDisabled((v) => v == 'Two');
+      expect(controller.isDisabled('Two'), isTrue);
+      expect(controller.isDisabled('One'), isFalse);
+
+      controller.dispose();
+    });
+
+    test('non-existent values and setIndex delegation', () async {
+      final controller = WheelController<String>(
+        options: ['A', 'B'],
+        value: 'A',
+      );
+      expect(controller.jumpToValue('Unknown'), isFalse);
+      expect(await controller.animateToValue('Unknown'), isFalse);
+
+      await controller.setIndex(1, animate: true);
+      expect(controller.selectedIndex, 1);
+      expect(controller.value, 'B');
+    });
+
+    test('Loop mode next and previous wraps correctly', () async {
+      final controller = WheelController<int>(
+        options: [10, 20, 30],
+        value: 10,
+        loop: true,
+      );
+
+      expect(controller.hasPrevious, isTrue);
+      expect(controller.hasNext, isTrue);
+
+      await controller.previous(animate: false);
+      expect(controller.value, 30);
+      expect(controller.selectedIndex, 2);
+
+      await controller.next(animate: false);
+      expect(controller.value, 10);
+      expect(controller.selectedIndex, 0);
+    });
+  });
+
+  group('Keyboard navigation shortcuts', () {
+    testWidgets('ArrowDown, ArrowUp, PageDown, PageUp, End, Home',
+        (tester) async {
+      final focusNode = FocusNode();
+      String selected = 'B';
+      final controller = WheelController<String>(
+        options: ['A', 'B', 'C', 'D', 'E'],
+        value: selected,
+        onChanged: (v) => selected = v,
+      );
+
+      await tester.pumpWidget(
+        _wrap(
+          WheelChoice<String>.raw(
+            controller: controller,
+            keyboard: true,
+            focusNode: focusNode,
+          ),
+        ),
+      );
+
+      focusNode.requestFocus();
+      await tester.pump();
+
+      // Press ArrowDown -> moves to C
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
+      await tester.pumpAndSettle();
+      expect(controller.value, 'C');
+
+      // Press ArrowUp -> moves back to B
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
+      await tester.pumpAndSettle();
+      expect(controller.value, 'B');
+
+      // Press End -> moves to E
+      await tester.sendKeyEvent(LogicalKeyboardKey.end);
+      await tester.pumpAndSettle();
+      expect(controller.value, 'E');
+
+      // Press Home -> moves to A
+      await tester.sendKeyEvent(LogicalKeyboardKey.home);
+      await tester.pumpAndSettle();
+      expect(controller.value, 'A');
+
+      // Press PageDown -> moves delta +3 -> D
+      await tester.sendKeyEvent(LogicalKeyboardKey.pageDown);
+      await tester.pumpAndSettle();
+      expect(controller.value, 'D');
+
+      // Press PageUp -> moves delta -3 -> A
+      await tester.sendKeyEvent(LogicalKeyboardKey.pageUp);
+      await tester.pumpAndSettle();
+      expect(controller.value, 'A');
+
+      focusNode.dispose();
+    });
   });
 }
