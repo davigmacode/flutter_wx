@@ -995,4 +995,139 @@ void main() {
       expect(scrollable.physics, isA<NeverScrollableScrollPhysics>());
     });
   });
+
+  group('Horizontal orientation tests', () {
+    testWidgets(
+        'fixed horizontal picker wraps with RotatedBox and sets dimensions',
+        (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: WheelChoice<String>(
+              options: const ['Item 1', 'Item 2', 'Item 3'],
+              value: 'Item 2',
+              scrollDirection: Axis.horizontal,
+              itemExtent: 60,
+              itemVisible: 3,
+              overlay: WheelOverlay.outlined(axis: Axis.horizontal),
+            ),
+          ),
+        ),
+      );
+
+      // RotatedBox(quarterTurns: 3) for viewport, plus RotatedBox(quarterTurns: 1) for items
+      expect(find.byType(RotatedBox), findsWidgets);
+      expect(find.text('Item 2'), findsWidgets);
+
+      // Width of fixed horizontal wheel = 60 * 3 = 180
+      final sizedBox = tester.widget<SizedBox>(
+        find
+            .ancestor(
+              of: find.byType(WheelOverlay),
+              matching: find.byType(SizedBox),
+            )
+            .first,
+      );
+      expect(sizedBox.width, equals(180.0));
+    });
+
+    testWidgets('expanded horizontal picker adapts to maxWidth',
+        (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Center(
+              child: SizedBox(
+                width: 300,
+                height: 80,
+                child: WheelChoice<int>(
+                  options: const [1, 2, 3, 4, 5],
+                  value: 3,
+                  scrollDirection: Axis.horizontal,
+                  expanded: true,
+                  itemVisible: 3,
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      expect(find.byType(RotatedBox), findsWidgets);
+      expect(find.text('3'), findsWidgets);
+    });
+
+    testWidgets('WheelOverlay with Axis.horizontal uses vertical border',
+        (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: WheelOverlay(
+              axis: Axis.horizontal,
+              extent: 50,
+              builder: WheelOverlay.outlined(axis: Axis.horizontal),
+              child: const SizedBox(width: 200, height: 60),
+            ),
+          ),
+        ),
+      );
+
+      expect(find.byType(WheelOverlay), findsOneWidget);
+    });
+  });
+
+  group('Null value handling & explicit null options', () {
+    testWidgets('WheelChoice supports explicit null option in list',
+        (tester) async {
+      String? selected;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: WheelChoice<String?>(
+              options: const [null, 'Apple', 'Banana'],
+              value: null,
+              itemLabel: (v) => v ?? 'None',
+              onChanged: (v) => selected = v,
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('None'), findsWidgets);
+
+      await tester.tap(find.text('Banana').first);
+      await tester.pumpAndSettle();
+      expect(selected, 'Banana');
+
+      await tester.tap(find.text('None').first);
+      await tester.pumpAndSettle();
+      expect(selected, isNull);
+    });
+
+    test(
+        'Controller selectedIndex and navigation guards when options are empty',
+        () {
+      final controller = WheelController<String>(
+        options: [],
+        value: null,
+      );
+
+      expect(controller.selectedIndex, equals(-1));
+      expect(controller.hasPrevious, isFalse);
+      expect(controller.hasNext, isFalse);
+      expect(controller.value, isNull);
+
+      // setOptions populates new items
+      controller.setOptions(['Alpha', 'Beta']);
+      expect(controller.selectedIndex, equals(0));
+      expect(controller.value, equals('Alpha'));
+      expect(controller.hasNext, isTrue);
+
+      // setOptions to empty resets to -1
+      controller.setOptions([]);
+      expect(controller.selectedIndex, equals(-1));
+      expect(controller.value, isNull);
+    });
+  });
 }
