@@ -1,4 +1,6 @@
 ## 1.3.0
+- Horizontal Orientation: Added `scrollDirection` support (`Axis.vertical` and `Axis.horizontal`) via hardware-accelerated `RotatedBox` transformation with full gesture and 3D snapping support.
+- Null Safety & Explicit Null Option: Supported nullable item options (`WheelChoice<T?>`), explicit unselected slots, and returned `selectedIndex = -1` when options list is empty.
 - Subtree Theming: Added `WheelChoiceTheme` and `WheelChoiceThemeData` with `lerp`, `copyWith`, `merge`, and `toString` to cascade consistent styling down the widget tree.
 - Form Integration: Added `WheelChoiceFormField<T>` extending Flutter's `FormField<T>` with validation, `InputDecoration` error rendering, `onSaved`, and `reset` support.
 - DX & Navigation: Added `next()`, `previous()`, `hasNext`, and `hasPrevious` to `WheelController` for programmatic stepped increments.

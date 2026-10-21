@@ -1,4 +1,4 @@
-[![Pub Version](https://img.shields.io/pub/v/wheel_choice)](https://pub.dev/packages/wheel_choice) ![GitHub](https://img.shields.io/github/license/davigmacode/flutter_wheel_choice) [![GitHub](https://badgen.net/badge/icon/buymeacoffee?icon=buymeacoffee&color=yellow&label)](https://www.buymeacoffee.com/davigmacode) [![GitHub](https://badgen.net/badge/icon/ko-fi?icon=kofi&color=red&label)](https://ko-fi.com/davigmacode)
+[![Pub Version](https://img.shields.io/pub/v/wheel_choice)](https://pub.dev/packages/wheel_choice) [![CI](https://github.com/davigmacode/flutter_wheel_choice/actions/workflows/ci.yml/badge.svg)](https://github.com/davigmacode/flutter_wheel_choice/actions/workflows/ci.yml) [![Coverage](https://img.shields.io/badge/coverage-90%25-brightgreen.svg)](https://github.com/davigmacode/flutter_wheel_choice) [![Tests](https://img.shields.io/badge/tests-40%20passed-success.svg)](https://github.com/davigmacode/flutter_wheel_choice) ![GitHub](https://img.shields.io/github/license/davigmacode/flutter_wheel_choice) [![GitHub](https://badgen.net/badge/icon/buymeacoffee?icon=buymeacoffee&color=yellow&label)](https://www.buymeacoffee.com/davigmacode) [![GitHub](https://badgen.net/badge/icon/ko-fi?icon=kofi&color=red&label)](https://ko-fi.com/davigmacode)
 
 Wheel-shaped picker widget for Flutter. Scroll and select items with customizable header, overlays, magnifier and 3D effects, disabled items, looping, themes, and custom item builders.
 
@@ -81,6 +81,34 @@ WheelChoiceTheme(
     ],
   ),
 );
+```
+
+### Horizontal Orientation
+
+Change scrolling orientation to horizontal using `scrollDirection: Axis.horizontal`:
+
+```dart
+WheelChoice<int>(
+  options: const [1, 2, 3, 4, 5],
+  value: 3,
+  scrollDirection: Axis.horizontal,
+  itemExtent: 70, // represents item width
+  itemVisible: 5,
+  overlay: WheelOverlay.outlined(axis: Axis.horizontal),
+)
+```
+
+### Handling Null Values (Explicit Null Option)
+
+To represent an "unselected" or "none" state in the wheel drum, include `null` in the options list:
+
+```dart
+WheelChoice<String?>(
+  options: const [null, 'Apple', 'Banana', 'Cherry'],
+  value: _selectedFruit, // null or item
+  itemLabel: (v) => v ?? '— None —',
+  onChanged: (v) => setState(() => _selectedFruit = v),
+)
 ```
 
 ### Form integration with `WheelChoiceFormField`
@@ -180,6 +208,7 @@ Note (experimental):
 | `effect` | `WheelEffect?` | `const WheelEffect()` | 3D curvature, magnifier & perspective |
 | `keyboard` | `bool?` | `false` | Enables arrow keys, page up/down, home/end |
 | `haptics` | `bool?` | `false` | Selection click haptic feedback on scroll |
+| `scrollDirection` | `Axis` | `Axis.vertical` | Scrolling orientation (`Axis.vertical` or `Axis.horizontal`) |
 
 ## Best Practices & Performance Guide
 
