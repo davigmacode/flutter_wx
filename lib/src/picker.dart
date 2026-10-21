@@ -362,15 +362,17 @@ class _WheelChoiceState<T> extends State<WheelChoice<T>> {
             // Ensure odd count for a centered selection line
             if (desiredVisible % 2 == 0) desiredVisible += 1;
             itemVisible = desiredVisible;
-            itemExtent = viewportHeight / itemVisible;
+            itemExtent = widget.itemExtent ?? (viewportHeight / itemVisible);
           } else {
             // Start from base extent, infer a suitable odd visible count
             itemExtent = baseExtent;
             itemVisible = (viewportHeight / itemExtent).round();
             if (itemVisible < 1) itemVisible = 1;
             if (itemVisible % 2 == 0) itemVisible += 1;
-            // Recompute extent to perfectly fill the viewport
-            itemExtent = viewportHeight / itemVisible;
+            // Recompute extent to perfectly fill the viewport when itemExtent is omitted
+            if (widget.itemExtent == null) {
+              itemExtent = viewportHeight / itemVisible;
+            }
           }
         } else {
           // Fallback when height is unknown or infinite
@@ -501,7 +503,7 @@ class _WheelView extends StatelessWidget {
     this.hapticsEnabled = false,
   });
 
-  final WheelController controller;
+  final WheelController<dynamic> controller;
   final WheelEffect effect;
   final double itemExtent;
   final ListWheelChildDelegate childDelegate;
