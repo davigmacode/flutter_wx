@@ -1,4 +1,4 @@
-[![Pub Version](https://img.shields.io/pub/v/wheel_choice)](https://pub.dev/packages/wheel_choice) [![CI](https://github.com/davigmacode/flutter_wheel_choice/actions/workflows/ci.yml/badge.svg)](https://github.com/davigmacode/flutter_wheel_choice/actions/workflows/ci.yml) [![Coverage](https://img.shields.io/badge/coverage-90%25-brightgreen.svg)](https://github.com/davigmacode/flutter_wheel_choice) [![Tests](https://img.shields.io/badge/tests-40%20passed-success.svg)](https://github.com/davigmacode/flutter_wheel_choice) ![GitHub](https://img.shields.io/github/license/davigmacode/flutter_wheel_choice) [![GitHub](https://badgen.net/badge/icon/buymeacoffee?icon=buymeacoffee&color=yellow&label)](https://www.buymeacoffee.com/davigmacode) [![GitHub](https://badgen.net/badge/icon/ko-fi?icon=kofi&color=red&label)](https://ko-fi.com/davigmacode)
+[![Pub Version](https://img.shields.io/pub/v/wheel_choice)](https://pub.dev/packages/wheel_choice) [![Pub Points](https://img.shields.io/pub/points/wheel_choice)](https://pub.dev/packages/wheel_choice/score) [![CI](https://github.com/davigmacode/flutter_wheel_choice/actions/workflows/ci.yml/badge.svg)](https://github.com/davigmacode/flutter_wheel_choice/actions/workflows/ci.yml) [![Coverage](https://img.shields.io/badge/coverage-91%25-brightgreen.svg)](https://github.com/davigmacode/flutter_wheel_choice) [![Tests](https://img.shields.io/badge/tests-40%20passed-success.svg)](https://github.com/davigmacode/flutter_wheel_choice) ![GitHub](https://img.shields.io/github/license/davigmacode/flutter_wheel_choice) [![GitHub](https://badgen.net/badge/icon/buymeacoffee?icon=buymeacoffee&color=yellow&label)](https://www.buymeacoffee.com/davigmacode) [![GitHub](https://badgen.net/badge/icon/ko-fi?icon=kofi&color=red&label)](https://ko-fi.com/davigmacode)
 
 Wheel-shaped picker widget for Flutter. Scroll and select items with customizable header, overlays, magnifier and 3D effects, disabled items, looping, themes, and custom item builders.
 
@@ -250,6 +250,12 @@ ValueListenableBuilder<String?>(
 
 ### 5. Group Related Pickers with `WheelChoiceTheme`
 Instead of duplicating `itemExtent`, `overlay`, `effect`, and `haptics` across multiple side-by-side pickers, wrap them in a single `WheelChoiceTheme`. This centralizes configuration and reduces widget tree overhead.
+
+### 6. Handling Null & Unselected States
+Physical cylindrical wheels must always land on a physical slot. To handle optional, none, or unselected states:
+- **Explicit Null Slot (Recommended)**: Use `WheelChoice<T?>` with `[null, ...items]` and format the unselected row with `itemLabel: (v) => v ?? '— None —'`. This provides clear visual feedback to the user.
+- **Mandatory Form Selection**: Use `WheelChoiceFormField<T>` with `initialValue: null`. The form field stays `null` until the user actively interacts with the wheel. A validator `(v) => v == null ? 'Required' : null` will properly reject submissions if the picker is left untouched.
+- **Empty Options**: If options are loaded asynchronously from an API and initially empty, `WheelController.selectedIndex` safely returns `-1`, and `hasPrevious` and `hasNext` return `false`.
 
 
 ## Examples

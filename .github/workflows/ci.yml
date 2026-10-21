@@ -32,6 +32,19 @@ jobs:
       - name: Run tests
         run: flutter test --coverage
 
+      - name: Report Coverage to GitHub Summary
+        run: |
+          LF=$(grep -o 'LF:[0-9]*' coverage/lcov.info | awk -F: '{sum += $2} END {print sum}')
+          LH=$(grep -o 'LH:[0-9]*' coverage/lcov.info | awk -F: '{sum += $2} END {print sum}')
+          PCT=$(awk "BEGIN {printf \"%.2f\", ($LH * 100) / $LF}")
+          echo "### 📊 Code Coverage Summary: **$PCT%**" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "| :--- | :--- |" >> $GITHUB_STEP_SUMMARY
+          echo "| Lines Hit | $LH |" >> $GITHUB_STEP_SUMMARY
+          echo "| Total Lines | $LF |" >> $GITHUB_STEP_SUMMARY
+          echo "| Coverage Percentage | **$PCT%** |" >> $GITHUB_STEP_SUMMARY
+
       - name: Verify pub publish dry-run
         run: dart pub publish --dry-run
 
