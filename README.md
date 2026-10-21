@@ -1,8 +1,22 @@
 [![Pub Version](https://img.shields.io/pub/v/wheel_choice)](https://pub.dev/packages/wheel_choice) ![GitHub](https://img.shields.io/github/license/davigmacode/flutter_wheel_choice) [![GitHub](https://badgen.net/badge/icon/buymeacoffee?icon=buymeacoffee&color=yellow&label)](https://www.buymeacoffee.com/davigmacode) [![GitHub](https://badgen.net/badge/icon/ko-fi?icon=kofi&color=red&label)](https://ko-fi.com/davigmacode)
 
-Wheel-shaped picker widget for Flutter. Scroll and select items with customizable header, overlays, magnifier and 3D effects, disabled items, looping, and custom item builders.
+Wheel-shaped picker widget for Flutter. Scroll and select items with customizable header, overlays, magnifier and 3D effects, disabled items, looping, themes, and custom item builders.
 
 Demo: https://davigmacode.github.io/flutter_wheel_choice
+
+## Layout Overview
+
+```text
+┌─────────────────────────────────────────┐  ▲
+│               WheelHeader               │  │ header.extent
+├─────────────────────────────────────────┤  ▼
+│               Item (Top)                │  ▲
+│   ┌─────────────────────────────────┐   │  │
+│   │      WheelOverlay (Active)      │   │  │ viewportHeight = itemExtent * itemVisible
+│   └─────────────────────────────────┘   │  │
+│              Item (Bottom)              │  │
+└─────────────────────────────────────────┘  ▼
+```
 
 ## Features
 
@@ -10,10 +24,13 @@ Demo: https://davigmacode.github.io/flutter_wheel_choice
 - Optional header (`WheelHeader`) aligned with the wheel viewport
 - Overlays to highlight selection (outlined or filled via `WheelOverlay`)
 - 3D look and magnifier (`WheelEffect`) with tunable perspective and diameter
+- Subtree theming via `WheelChoiceTheme`
+- Isolated reactive item rendering (no parent rebuild needed on selection changes)
 - Item builder and label resolver (`WheelItem.delegate`, `itemLabel`)
 - Disable items and optionally loop the list (`itemDisabled`, `loop`)
-- Programmatic control with `WheelController`
+- Programmatic control (`WheelController.next`, `.previous`, `.setValue`, `.animateToIndex`)
 - Reactive listeners: `valueListenable`, `indexListenable`
+- Dual callbacks: `onChanged` (value) and `onIndexChanged` (index)
 - Custom scroll `physics` and `clipBehavior`
 - Adaptive height with `expanded` and `itemVisible`
 
@@ -36,16 +53,38 @@ final picker = WheelChoice<String>(
   options: const ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
   value: 'Wed',
   onChanged: (v) => debugPrint('Selected: $v'),
-  itemVisible: 5, // should be odd
+  onIndexChanged: (i) => debugPrint('Index: $i'),
+  itemVisible: 5, // should be odd; auto-normalized
   header: const WheelHeader(child: Text('Day')),
   overlay: WheelOverlay.outlined(inset: 12),
   effect: const WheelEffect(useMagnifier: true, magnification: 1.1),
 );
 ```
 
+### Theming with `WheelChoiceTheme`
+
+Configure shared styles across multiple wheel pickers without repeating properties:
+
+```dart
+WheelChoiceTheme(
+  data: WheelChoiceThemeData(
+    itemExtent: 44,
+    itemVisible: 5,
+    overlay: WheelOverlay.outlined(inset: 8),
+    haptics: true,
+  ),
+  child: Row(
+    children: [
+      Expanded(child: WheelChoice<int>(options: hours)),
+      Expanded(child: WheelChoice<int>(options: minutes)),
+    ],
+  ),
+);
+```
+
 ### Programmatic control
 
-Use `WheelController` to change selection by value and keep options in sync.
+Use `WheelController` to change selection by value or index and step with `next()` and `previous()`:
 
 ```dart
 final days = const ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
@@ -57,7 +96,12 @@ final controller = WheelController<String>(
 
 WheelChoice<String>.raw(controller: controller);
 
-// Programmatically select a value later
+// Step programmatically
+if (controller.hasNext) {
+  await controller.next();
+}
+
+// Programmatically select a value
 await controller.setValue('Fri', animate: true);
 
 // If your options list changes, update the controller too
@@ -101,6 +145,29 @@ Note (experimental):
 - Keyboard requires the wheel to be focused (click it or provide a FocusNode and request focus).
 - Haptics are only felt on real devices; desktop/web/emulators typically do not vibrate.
 
+## Cheat Sheet
+
+| Property | Type | Default | Description |
+| :--- | :--- | :--- | :--- |
+| `options` | `List<T>?` | `null` | Selectable values |
+| `value` | `T?` | `null` | Initial selected value (defaults to first item if not in list) |
+| `onChanged` | `ValueChanged<T>?` | `null` | Invoked on value change |
+| `onIndexChanged` | `ValueChanged<int>?` | `null` | Invoked on index change |
+| `itemVisible` | `int?` | `5` | Visible rows in viewport (auto-normalized to odd number) |
+| `itemExtent` | `double?` | `40.0` | Height of each item row |
+| `loop` | `bool?` | `false` | Enables wrap-around list scrolling |
+| `expanded` | `bool?` | `false` | Adapts height to parent constraints |
+| `header` | `WheelHeader?` | `null` | Header row above viewport |
+| `overlay` | `WidgetBuilder?` | `null` | Selection highlight overlay |
+| `effect` | `WheelEffect?` | `const WheelEffect()` | 3D curvature, magnifier & perspective |
+| `keyboard` | `bool?` | `false` | Enables arrow keys, page up/down, home/end |
+| `haptics` | `bool?` | `false` | Selection click haptic feedback on scroll |
+
+## Performance Note
+
+- **Finite mode (`loop: false`)**: Items are built lazily on demand (`ListWheelChildBuilderDelegate`). Ideal for lists of any size.
+- **Loop mode (`loop: true`)**: All children are instantiated upfront via `ListWheelChildLoopingListDelegate`. Recommended for small-to-medium lists ($\le 100$ items) such as dates, hours, and minutes.
+
 ## Examples
 
 This package ships with a runnable example that demonstrates:
@@ -139,6 +206,8 @@ See full docs on pub.dev: https://pub.dev/documentation/wheel_choice/latest/
 Key exports:
 
 - `WheelChoice<T>` — the main widget
+- `WheelChoiceTheme` & `WheelChoiceThemeData` — subtree theming
+- `WheelController<T>` — programmatic controller with `.next()` and `.previous()`
 - `WheelHeader` — header above the viewport
 - `WheelOverlay` — selection overlays (outlined/filled)
 - `WheelEffect` — magnifier, perspective, diameter, opacity, squeeze
@@ -158,4 +227,3 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 <a href="https://ko-fi.com/davigmacode" target="_blank"><img src="https://storage.ko-fi.com/cdn/brandasset/kofi_s_tag_white.png" alt="Ko-Fi" height="45"></a>
 
 If this package or any other package I created is helping you, please consider to sponsor me so that I can take time to read the issues, fix bugs, merge pull requests and add features to these packages.
-
