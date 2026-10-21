@@ -525,6 +525,11 @@ void main() {
       expect(d1, equals(d2));
       expect(d1.hashCode, equals(d2.hashCode));
       expect(d1, isNot(equals(d3)));
+      expect(d1.toString(), contains('WheelChoiceThemeData(itemExtent: 40.0'));
+
+      final lerped = WheelChoiceThemeData.lerp(d1, d3, 0.5);
+      expect(lerped?.itemExtent, equals(45.0));
+      expect(WheelChoiceThemeData.lerp(d1, d1, 0.5), equals(d1));
     });
 
     testWidgets('WheelChoiceTheme wrap and updateShouldNotify', (tester) async {
@@ -697,10 +702,17 @@ void main() {
         selected: false,
         disabled: true,
       );
+      final item4 = WheelItem(
+        data: 'A',
+        label: 'A-different',
+        selected: true,
+        disabled: false,
+      );
 
       expect(item1, equals(item2));
       expect(item1.hashCode, equals(item2.hashCode));
       expect(item1, isNot(equals(item3)));
+      expect(item1, isNot(equals(item4)));
       expect(item1.toString(), contains('WheelItem(data: A'));
     });
 
