@@ -146,4 +146,139 @@ void main() {
     expect(wheel.overAndUnderCenterOpacity, equals(0.6));
     expect(wheel.squeeze, equals(0.9));
   });
+
+  testWidgets(
+    'WheelChoice updates when options change dynamically (didUpdateWidget)',
+    (
+      tester,
+    ) async {
+      List<String> options = ['Alpha', 'Beta'];
+      String selected = 'Alpha';
+
+      await tester.pumpWidget(
+        StatefulBuilder(
+          builder: (context, setState) {
+            return _wrap(
+              Column(
+                children: [
+                  WheelChoice<String>(
+                    options: options,
+                    value: selected,
+                    onChanged: (v) => selected = v,
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      setState(() {
+                        options = ['One', 'Two', 'Three'];
+                        selected = 'Two';
+                      });
+                    },
+                    child: const Text('Update'),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      );
+
+      expect(find.text('Alpha'), findsOneWidget);
+      expect(find.text('Beta'), findsOneWidget);
+      expect(find.text('One'), findsNothing);
+
+      // Tap to trigger state change and didUpdateWidget
+      await tester.tap(find.text('Update'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('One'), findsOneWidget);
+      expect(find.text('Two'), findsOneWidget);
+      expect(find.text('Three'), findsOneWidget);
+      expect(find.text('Alpha'), findsNothing);
+    },
+  );
+
+  test('WheelController handles out-of-bounds indices safely', () {
+    final controller = WheelController<String>(
+      options: ['A', 'B', 'C'],
+      value: 'A',
+      loop: false,
+    );
+
+    // Negative index should not throw
+    expect(() => controller.handleIndexChanged(-5), returnsNormally);
+    expect(controller.value, 'A');
+
+    // Past end index should not throw
+    expect(() => controller.handleIndexChanged(99), returnsNormally);
+    expect(controller.value, 'A');
+
+    // Negative index in loop mode wraps safely
+    final loopController = WheelController<String>(
+      options: ['A', 'B', 'C'],
+      value: 'A',
+      loop: true,
+    );
+    expect(() => loopController.handleIndexChanged(-1), returnsNormally);
+    // -1 % 3 normalized is index 2 ('C')
+    expect(loopController.value, 'C');
+  });
+
+  test('WheelController programmatic setOptions and setValue', () async {
+    final controller = WheelController<int>(
+      options: [10, 20, 30],
+      value: 10,
+    );
+
+    expect(controller.value, 10);
+    expect(controller.selectedIndex, 0);
+
+    // Jump by value
+    final res = controller.jumpToValue(30);
+    expect(res, isTrue);
+    expect(controller.value, 30);
+    expect(controller.selectedIndex, 2);
+
+    // Update options list
+    controller.setOptions([100, 200, 300], alignToValue: false);
+    expect(controller.options, [100, 200, 300]);
+  });
+
+  testWidgets(
+    'WheelChoice with custom header extent centers overlay on wheel',
+    (
+      tester,
+    ) async {
+      await tester.pumpWidget(
+        _wrap(
+          WheelChoice<String>(
+            options: const ['A', 'B', 'C'],
+            value: 'B',
+            header: const WheelHeader(
+              extent: 60,
+              child: Text('Header 60px'),
+            ),
+            overlay: (_) => Container(key: const Key('overlay-box')),
+          ),
+        ),
+      );
+
+      final overlayBox = tester.getRect(find.byKey(const Key('overlay-box')));
+      final wheelBox = tester.getRect(find.byType(ListWheelScrollView));
+
+      // Overlay center must match wheel view vertical center
+      expect(overlayBox.center.dy, equals(wheelBox.center.dy));
+    },
+  );
+
+  testWidgets('WheelChoice handles empty options gracefully', (tester) async {
+    await tester.pumpWidget(
+      _wrap(
+        const WheelChoice<String>(
+          options: [],
+        ),
+      ),
+    );
+
+    expect(find.byType(WheelChoice<String>), findsOneWidget);
+  });
 }
