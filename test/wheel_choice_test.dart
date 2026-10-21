@@ -4,8 +4,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:wheel_choice/wheel_choice.dart';
 
 Widget _wrap(Widget child) => MaterialApp(
-  home: Scaffold(body: Center(child: child)),
-);
+      home: Scaffold(body: Center(child: child)),
+    );
 
 void main() {
   testWidgets('WheelChoice builds and shows header and overlay', (
@@ -355,5 +355,144 @@ void main() {
       find.byType(ListWheelScrollView),
     );
     expect(wheel.itemExtent, equals(40.0));
+  });
+
+  test('WheelController next, previous, hasNext, hasPrevious', () async {
+    final controller = WheelController<int>(
+      options: [1, 2, 3],
+      value: 1,
+    );
+
+    expect(controller.hasPrevious, isFalse);
+    expect(controller.hasNext, isTrue);
+
+    await controller.next(animate: false);
+    expect(controller.value, 2);
+    expect(controller.selectedIndex, 1);
+    expect(controller.hasPrevious, isTrue);
+    expect(controller.hasNext, isTrue);
+
+    await controller.next(animate: false);
+    expect(controller.value, 3);
+    expect(controller.selectedIndex, 2);
+    expect(controller.hasPrevious, isTrue);
+    expect(controller.hasNext, isFalse);
+
+    await controller.previous(animate: false);
+    expect(controller.value, 2);
+    expect(controller.selectedIndex, 1);
+  });
+
+  testWidgets('WheelChoice onIndexChanged callback fires', (tester) async {
+    int? changedIndex;
+    final controller = WheelController<String>(
+      options: ['A', 'B', 'C'],
+      value: 'A',
+      onIndexChanged: (i) => changedIndex = i,
+    );
+
+    await tester.pumpWidget(
+      _wrap(
+        WheelChoice<String>.raw(
+          controller: controller,
+        ),
+      ),
+    );
+
+    await controller.setValue('B', animate: false);
+    expect(changedIndex, 1);
+  });
+
+  testWidgets('WheelChoice inherits configuration from WheelChoiceTheme', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _wrap(
+        WheelChoiceTheme(
+          data: const WheelChoiceThemeData(
+            itemExtent: 52.0,
+            itemVisible: 3,
+          ),
+          child: const WheelChoice<String>(
+            options: ['Alpha', 'Beta', 'Gamma'],
+          ),
+        ),
+      ),
+    );
+
+    final wheel = tester.widget<ListWheelScrollView>(
+      find.byType(ListWheelScrollView),
+    );
+    expect(wheel.itemExtent, equals(52.0));
+
+    final sizedBox = tester.widget<SizedBox>(
+      find
+          .ancestor(
+            of: find.byType(WheelOverlay),
+            matching: find.byType(SizedBox),
+          )
+          .first,
+    );
+    // height = itemExtent * itemVisible = 52.0 * 3 = 156.0
+    expect(sizedBox.height, equals(156.0));
+  });
+
+  testWidgets('WheelChoice fixed mode normalizes even itemVisible to odd', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _wrap(
+        const WheelChoice<String>(
+          options: ['A', 'B', 'C', 'D', 'E'],
+          itemVisible: 4, // Even number should normalize to 5
+          itemExtent: 40.0,
+        ),
+      ),
+    );
+
+    final sizedBox = tester.widget<SizedBox>(
+      find
+          .ancestor(
+            of: find.byType(WheelOverlay),
+            matching: find.byType(SizedBox),
+          )
+          .first,
+    );
+    // height = 40.0 * 5 = 200.0
+    expect(sizedBox.height, equals(200.0));
+  });
+
+  testWidgets(
+      'WheelChoice item reactive rebuilds on value change without setState', (
+    tester,
+  ) async {
+    final controller = WheelController<String>(
+      options: ['Item1', 'Item2', 'Item3'],
+      value: 'Item1',
+    );
+
+    await tester.pumpWidget(
+      _wrap(
+        WheelChoice<String>.raw(
+          controller: controller,
+          itemBuilder: (context, item) {
+            return Text(
+              item.label,
+              key: Key('text-${item.data}-${item.selected}'),
+            );
+          },
+        ),
+      ),
+    );
+
+    expect(find.byKey(const Key('text-Item1-true')), findsOneWidget);
+    expect(find.byKey(const Key('text-Item2-false')), findsOneWidget);
+
+    // Change value via controller without rebuilding parent
+    controller.setValue('Item2', animate: false);
+    await tester.pump();
+
+    expect(find.byKey(const Key('text-Item1-false')), findsOneWidget);
+    expect(find.byKey(const Key('text-Item2-true')), findsOneWidget);
   });
 }
