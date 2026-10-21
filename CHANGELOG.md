@@ -1,3 +1,21 @@
+## 1.3.0
+- Subtree Theming: Added `WheelChoiceTheme` and `WheelChoiceThemeData` with `lerp`, `copyWith`, `merge`, and `toString` to cascade consistent styling down the widget tree.
+- DX & Navigation: Added `next()`, `previous()`, `hasNext`, and `hasPrevious` to `WheelController` for programmatic stepped increments.
+- Callbacks: Added `onIndexChanged` callback to `WheelChoice` and `WheelController`.
+- Performance:
+  - Optimized `WheelController.selectedIndex` to $O(1)$ lookup via `_indexNotifier.value`.
+  - Item builders are isolated with `ValueListenableBuilder<T?>`, avoiding unnecessary parent rebuilds during scroll and selection changes.
+- Bug Fixes & Refinements:
+  - Fixed shortest-path circular loop snapping in `handleScrollEnd` and `_findNearestEnabledIndexLoop`.
+  - Guarded against `positions.isNotEmpty` / `hasClients` assertion when methods are called prior to widget attachment.
+  - Added modulo normalization (`_normalizeMod`) and out-of-bounds safety guards in scroll listeners.
+  - Fixed `didUpdateWidget` synchronization when `options` change dynamically.
+  - Fixed keyboard navigation shortcuts event routing hierarchy.
+  - Included `label` in `WheelItem` equality and hash code.
+- Examples & Docs:
+  - Overhauled `example/lib/main.dart` showcasing Theming, Time Stepper, Custom Builder & Filled Overlay, Pure Reactive, and Dynamic Forms.
+  - Expanded README with visual ASCII architecture, layout reference, and theming guide.
+
 ## 1.2.0
 - Experimental: keyboard navigation (arrow up/down, PgUp/PgDn, Home/End) and
   haptic feedback on selection. Requires focus for keyboard; haptics only on
