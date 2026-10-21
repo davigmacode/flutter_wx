@@ -163,10 +163,47 @@ Note (experimental):
 | `keyboard` | `bool?` | `false` | Enables arrow keys, page up/down, home/end |
 | `haptics` | `bool?` | `false` | Selection click haptic feedback on scroll |
 
-## Performance Note
+## Best Practices & Performance Guide
 
-- **Finite mode (`loop: false`)**: Items are built lazily on demand (`ListWheelChildBuilderDelegate`). Ideal for lists of any size.
-- **Loop mode (`loop: true`)**: All children are instantiated upfront via `ListWheelChildLoopingListDelegate`. Recommended for small-to-medium lists ($\le 100$ items) such as dates, hours, and minutes.
+### 1. Prefer Reactive Listeners over Parent `setState()`
+If your widget tree contains heavy forms, multiple cards, or complex layouts, avoid calling `setState()` inside `onChanged` or `onIndexChanged`. Calling `setState()` in the parent forces the entire page to rebuild on every scroll tick.
+
+Instead, use `WheelController` and listen directly via `ValueListenableBuilder`:
+
+```dart
+// ❌ Avoid: Triggers full parent rebuild on every scroll tick
+WheelChoice<String>(
+  options: items,
+  onChanged: (v) => setState(() => _selected = v),
+)
+
+// ✅ Recommended: Zero parent rebuilds, butter-smooth 60/120 FPS dragging
+WheelChoice<String>.raw(
+  controller: _controller,
+)
+
+// Only the small output widget rebuilds:
+ValueListenableBuilder<String?>(
+  valueListenable: _controller.valueListenable,
+  builder: (context, val, _) => Text('Selected: ${val ?? '-'}'),
+)
+```
+
+### 2. Keep Custom `itemBuilder` Lightweight
+- Render flat, lightweight rows or use `WheelItem.delegate()`.
+- Avoid deep widget hierarchies, complex decorations/box shadows, or expensive operations (e.g. searching collections or parsing dates) directly inside the item builder.
+
+### 3. Use Magnifier Judiciously
+- `WheelEffect(useMagnifier: true)` applies optical magnification with an extra raster layer in Flutter's rendering pipeline.
+- For maximum scroll performance or modern minimalist layouts, consider `const WheelEffect.flat()` or omit `useMagnifier`.
+
+### 4. Finite vs. Loop Mode Sizing
+- **Finite mode (`loop: false`)**: Children are lazily instantiated on demand (`ListWheelChildBuilderDelegate`). Ideal for datasets of any size.
+- **Loop mode (`loop: true`)**: All children are instantiated upfront (`ListWheelChildLoopingListDelegate`). Best suited for circular datasets under $\le 100$ items (e.g. hours, minutes, months).
+
+### 5. Group Related Pickers with `WheelChoiceTheme`
+Instead of duplicating `itemExtent`, `overlay`, `effect`, and `haptics` across multiple side-by-side pickers, wrap them in a single `WheelChoiceTheme`. This centralizes configuration and reduces widget tree overhead.
+
 
 ## Examples
 
