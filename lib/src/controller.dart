@@ -4,6 +4,13 @@ import 'item.dart';
 
 /// Controller for [FixedExtentScrollController] that understands the picker
 /// options and current value, enabling programmatic selection by value.
+///
+/// Null Handling:
+/// - Supports nullable types (e.g. `WheelController<String?>`).
+/// - If `null` is in [options] and [value] is `null`, the controller starts on
+///   the `null` entry.
+/// - If [options] is empty, [selectedIndex] returns `-1`, and [hasPrevious]
+///   and [hasNext] return `false`.
 class WheelController<T> extends FixedExtentScrollController {
   /// Creates a value-aware controller for a wheel.
   ///

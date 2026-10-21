@@ -105,12 +105,21 @@ class WheelChoice<T> extends StatefulWidget {
   ///   from the nearest [WheelChoiceTheme] ancestor if available.
   /// - [expanded]: If true, the wheel adapts to the parent height and adjusts
   ///   squeeze/itemExtent accordingly.
+  /// - [scrollDirection]: Scrolling orientation (`Axis.vertical` or
+  ///   `Axis.horizontal`). Defaults to `Axis.vertical`.
   /// - [keyboard] (Experimental): When true, enables basic keyboard navigation
   ///   (↑/↓, PgUp/PgDn, Home/End). Focus the wheel to use. Defaults to `false`.
   /// - [focusNode] (Experimental): Optional focus node used when [keyboard] is true.
   /// - [haptics] (Experimental): When true, plays a selection click haptic on
   ///   selection change from user scroll. Defaults to `false`. Only effective on
   ///   supported devices; desktop/web/emulators typically do not vibrate.
+  ///
+  /// Null Handling & Unselected States:
+  /// - To support an "unselected" or "none" slot, use a nullable type `T?` and
+  ///   include `null` directly in [options] (e.g. `options: const [null, 'A', 'B']`).
+  /// - Customize the label for `null` via [itemLabel]:
+  ///   `itemLabel: (v) => v ?? '— None —'`
+  /// - If [options] is empty, [selectedIndex] returns `-1`.
   ///
   /// Ownership:
   /// - This constructor creates and owns an internal [WheelController]. The

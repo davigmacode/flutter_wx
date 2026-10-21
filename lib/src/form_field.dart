@@ -29,6 +29,15 @@ import 'picker.dart';
 ///   onSaved: (value) => _savedColor = value,
 /// )
 /// ```
+///
+/// Null Handling in Forms:
+/// - When a selection is mandatory, set `initialValue: null`. The form field
+///   tracks `null` until the user actively interacts with the wheel.
+/// - A [validator] checking `value == null` will block form submission if the
+///   field is left untouched:
+///   ```dart
+///   validator: (v) => v == null ? 'Please make a selection' : null,
+///   ```
 class WheelChoiceFormField<T> extends FormField<T> {
   /// Creates a [FormField] containing a [WheelChoice].
   WheelChoiceFormField({
