@@ -83,12 +83,13 @@ class WheelItem<T> {
         other is WheelItem<T> &&
             runtimeType == other.runtimeType &&
             data == other.data &&
+            label == other.label &&
             selected == other.selected &&
             disabled == other.disabled;
   }
 
   @override
-  int get hashCode => Object.hash(data, selected, disabled);
+  int get hashCode => Object.hash(data, label, selected, disabled);
 
   @override
   String toString() =>

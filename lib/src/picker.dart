@@ -384,8 +384,8 @@ class _WheelChoiceState<T> extends State<WheelChoice<T>> {
         final hasFiniteHeight = viewportHeight.isFinite && viewportHeight > 0;
 
         // Derive item extent and visible count from the available height.
-        final baseExtent =
-            widget.itemExtent ?? theme?.itemExtent ?? WheelItem.defaultExtent;
+        final explicitItemExtent = widget.itemExtent ?? theme?.itemExtent;
+        final baseExtent = explicitItemExtent ?? WheelItem.defaultExtent;
         int? desiredVisible = widget.itemVisible ?? theme?.itemVisible;
         double itemExtent;
         int itemVisible;
@@ -395,7 +395,7 @@ class _WheelChoiceState<T> extends State<WheelChoice<T>> {
             // Ensure odd count for a centered selection line
             if (desiredVisible % 2 == 0) desiredVisible += 1;
             itemVisible = desiredVisible;
-            itemExtent = widget.itemExtent ?? (viewportHeight / itemVisible);
+            itemExtent = explicitItemExtent ?? (viewportHeight / itemVisible);
           } else {
             // Start from base extent, infer a suitable odd visible count
             itemExtent = baseExtent;
@@ -403,7 +403,7 @@ class _WheelChoiceState<T> extends State<WheelChoice<T>> {
             if (itemVisible < 1) itemVisible = 1;
             if (itemVisible % 2 == 0) itemVisible += 1;
             // Recompute extent to perfectly fill the viewport when itemExtent is omitted
-            if (widget.itemExtent == null) {
+            if (explicitItemExtent == null) {
               itemExtent = viewportHeight / itemVisible;
             }
           }

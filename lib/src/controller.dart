@@ -90,12 +90,7 @@ class WheelController<T> extends FixedExtentScrollController {
   ValueListenable<T?> get valueListenable => _valueNotifier;
 
   /// Index of the current [value] in [options], or 0 when unknown.
-  int get selectedIndex {
-    final v = _value;
-    if (v == null) return 0;
-    final i = _options.indexOf(v);
-    return i >= 0 ? i : 0;
-  }
+  int get selectedIndex => _indexNotifier.value;
 
   /// Predicate to check whether an item is disabled.
   bool isDisabled(T item) => _itemDisabled?.call(item) ?? false;
@@ -300,7 +295,7 @@ class WheelController<T> extends FixedExtentScrollController {
           : _findNearestEnabledIndex(actualIndex);
       if (nearestIndex != actualIndex) {
         final target =
-            _loop ? index + (nearestIndex - actualIndex) : nearestIndex;
+            _loop ? _loopTargetForBaseIndex(nearestIndex) : nearestIndex;
         Future.microtask(() {
           final d = duration ?? _animationDuration;
           final c = curve ?? _animationCurve;
@@ -314,30 +309,19 @@ class WheelController<T> extends FixedExtentScrollController {
 
   int _findNearestEnabledIndexLoop(int fromIndex) {
     final len = _options.length;
-    int? bestIndex;
-    int bestDistance = len;
-    for (int offset = 1; offset < len; offset++) {
+    if (len <= 1) return fromIndex;
+    final maxOffset = len ~/ 2;
+    for (int offset = 1; offset <= maxOffset; offset++) {
       final downIndex = (fromIndex + offset) % len;
-      final upIndex = (fromIndex - offset + len) % len;
       if (!isDisabled(_options[downIndex])) {
-        final wraps = fromIndex > downIndex;
-        final effectiveDistance = offset + (wraps ? len : 0);
-        if (effectiveDistance < bestDistance) {
-          bestDistance = effectiveDistance;
-          bestIndex = downIndex;
-        }
+        return downIndex;
       }
+      final upIndex = (fromIndex - offset + len) % len;
       if (!isDisabled(_options[upIndex])) {
-        final wraps = fromIndex < upIndex;
-        final effectiveDistance = offset + (wraps ? len : 0);
-        if (effectiveDistance < bestDistance) {
-          bestDistance = effectiveDistance;
-          bestIndex = upIndex;
-        }
+        return upIndex;
       }
-      if (bestIndex != null && bestDistance == offset) break;
     }
-    return bestIndex ?? fromIndex;
+    return fromIndex;
   }
 
   int _findNearestEnabledIndex(int fromIndex) {

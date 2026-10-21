@@ -1,3 +1,4 @@
+import 'dart:ui' as ui;
 import 'package:flutter/widgets.dart';
 import 'effect.dart';
 
@@ -76,6 +77,38 @@ class WheelChoiceThemeData {
       physics: other.physics,
       clipBehavior: other.clipBehavior,
     );
+  }
+
+  /// Linearly interpolates between two [WheelChoiceThemeData]s.
+  static WheelChoiceThemeData? lerp(
+    WheelChoiceThemeData? a,
+    WheelChoiceThemeData? b,
+    double t,
+  ) {
+    if (identical(a, b)) return a;
+    return WheelChoiceThemeData(
+      itemExtent: ui.lerpDouble(a?.itemExtent, b?.itemExtent, t),
+      itemVisible: t < 0.5 ? a?.itemVisible : b?.itemVisible,
+      effect: b?.effect ?? a?.effect,
+      overlay: t < 0.5 ? a?.overlay : b?.overlay,
+      haptics: t < 0.5 ? a?.haptics : b?.haptics,
+      keyboard: t < 0.5 ? a?.keyboard : b?.keyboard,
+      physics: t < 0.5 ? a?.physics : b?.physics,
+      clipBehavior: t < 0.5 ? a?.clipBehavior : b?.clipBehavior,
+    );
+  }
+
+  @override
+  String toString() {
+    return 'WheelChoiceThemeData('
+        'itemExtent: $itemExtent, '
+        'itemVisible: $itemVisible, '
+        'effect: $effect, '
+        'overlay: $overlay, '
+        'haptics: $haptics, '
+        'keyboard: $keyboard, '
+        'physics: $physics, '
+        'clipBehavior: $clipBehavior)';
   }
 
   @override
