@@ -427,37 +427,24 @@ class _ExampleHomePageState extends State<ExampleHomePage> {
         const SizedBox(height: 8),
         Form(
           key: _formKey,
-          child: FormField<String>(
+          child: WheelChoiceFormField<String>(
+            options: currentTechOptions,
             initialValue: _selectedTech,
+            onChanged: (v) {
+              if (v != null) {
+                setState(() => _selectedTech = v);
+              }
+            },
+            decoration: const InputDecoration(
+              labelText: 'Technology',
+              border: OutlineInputBorder(),
+              contentPadding: EdgeInsets.all(8),
+            ),
             validator: (v) =>
                 (v == null || v.isEmpty) ? 'Please pick an item' : null,
-            builder: (formState) {
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  SizedBox(
-                    height: 160,
-                    child: WheelChoice<String>(
-                      options: currentTechOptions,
-                      value: _selectedTech,
-                      onChanged: (v) {
-                        setState(() => _selectedTech = v);
-                        formState.didChange(v);
-                      },
-                      overlay: WheelOverlay.outlined(inset: 16),
-                    ),
-                  ),
-                  if (formState.hasError)
-                    Text(
-                      formState.errorText!,
-                      style: TextStyle(
-                        color: theme.colorScheme.error,
-                        fontSize: 12,
-                      ),
-                    ),
-                ],
-              );
-            },
+            overlay: WheelOverlay.outlined(inset: 16),
+            itemVisible: 3,
+            itemExtent: 40,
           ),
         ),
         Text(
