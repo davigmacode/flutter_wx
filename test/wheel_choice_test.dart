@@ -281,4 +281,79 @@ void main() {
 
     expect(find.byType(WheelChoice<String>), findsOneWidget);
   });
+
+  test('WheelController setValue respects notify: false', () async {
+    int callCount = 0;
+    final controller = WheelController<String>(
+      options: ['A', 'B', 'C'],
+      value: 'A',
+      onChanged: (_) => callCount++,
+    );
+
+    await controller.setValue('B', notify: false);
+    expect(controller.value, 'B');
+    expect(callCount, 0);
+
+    await controller.setValue('C', notify: true);
+    expect(controller.value, 'C');
+    expect(callCount, 1);
+  });
+
+  test(
+    'WheelController initial value fallback to first item when not in options',
+    () {
+      final controller = WheelController<String>(
+        options: ['First', 'Second'],
+        value: 'Unknown',
+      );
+
+      expect(controller.value, 'First');
+      expect(controller.selectedIndex, 0);
+      expect(controller.valueListenable.value, 'First');
+      expect(controller.indexListenable.value, 0);
+    },
+  );
+
+  test(
+    'WheelController setOptions resets to first item when old value is missing',
+    () {
+      final controller = WheelController<String>(
+        options: ['Apple', 'Banana'],
+        value: 'Banana',
+      );
+
+      expect(controller.value, 'Banana');
+      expect(controller.selectedIndex, 1);
+
+      controller.setOptions(['Cat', 'Dog', 'Bird']);
+
+      expect(controller.value, 'Cat');
+      expect(controller.selectedIndex, 0);
+      expect(controller.valueListenable.value, 'Cat');
+      expect(controller.indexListenable.value, 0);
+    },
+  );
+
+  testWidgets('WheelChoice expanded mode preserves explicit itemExtent', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _wrap(
+        SizedBox(
+          height: 300,
+          child: WheelChoice<String>(
+            options: const ['One', 'Two', 'Three', 'Four', 'Five'],
+            itemVisible: 5,
+            itemExtent: 40.0,
+            expanded: true,
+          ),
+        ),
+      ),
+    );
+
+    final wheel = tester.widget<ListWheelScrollView>(
+      find.byType(ListWheelScrollView),
+    );
+    expect(wheel.itemExtent, equals(40.0));
+  });
 }
