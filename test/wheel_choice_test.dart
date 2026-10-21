@@ -878,4 +878,121 @@ void main() {
       focusNode.dispose();
     });
   });
+
+  group('WheelChoiceFormField widget tests', () {
+    testWidgets('validation, onSaved, reset, and decoration errorText',
+        (tester) async {
+      final formKey = GlobalKey<FormState>();
+      String? savedValue;
+      String? changedValue;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Form(
+              key: formKey,
+              child: WheelChoiceFormField<String>(
+                options: const ['Red', 'Green', 'Blue'],
+                initialValue: 'Red',
+                decoration: const InputDecoration(labelText: 'Color'),
+                validator: (val) => val == 'Red' ? 'Red is not allowed' : null,
+                onChanged: (val) => changedValue = val,
+                onSaved: (val) => savedValue = val,
+              ),
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('Red'), findsWidgets);
+      expect(find.text('Color'), findsOneWidget);
+
+      // Validate -> should fail because value is 'Red'
+      final isValid = formKey.currentState!.validate();
+      await tester.pumpAndSettle();
+      expect(isValid, isFalse);
+      expect(find.text('Red is not allowed'), findsOneWidget);
+
+      // Change selection to 'Green'
+      await tester.tap(find.text('Green').first);
+      await tester.pumpAndSettle();
+      expect(changedValue, 'Green');
+
+      // Validate -> should pass now
+      expect(formKey.currentState!.validate(), isTrue);
+      await tester.pumpAndSettle();
+      expect(find.text('Red is not allowed'), findsNothing);
+
+      // Save form
+      formKey.currentState!.save();
+      expect(savedValue, 'Green');
+
+      // Reset form
+      formKey.currentState!.reset();
+      await tester.pumpAndSettle();
+      expect(formKey.currentState!.validate(), isFalse); // reset to 'Red'
+    });
+
+    testWidgets('works with external controller and synchronizes reset',
+        (tester) async {
+      final formKey = GlobalKey<FormState>();
+      final controller = WheelController<String>(
+        options: ['Small', 'Medium', 'Large'],
+        value: 'Small',
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Form(
+              key: formKey,
+              child: WheelChoiceFormField<String>(
+                controller: controller,
+                validator: (v) => v == 'Large' ? 'Too big' : null,
+              ),
+            ),
+          ),
+        ),
+      );
+
+      expect(controller.value, 'Small');
+      expect(formKey.currentState!.validate(), isTrue);
+
+      // Change via controller
+      controller.setValue('Large', animate: false);
+      await tester.pumpAndSettle();
+
+      expect(formKey.currentState!.validate(), isFalse);
+      await tester.pumpAndSettle();
+      expect(find.text('Too big'), findsOneWidget);
+
+      // Reset
+      formKey.currentState!.reset();
+      await tester.pumpAndSettle();
+      expect(controller.value, 'Small');
+    });
+
+    testWidgets(
+        'disabled field applies NeverScrollableScrollPhysics and disabled state',
+        (tester) async {
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: Form(
+              child: WheelChoiceFormField<String>(
+                options: const ['One', 'Two'],
+                initialValue: 'One',
+                enabled: false,
+              ),
+            ),
+          ),
+        ),
+      );
+
+      final scrollable = tester.widget<ListWheelScrollView>(
+        find.byType(ListWheelScrollView),
+      );
+      expect(scrollable.physics, isA<NeverScrollableScrollPhysics>());
+    });
+  });
 }
