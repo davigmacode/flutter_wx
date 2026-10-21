@@ -6,11 +6,25 @@ import 'header.dart';
 import 'effect.dart';
 import 'overlay.dart';
 import 'controller.dart';
+import 'theme.dart';
 
 /// A customizable picker widget that mimics a wheel or "slot machine"-like scroll selector.
 ///
 /// Useful for building things like time selectors, value choosers, or
 /// any dropdown-like vertical list with better UX.
+///
+/// Layout Structure:
+/// ```text
+/// ┌─────────────────────────────────────────┐  ▲
+/// │               WheelHeader               │  │ header.extent
+/// ├─────────────────────────────────────────┤  ▼
+/// │               Item (Top)                │  ▲
+/// │   ┌─────────────────────────────────┐   │  │
+/// │   │      WheelOverlay (Active)      │   │  │ viewportHeight = itemExtent * itemVisible
+/// │   └─────────────────────────────────┘   │  │
+/// │              Item (Bottom)              │  │
+/// └─────────────────────────────────────────┘  ▼
+/// ```
 ///
 /// Usage:
 /// ```dart
@@ -102,6 +116,7 @@ class WheelChoice<T> extends StatefulWidget {
     this.value,
     this.options,
     this.onChanged,
+    this.onIndexChanged,
     this.loop,
     this.animationDuration,
     this.animationCurve,
@@ -146,13 +161,14 @@ class WheelChoice<T> extends StatefulWidget {
     this.focusNode,
     this.haptics,
     this.expanded,
-  }) : value = null,
-       options = null,
-       onChanged = null,
-       loop = null,
-       animationDuration = null,
-       animationCurve = null,
-       itemDisabled = null;
+  })  : value = null,
+        options = null,
+        onChanged = null,
+        onIndexChanged = null,
+        loop = null,
+        animationDuration = null,
+        animationCurve = null,
+        itemDisabled = null;
 
   /// Scroll controller for programmatic control.
   ///
@@ -174,6 +190,10 @@ class WheelChoice<T> extends StatefulWidget {
   /// Called when the selection changes (user or programmatic).
   /// Ignored by [WheelChoice.raw].
   final ValueChanged<T>? onChanged;
+
+  /// Called when the selected index changes (user or programmatic).
+  /// Ignored by [WheelChoice.raw].
+  final ValueChanged<int>? onIndexChanged;
 
   /// Enables wrap-around semantics for programmatic moves and nearest-enabled
   /// snapping after settle (default ctor). Ignored by [WheelChoice.raw].
@@ -245,6 +265,7 @@ class _WheelChoiceState<T> extends State<WheelChoice<T>> {
       value: widget.value,
       options: widget.options,
       onChanged: widget.onChanged,
+      onIndexChanged: widget.onIndexChanged,
       itemDisabled: widget.itemDisabled,
       loop: widget.loop,
       animationDuration: widget.animationDuration,
@@ -252,49 +273,49 @@ class _WheelChoiceState<T> extends State<WheelChoice<T>> {
     );
   }
 
-  bool? _defaultExpanded;
-  bool _ensureExpanded() => _defaultExpanded ??= false;
-  bool get _expanded => widget.expanded ?? _ensureExpanded();
-
-  WheelEffect? _defaultEffect;
-  WheelEffect _ensureEffect() => _defaultEffect ??= WheelEffect();
-  WheelEffect get _effect => widget.effect ?? _ensureEffect();
-
-  WheelItemBuilder<T>? _defaultItemBuilder;
-  WheelItemBuilder<T> _ensureItemBuilder() =>
-      _defaultItemBuilder ??= WheelItem.delegate();
+  bool get _expanded => widget.expanded ?? false;
   WheelItemBuilder<T> get _itemBuilder =>
-      widget.itemBuilder ?? _ensureItemBuilder();
+      widget.itemBuilder ?? WheelItem.delegate();
+
+  WheelEffect _resolveEffect(WheelChoiceThemeData? theme) {
+    return widget.effect ?? theme?.effect ?? const WheelEffect();
+  }
 
   IndexedWidgetBuilder _childBuilder(double extent) {
     return (context, i) {
       final item = _ctrl.options[i];
       final disabled = _ctrl.isDisabled(item);
-      final selected = item == _ctrl.value;
       final label = widget.itemLabel?.call(item) ?? item.toString();
-      final built = _itemBuilder(
-        context,
-        WheelItem(
-          data: item,
-          label: label,
-          selected: selected && !disabled,
-          disabled: disabled,
-        ),
-      );
 
-      // Wraps an item with semantics and tap-to-select behavior.
       return SizedBox(
         height: extent,
-        child: GestureDetector(
-          onTap: () {
-            if (!disabled) _ctrl.animateToIndex(i);
+        child: ValueListenableBuilder<T?>(
+          valueListenable: _ctrl.valueListenable,
+          builder: (context, currentValue, _) {
+            final selected = item == currentValue;
+            final built = _itemBuilder(
+              context,
+              WheelItem(
+                data: item,
+                label: label,
+                selected: selected && !disabled,
+                disabled: disabled,
+              ),
+            );
+
+            // Wraps an item with semantics and tap-to-select behavior.
+            return GestureDetector(
+              onTap: () {
+                if (!disabled) _ctrl.animateToIndex(i);
+              },
+              child: Semantics(
+                button: true,
+                selected: selected,
+                enabled: !disabled,
+                child: built,
+              ),
+            );
           },
-          child: Semantics(
-            button: true,
-            selected: selected,
-            enabled: !disabled,
-            child: built,
-          ),
         ),
       );
     };
@@ -320,24 +341,28 @@ class _WheelChoiceState<T> extends State<WheelChoice<T>> {
   }
 
   Widget _fixedPicker(BuildContext context) {
-    final itemExtent = widget.itemExtent ?? WheelItem.defaultExtent;
-    final itemVisible = widget.itemVisible ?? 5;
+    final theme = WheelChoiceTheme.of(context);
+    final itemExtent =
+        widget.itemExtent ?? theme?.itemExtent ?? WheelItem.defaultExtent;
+    int itemVisible = widget.itemVisible ?? theme?.itemVisible ?? 5;
+    if (itemVisible < 1) itemVisible = 1;
+    if (itemVisible % 2 == 0) itemVisible += 1;
     final itemBuilder = _childBuilder(itemExtent);
     final itemDelegate = _childDelegate(context, itemBuilder);
     final viewportHeight = itemExtent * itemVisible;
     return SizedBox(
       height: viewportHeight,
       child: WheelOverlay(
-        builder: widget.overlay,
+        builder: widget.overlay ?? theme?.overlay,
         extent: itemExtent,
         child: _WheelView(
           controller: _ctrl,
-          effect: _effect,
-          physics: widget.physics,
-          clipBehavior: widget.clipBehavior,
-          keyboardEnabled: widget.keyboard ?? false,
+          effect: _resolveEffect(theme),
+          physics: widget.physics ?? theme?.physics,
+          clipBehavior: widget.clipBehavior ?? theme?.clipBehavior,
+          keyboardEnabled: widget.keyboard ?? theme?.keyboard ?? false,
           focusNode: widget.focusNode,
-          hapticsEnabled: widget.haptics ?? false,
+          hapticsEnabled: widget.haptics ?? theme?.haptics ?? false,
           itemExtent: itemExtent,
           childDelegate: itemDelegate,
         ),
@@ -346,14 +371,17 @@ class _WheelChoiceState<T> extends State<WheelChoice<T>> {
   }
 
   Widget _expandedPicker(BuildContext context) {
+    final theme = WheelChoiceTheme.of(context);
+    final effect = _resolveEffect(theme);
     return LayoutBuilder(
       builder: (context, constraints) {
         final viewportHeight = constraints.maxHeight;
         final hasFiniteHeight = viewportHeight.isFinite && viewportHeight > 0;
 
         // Derive item extent and visible count from the available height.
-        final baseExtent = widget.itemExtent ?? WheelItem.defaultExtent;
-        int? desiredVisible = widget.itemVisible;
+        final baseExtent =
+            widget.itemExtent ?? theme?.itemExtent ?? WheelItem.defaultExtent;
+        int? desiredVisible = widget.itemVisible ?? theme?.itemVisible;
         double itemExtent;
         int itemVisible;
 
@@ -381,9 +409,8 @@ class _WheelChoiceState<T> extends State<WheelChoice<T>> {
           if (itemVisible % 2 == 0) itemVisible += 1;
         }
 
-        final effectiveHeight = hasFiniteHeight
-            ? viewportHeight
-            : itemExtent * itemVisible;
+        final effectiveHeight =
+            hasFiniteHeight ? viewportHeight : itemExtent * itemVisible;
 
         final itemBuilder = _childBuilder(itemExtent);
         final itemDelegate = _childDelegate(context, itemBuilder);
@@ -391,21 +418,21 @@ class _WheelChoiceState<T> extends State<WheelChoice<T>> {
         // Squeeze to make the wheel fill the viewport exactly when bounded.
         final double squeeze = hasFiniteHeight
             ? (itemVisible * itemExtent) / effectiveHeight
-            : _effect.squeezeX;
+            : effect.squeezeX;
 
         return SizedBox(
           height: effectiveHeight,
           child: WheelOverlay(
-            builder: widget.overlay,
+            builder: widget.overlay ?? theme?.overlay,
             extent: itemExtent,
             child: _WheelView(
               controller: _ctrl,
-              effect: _effect.copyWith(squeeze: squeeze),
-              physics: widget.physics,
-              clipBehavior: widget.clipBehavior,
-              keyboardEnabled: widget.keyboard ?? false,
+              effect: effect.copyWith(squeeze: squeeze),
+              physics: widget.physics ?? theme?.physics,
+              clipBehavior: widget.clipBehavior ?? theme?.clipBehavior,
+              keyboardEnabled: widget.keyboard ?? theme?.keyboard ?? false,
               focusNode: widget.focusNode,
-              hapticsEnabled: widget.haptics ?? false,
+              hapticsEnabled: widget.haptics ?? theme?.haptics ?? false,
               itemExtent: itemExtent,
               childDelegate: itemDelegate,
             ),
@@ -416,12 +443,14 @@ class _WheelChoiceState<T> extends State<WheelChoice<T>> {
   }
 
   @override
+
   /// Initializes the internal state and controller.
   void initState() {
     super.initState();
   }
 
   @override
+
   /// Keeps the controller position and effects in sync with widget updates.
   void didUpdateWidget(covariant WheelChoice<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -446,6 +475,10 @@ class _WheelChoiceState<T> extends State<WheelChoice<T>> {
 
       if (widget.onChanged != oldWidget.onChanged) {
         _defaultCtrl?.setOnChanged(widget.onChanged);
+      }
+
+      if (widget.onIndexChanged != oldWidget.onIndexChanged) {
+        _defaultCtrl?.setOnIndexChanged(widget.onIndexChanged);
       }
 
       if (widget.itemDisabled != oldWidget.itemDisabled) {
@@ -475,6 +508,7 @@ class _WheelChoiceState<T> extends State<WheelChoice<T>> {
   }
 
   @override
+
   /// Lays out the wheel (and header when provided) with an optional overlay.
   Widget build(BuildContext context) {
     final picker = _expanded ? _expandedPicker(context) : _fixedPicker(context);
