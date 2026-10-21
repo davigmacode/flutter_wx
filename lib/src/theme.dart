@@ -15,9 +15,10 @@ class WheelChoiceThemeData {
     this.keyboard,
     this.physics,
     this.clipBehavior,
+    this.scrollDirection,
   });
 
-  /// The height of each item in the picker.
+  /// The height (or width in horizontal mode) of each item in the picker.
   final double? itemExtent;
 
   /// Number of visible items in the viewport.
@@ -41,6 +42,9 @@ class WheelChoiceThemeData {
   /// Optional viewport clipping behavior.
   final Clip? clipBehavior;
 
+  /// The scrolling orientation (`Axis.vertical` or `Axis.horizontal`).
+  final Axis? scrollDirection;
+
   /// Creates a copy of this theme with the given fields replaced.
   WheelChoiceThemeData copyWith({
     double? itemExtent,
@@ -51,6 +55,7 @@ class WheelChoiceThemeData {
     bool? keyboard,
     ScrollPhysics? physics,
     Clip? clipBehavior,
+    Axis? scrollDirection,
   }) {
     return WheelChoiceThemeData(
       itemExtent: itemExtent ?? this.itemExtent,
@@ -61,6 +66,7 @@ class WheelChoiceThemeData {
       keyboard: keyboard ?? this.keyboard,
       physics: physics ?? this.physics,
       clipBehavior: clipBehavior ?? this.clipBehavior,
+      scrollDirection: scrollDirection ?? this.scrollDirection,
     );
   }
 
@@ -76,6 +82,7 @@ class WheelChoiceThemeData {
       keyboard: other.keyboard,
       physics: other.physics,
       clipBehavior: other.clipBehavior,
+      scrollDirection: other.scrollDirection ?? scrollDirection,
     );
   }
 
@@ -95,6 +102,7 @@ class WheelChoiceThemeData {
       keyboard: t < 0.5 ? a?.keyboard : b?.keyboard,
       physics: t < 0.5 ? a?.physics : b?.physics,
       clipBehavior: t < 0.5 ? a?.clipBehavior : b?.clipBehavior,
+      scrollDirection: t < 0.5 ? a?.scrollDirection : b?.scrollDirection,
     );
   }
 
@@ -108,7 +116,8 @@ class WheelChoiceThemeData {
         'haptics: $haptics, '
         'keyboard: $keyboard, '
         'physics: $physics, '
-        'clipBehavior: $clipBehavior)';
+        'clipBehavior: $clipBehavior, '
+        'scrollDirection: $scrollDirection)';
   }
 
   @override
@@ -123,7 +132,8 @@ class WheelChoiceThemeData {
             haptics == other.haptics &&
             keyboard == other.keyboard &&
             physics == other.physics &&
-            clipBehavior == other.clipBehavior;
+            clipBehavior == other.clipBehavior &&
+            scrollDirection == other.scrollDirection;
   }
 
   @override
@@ -136,6 +146,7 @@ class WheelChoiceThemeData {
         keyboard,
         physics,
         clipBehavior,
+        scrollDirection,
       );
 }
 

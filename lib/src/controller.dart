@@ -48,15 +48,16 @@ class WheelController<T> extends FixedExtentScrollController {
         super(initialItem: _initialIndex(options ?? [], value));
 
   static T? _initialValue<T>(List<T> options, T? value) {
-    if (value != null && options.contains(value)) {
+    if (options.contains(value)) {
       return value;
     }
     return options.isNotEmpty ? options.first : null;
   }
 
   static int _initialIndex<T>(List<T> options, T? value) {
-    if (value != null) {
-      final idx = options.indexOf(value);
+    if (options.isEmpty) return -1;
+    if (options.contains(value)) {
+      final idx = options.indexOf(value as T);
       if (idx >= 0) return idx;
     }
     return 0;
@@ -89,8 +90,8 @@ class WheelController<T> extends FixedExtentScrollController {
   /// Read-only listenable for the current [value].
   ValueListenable<T?> get valueListenable => _valueNotifier;
 
-  /// Index of the current [value] in [options], or 0 when unknown.
-  int get selectedIndex => _indexNotifier.value;
+  /// Index of the current [value] in [options], or -1 when options are empty.
+  int get selectedIndex => _options.isEmpty ? -1 : _indexNotifier.value;
 
   /// Predicate to check whether an item is disabled.
   bool isDisabled(T item) => _itemDisabled?.call(item) ?? false;
@@ -99,12 +100,13 @@ class WheelController<T> extends FixedExtentScrollController {
   void setOnIndexChanged(ValueChanged<int>? f) => _onIndexChanged = f;
 
   /// Whether there is a previous item selectable from the current position.
-  bool get hasPrevious => _loop ? _options.isNotEmpty : selectedIndex > 0;
+  bool get hasPrevious =>
+      _options.isEmpty ? false : (_loop ? true : selectedIndex > 0);
 
   /// Whether there is a next item selectable from the current position.
-  bool get hasNext => _loop
-      ? _options.isNotEmpty
-      : (_options.isNotEmpty && selectedIndex < _options.length - 1);
+  bool get hasNext => _options.isEmpty
+      ? false
+      : (_loop ? true : selectedIndex < _options.length - 1);
 
   /// Moves selection to the next item if available.
   Future<bool> next({
@@ -173,22 +175,17 @@ class WheelController<T> extends FixedExtentScrollController {
     if (_options.isEmpty) {
       _value = null;
       _valueNotifier.value = null;
-      _indexNotifier.value = 0;
+      _indexNotifier.value = -1;
       return;
     }
 
     int targetIndex = 0;
-    if (_value != null) {
-      final idx = _options.indexOf(_value as T);
-      if (idx >= 0) {
-        targetIndex = idx;
-      } else {
-        _value = _options.first;
-        _valueNotifier.value = _value;
-      }
+    if (_options.contains(_value)) {
+      targetIndex = _options.indexOf(_value as T);
     } else {
       _value = _options.first;
       _valueNotifier.value = _value;
+      targetIndex = 0;
     }
     _indexNotifier.value = targetIndex;
 

@@ -55,6 +55,7 @@ class WheelChoiceFormField<T> extends FormField<T> {
     FocusNode? focusNode,
     bool? haptics,
     bool? expanded,
+    Axis? scrollDirection,
     InputDecoration? decoration,
     super.onSaved,
     super.validator,
@@ -92,6 +93,7 @@ class WheelChoiceFormField<T> extends FormField<T> {
                 focusNode: focusNode,
                 haptics: enabled ? haptics : false,
                 expanded: expanded,
+                scrollDirection: scrollDirection,
               );
             } else {
               wheel = WheelChoice<T>(
@@ -116,6 +118,7 @@ class WheelChoiceFormField<T> extends FormField<T> {
                 focusNode: focusNode,
                 haptics: enabled ? haptics : false,
                 expanded: expanded,
+                scrollDirection: scrollDirection,
               );
             }
 

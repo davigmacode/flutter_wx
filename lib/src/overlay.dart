@@ -17,6 +17,7 @@ class WheelOverlay extends StatelessWidget {
     this.builder,
     this.extent,
     this.offset,
+    this.axis = Axis.vertical,
     required this.child,
   });
 
@@ -24,11 +25,15 @@ class WheelOverlay extends StatelessWidget {
   /// If `null`, only [child] is displayed.
   final WidgetBuilder? builder;
 
-  /// Height of the overlay box. Usually matches the item extent.
+  /// Height (or width in horizontal mode) of the overlay box. Usually matches
+  /// the item extent.
   final double? extent;
 
-  /// Vertical offset applied to the overlay (e.g. to account for headers).
+  /// Offset applied to the overlay along the scrolling axis.
   final double? offset;
+
+  /// The scrolling orientation of the wheel.
+  final Axis axis;
 
   /// The underlying wheel view.
   final Widget child;
@@ -39,7 +44,7 @@ class WheelOverlay extends StatelessWidget {
   /// - [color]: Background color inside the overlay bounds.
   /// - [border]: Custom border (e.g. `Border.all(...)`).
   /// - [borderRadius]: Rounded corners for the overlay box.
-  /// - [margin]: Horizontal insets around the overlay box.
+  /// - [margin]: Insets around the overlay box.
   static WidgetBuilder delegate({
     Color? color,
     BoxBorder? border,
@@ -58,24 +63,33 @@ class WheelOverlay extends StatelessWidget {
     };
   }
 
-  /// Creates an overlay with horizontal border lines.
+  /// Creates an overlay with border lines (horizontal for vertical wheel,
+  /// vertical for horizontal wheel).
   ///
   /// Props:
-  /// - [borderColor]: Color for the horizontal lines.
-  /// - [inset]: Horizontal space left/right of the lines.
+  /// - [borderColor]: Color for the highlight lines.
+  /// - [inset]: Space around the lines perpendicular to scrolling.
+  /// - [axis]: Scrolling orientation (`Axis.vertical` or `Axis.horizontal`).
   static WidgetBuilder outlined({
     Color? borderColor,
     double? inset,
+    Axis axis = Axis.vertical,
   }) {
     return (context) {
       final theme = Theme.of(context);
+      final borderSide = BorderSide(
+        color: borderColor ?? theme.colorScheme.outlineVariant,
+      );
+      final border = axis == Axis.vertical
+          ? Border.symmetric(horizontal: borderSide)
+          : Border.symmetric(vertical: borderSide);
+      final margin = axis == Axis.vertical
+          ? EdgeInsets.symmetric(horizontal: inset ?? 0)
+          : EdgeInsets.symmetric(vertical: inset ?? 0);
+
       return WheelOverlay.delegate(
-        border: Border.symmetric(
-          horizontal: BorderSide(
-            color: borderColor ?? theme.colorScheme.outlineVariant,
-          ),
-        ),
-        margin: EdgeInsets.symmetric(horizontal: inset ?? 0),
+        border: border,
+        margin: margin,
       )(context);
     };
   }
@@ -85,16 +99,20 @@ class WheelOverlay extends StatelessWidget {
   /// Props:
   /// - [color]: Fill color inside the overlay bounds.
   /// - [cornerRadius]: Corner radius for the rounded rectangle.
-  /// - [inset]: Horizontal space around the overlay.
+  /// - [inset]: Space around the overlay perpendicular to scrolling.
+  /// - [axis]: Scrolling orientation (`Axis.vertical` or `Axis.horizontal`).
   static WidgetBuilder filled({
     Color? color,
     double? cornerRadius,
     double? inset,
+    Axis axis = Axis.vertical,
   }) {
     return WheelOverlay.delegate(
       color: color ?? Colors.black12,
       borderRadius: BorderRadius.circular(cornerRadius ?? 6),
-      margin: EdgeInsets.symmetric(horizontal: inset ?? 16),
+      margin: axis == Axis.vertical
+          ? EdgeInsets.symmetric(horizontal: inset ?? 16)
+          : EdgeInsets.symmetric(vertical: inset ?? 16),
     );
   }
 
@@ -105,13 +123,16 @@ class WheelOverlay extends StatelessWidget {
     if (builder != null) {
       Widget overlay = IgnorePointer(
         child: SizedBox(
-          height: extent,
+          width: axis == Axis.horizontal ? extent : null,
+          height: axis == Axis.vertical ? extent : null,
           child: builder!(context),
         ),
       );
       if (offset != null) {
         overlay = Transform.translate(
-          offset: Offset(0, offset! / 2),
+          offset: axis == Axis.vertical
+              ? Offset(0, offset! / 2)
+              : Offset(offset! / 2, 0),
           child: overlay,
         );
       }

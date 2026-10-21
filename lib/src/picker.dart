@@ -139,6 +139,7 @@ class WheelChoice<T> extends StatefulWidget {
     this.focusNode,
     this.haptics,
     this.expanded,
+    this.scrollDirection,
   }) : controller = null;
 
   /// Creates a wheel chooser using an external [controller].
@@ -166,6 +167,7 @@ class WheelChoice<T> extends StatefulWidget {
     this.focusNode,
     this.haptics,
     this.expanded,
+    this.scrollDirection,
   })  : value = null,
         options = null,
         onChanged = null,
@@ -257,6 +259,10 @@ class WheelChoice<T> extends StatefulWidget {
   /// Whether to automatically expand to parent height.
   final bool? expanded;
 
+  /// The scrolling orientation (`Axis.vertical` or `Axis.horizontal`).
+  /// Defaults to `Axis.vertical` or inherits from [WheelChoiceTheme].
+  final Axis? scrollDirection;
+
   @override
   State<WheelChoice<T>> createState() => _WheelChoiceState<T>();
 }
@@ -286,42 +292,55 @@ class _WheelChoiceState<T> extends State<WheelChoice<T>> {
     return widget.effect ?? theme?.effect ?? const WheelEffect();
   }
 
-  IndexedWidgetBuilder _childBuilder(double extent) {
+  Axis _resolveScrollDirection(WheelChoiceThemeData? theme) {
+    return widget.scrollDirection ?? theme?.scrollDirection ?? Axis.vertical;
+  }
+
+  IndexedWidgetBuilder _childBuilder(double extent, bool isHorizontal) {
     return (context, i) {
       final item = _ctrl.options[i];
       final disabled = _ctrl.isDisabled(item);
       final label = widget.itemLabel?.call(item) ?? item.toString();
 
+      Widget itemContent = ValueListenableBuilder<T?>(
+        valueListenable: _ctrl.valueListenable,
+        builder: (context, currentValue, _) {
+          final selected = item == currentValue;
+          final built = _itemBuilder(
+            context,
+            WheelItem(
+              data: item,
+              label: label,
+              selected: selected && !disabled,
+              disabled: disabled,
+            ),
+          );
+
+          // Wraps an item with semantics and tap-to-select behavior.
+          return GestureDetector(
+            onTap: () {
+              if (!disabled) _ctrl.animateToIndex(i);
+            },
+            child: Semantics(
+              button: true,
+              selected: selected,
+              enabled: !disabled,
+              child: built,
+            ),
+          );
+        },
+      );
+
+      if (isHorizontal) {
+        itemContent = RotatedBox(
+          quarterTurns: 1,
+          child: itemContent,
+        );
+      }
+
       return SizedBox(
         height: extent,
-        child: ValueListenableBuilder<T?>(
-          valueListenable: _ctrl.valueListenable,
-          builder: (context, currentValue, _) {
-            final selected = item == currentValue;
-            final built = _itemBuilder(
-              context,
-              WheelItem(
-                data: item,
-                label: label,
-                selected: selected && !disabled,
-                disabled: disabled,
-              ),
-            );
-
-            // Wraps an item with semantics and tap-to-select behavior.
-            return GestureDetector(
-              onTap: () {
-                if (!disabled) _ctrl.animateToIndex(i);
-              },
-              child: Semantics(
-                button: true,
-                selected: selected,
-                enabled: !disabled,
-                child: built,
-              ),
-            );
-          },
-        ),
+        child: itemContent,
       );
     };
   }
@@ -347,22 +366,116 @@ class _WheelChoiceState<T> extends State<WheelChoice<T>> {
 
   Widget _fixedPicker(BuildContext context) {
     final theme = WheelChoiceTheme.of(context);
+    final direction = _resolveScrollDirection(theme);
+    final isHorizontal = direction == Axis.horizontal;
     final itemExtent =
         widget.itemExtent ?? theme?.itemExtent ?? WheelItem.defaultExtent;
     int itemVisible = widget.itemVisible ?? theme?.itemVisible ?? 5;
     if (itemVisible < 1) itemVisible = 1;
     if (itemVisible % 2 == 0) itemVisible += 1;
-    final itemBuilder = _childBuilder(itemExtent);
+    final itemBuilder = _childBuilder(itemExtent, isHorizontal);
     final itemDelegate = _childDelegate(context, itemBuilder);
-    final viewportHeight = itemExtent * itemVisible;
+    final viewportLength = itemExtent * itemVisible;
+
+    Widget wheelView = _WheelView(
+      controller: _ctrl,
+      effect: _resolveEffect(theme),
+      physics: widget.physics ?? theme?.physics,
+      clipBehavior: widget.clipBehavior ?? theme?.clipBehavior,
+      keyboardEnabled: widget.keyboard ?? theme?.keyboard ?? false,
+      focusNode: widget.focusNode,
+      hapticsEnabled: widget.haptics ?? theme?.haptics ?? false,
+      itemExtent: itemExtent,
+      childDelegate: itemDelegate,
+    );
+
+    if (isHorizontal) {
+      wheelView = RotatedBox(
+        quarterTurns: 3,
+        child: wheelView,
+      );
+    }
+
+    final overlayBuilder = widget.overlay ?? theme?.overlay;
+
+    final wheelOverlay = WheelOverlay(
+      builder: overlayBuilder,
+      extent: itemExtent,
+      axis: direction,
+      child: wheelView,
+    );
+
+    if (isHorizontal) {
+      return SizedBox(
+        width: viewportLength,
+        height: itemExtent * 1.5,
+        child: wheelOverlay,
+      );
+    }
+
     return SizedBox(
-      height: viewportHeight,
-      child: WheelOverlay(
-        builder: widget.overlay ?? theme?.overlay,
-        extent: itemExtent,
-        child: _WheelView(
+      height: viewportLength,
+      child: wheelOverlay,
+    );
+  }
+
+  Widget _expandedPicker(BuildContext context) {
+    final theme = WheelChoiceTheme.of(context);
+    final direction = _resolveScrollDirection(theme);
+    final isHorizontal = direction == Axis.horizontal;
+    final effect = _resolveEffect(theme);
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final viewportLength =
+            isHorizontal ? constraints.maxWidth : constraints.maxHeight;
+        final hasFiniteLength = viewportLength.isFinite && viewportLength > 0;
+
+        // Derive item extent and visible count from the available size.
+        final explicitItemExtent = widget.itemExtent ?? theme?.itemExtent;
+        final baseExtent = explicitItemExtent ?? WheelItem.defaultExtent;
+        int? desiredVisible = widget.itemVisible ?? theme?.itemVisible;
+        double itemExtent;
+        int itemVisible;
+
+        if (hasFiniteLength) {
+          if (desiredVisible != null) {
+            // Ensure odd count for a centered selection line
+            if (desiredVisible % 2 == 0) desiredVisible += 1;
+            itemVisible = desiredVisible;
+            itemExtent = explicitItemExtent ?? (viewportLength / itemVisible);
+          } else {
+            // Start from base extent, infer a suitable odd visible count
+            itemExtent = baseExtent;
+            itemVisible = (viewportLength / itemExtent).round();
+            if (itemVisible < 1) itemVisible = 1;
+            if (itemVisible % 2 == 0) itemVisible += 1;
+            // Recompute extent to perfectly fill the viewport when itemExtent is omitted
+            if (explicitItemExtent == null) {
+              itemExtent = viewportLength / itemVisible;
+            }
+          }
+        } else {
+          // Fallback when size is unknown or infinite
+          itemExtent = baseExtent;
+          itemVisible = desiredVisible ?? 5;
+          if (itemVisible % 2 == 0) itemVisible += 1;
+        }
+
+        final effectiveLength =
+            hasFiniteLength ? viewportLength : itemExtent * itemVisible;
+
+        final itemBuilder = _childBuilder(itemExtent, isHorizontal);
+        final itemDelegate = _childDelegate(context, itemBuilder);
+
+        // Squeeze to make the wheel fill the viewport exactly when bounded.
+        final double squeeze = hasFiniteLength
+            ? (itemVisible * itemExtent) / effectiveLength
+            : effect.squeezeX;
+
+        Widget wheelView = _WheelView(
           controller: _ctrl,
-          effect: _resolveEffect(theme),
+          effect: effect.copyWith(squeeze: squeeze),
           physics: widget.physics ?? theme?.physics,
           clipBehavior: widget.clipBehavior ?? theme?.clipBehavior,
           keyboardEnabled: widget.keyboard ?? theme?.keyboard ?? false,
@@ -370,78 +483,35 @@ class _WheelChoiceState<T> extends State<WheelChoice<T>> {
           hapticsEnabled: widget.haptics ?? theme?.haptics ?? false,
           itemExtent: itemExtent,
           childDelegate: itemDelegate,
-        ),
-      ),
-    );
-  }
+        );
 
-  Widget _expandedPicker(BuildContext context) {
-    final theme = WheelChoiceTheme.of(context);
-    final effect = _resolveEffect(theme);
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final viewportHeight = constraints.maxHeight;
-        final hasFiniteHeight = viewportHeight.isFinite && viewportHeight > 0;
-
-        // Derive item extent and visible count from the available height.
-        final explicitItemExtent = widget.itemExtent ?? theme?.itemExtent;
-        final baseExtent = explicitItemExtent ?? WheelItem.defaultExtent;
-        int? desiredVisible = widget.itemVisible ?? theme?.itemVisible;
-        double itemExtent;
-        int itemVisible;
-
-        if (hasFiniteHeight) {
-          if (desiredVisible != null) {
-            // Ensure odd count for a centered selection line
-            if (desiredVisible % 2 == 0) desiredVisible += 1;
-            itemVisible = desiredVisible;
-            itemExtent = explicitItemExtent ?? (viewportHeight / itemVisible);
-          } else {
-            // Start from base extent, infer a suitable odd visible count
-            itemExtent = baseExtent;
-            itemVisible = (viewportHeight / itemExtent).round();
-            if (itemVisible < 1) itemVisible = 1;
-            if (itemVisible % 2 == 0) itemVisible += 1;
-            // Recompute extent to perfectly fill the viewport when itemExtent is omitted
-            if (explicitItemExtent == null) {
-              itemExtent = viewportHeight / itemVisible;
-            }
-          }
-        } else {
-          // Fallback when height is unknown or infinite
-          itemExtent = baseExtent;
-          itemVisible = desiredVisible ?? 5;
-          if (itemVisible % 2 == 0) itemVisible += 1;
+        if (isHorizontal) {
+          wheelView = RotatedBox(
+            quarterTurns: 3,
+            child: wheelView,
+          );
         }
 
-        final effectiveHeight =
-            hasFiniteHeight ? viewportHeight : itemExtent * itemVisible;
+        final wheelOverlay = WheelOverlay(
+          builder: widget.overlay ?? theme?.overlay,
+          extent: itemExtent,
+          axis: direction,
+          child: wheelView,
+        );
 
-        final itemBuilder = _childBuilder(itemExtent);
-        final itemDelegate = _childDelegate(context, itemBuilder);
-
-        // Squeeze to make the wheel fill the viewport exactly when bounded.
-        final double squeeze = hasFiniteHeight
-            ? (itemVisible * itemExtent) / effectiveHeight
-            : effect.squeezeX;
+        if (isHorizontal) {
+          return SizedBox(
+            width: effectiveLength,
+            height: constraints.maxHeight.isFinite && constraints.maxHeight > 0
+                ? constraints.maxHeight
+                : itemExtent * 1.5,
+            child: wheelOverlay,
+          );
+        }
 
         return SizedBox(
-          height: effectiveHeight,
-          child: WheelOverlay(
-            builder: widget.overlay ?? theme?.overlay,
-            extent: itemExtent,
-            child: _WheelView(
-              controller: _ctrl,
-              effect: effect.copyWith(squeeze: squeeze),
-              physics: widget.physics ?? theme?.physics,
-              clipBehavior: widget.clipBehavior ?? theme?.clipBehavior,
-              keyboardEnabled: widget.keyboard ?? theme?.keyboard ?? false,
-              focusNode: widget.focusNode,
-              hapticsEnabled: widget.haptics ?? theme?.haptics ?? false,
-              itemExtent: itemExtent,
-              childDelegate: itemDelegate,
-            ),
-          ),
+          height: effectiveLength,
+          child: wheelOverlay,
         );
       },
     );
