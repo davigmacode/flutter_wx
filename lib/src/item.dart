@@ -115,5 +115,5 @@ typedef WheelItemDisable<T> = bool Function(T value);
 ///   );
 /// }
 /// ```
-typedef WheelItemBuilder<T> =
-    Widget Function(BuildContext context, WheelItem<T> item);
+typedef WheelItemBuilder<T> = Widget Function(
+    BuildContext context, WheelItem<T> item);

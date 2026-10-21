@@ -142,6 +142,7 @@ class WheelEffect {
   }
 
   @override
+
   /// Equality operator comparing all effect properties.
   bool operator ==(Object other) {
     return identical(this, other) ||
@@ -157,14 +158,15 @@ class WheelEffect {
   }
 
   @override
+
   /// Hash code combining all configurable fields.
   int get hashCode => Object.hash(
-    useMagnifier,
-    magnification,
-    diameterRatio,
-    perspective,
-    offAxisFraction,
-    overAndUnderCenterOpacity,
-    squeeze,
-  );
+        useMagnifier,
+        magnification,
+        diameterRatio,
+        perspective,
+        offAxisFraction,
+        overAndUnderCenterOpacity,
+        squeeze,
+      );
 }

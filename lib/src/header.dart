@@ -35,11 +35,11 @@ class WheelHeader extends StatelessWidget {
     Decoration? decoration,
     TextStyle? textStyle,
     Widget? child,
-  }) : extent = extent ?? other.extent,
-       align = align ?? other.align,
-       decoration = decoration ?? other.decoration,
-       textStyle = textStyle ?? other.textStyle,
-       child = child ?? other.child;
+  })  : extent = extent ?? other.extent,
+        align = align ?? other.align,
+        decoration = decoration ?? other.decoration,
+        textStyle = textStyle ?? other.textStyle,
+        child = child ?? other.child;
 
   /// Explicit height for the header row. Defaults to
   /// [WheelItem.defaultExtent] when not provided.
@@ -78,6 +78,7 @@ class WheelHeader extends StatelessWidget {
   }
 
   @override
+
   /// Builds the header container with merged text style and decoration.
   Widget build(BuildContext context) {
     final theme = Theme.of(context).textTheme;

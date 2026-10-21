@@ -99,6 +99,7 @@ class WheelOverlay extends StatelessWidget {
   }
 
   @override
+
   /// Builds the wheel with the overlay stacked on top when [builder] is set.
   Widget build(BuildContext context) {
     if (builder != null) {
