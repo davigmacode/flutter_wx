@@ -111,7 +111,7 @@ class WheelController<T> extends FixedExtentScrollController {
   }) {
     if (options == null) return;
     _options = List<T>.from(options);
-    if (alignToValue && _value != null) {
+    if (alignToValue && _value != null && hasClients) {
       final idx = _options.indexOf(_value as T);
       if (idx >= 0) {
         if (animate) {
@@ -188,7 +188,8 @@ class WheelController<T> extends FixedExtentScrollController {
   /// Handles selection change from the wheel at [index].
   void handleIndexChanged(int index) {
     if (_options.isEmpty) return;
-    final actualIndex = _loop ? index % _options.length : index;
+    final actualIndex = _loop ? _normalizeMod(index, _options.length) : index;
+    if (actualIndex < 0 || actualIndex >= _options.length) return;
     final newValue = _options[actualIndex];
     if (!isDisabled(newValue) && _value != newValue) {
       _value = newValue;
@@ -204,9 +205,10 @@ class WheelController<T> extends FixedExtentScrollController {
     Duration? duration,
     Curve? curve,
   }) {
-    if (_options.isEmpty) return;
+    if (_options.isEmpty || !hasClients) return;
     final index = selectedItem;
-    final actualIndex = _loop ? index % _options.length : index;
+    final actualIndex = _loop ? _normalizeMod(index, _options.length) : index;
+    if (actualIndex < 0 || actualIndex >= _options.length) return;
     final item = _options[actualIndex];
     if (isDisabled(item)) {
       final nearestIndex = _loop
@@ -219,7 +221,9 @@ class WheelController<T> extends FixedExtentScrollController {
         Future.microtask(() {
           final d = duration ?? _animationDuration;
           final c = curve ?? _animationCurve;
-          animateToItem(target, duration: d, curve: c);
+          if (hasClients) {
+            animateToItem(target, duration: d, curve: c);
+          }
         });
       }
     }
@@ -290,6 +294,7 @@ class WheelController<T> extends FixedExtentScrollController {
   int _loopTargetForBaseIndex(int baseIndex) {
     final len = _options.length;
     if (len == 0) return 0;
+    if (!hasClients) return baseIndex;
     final current = selectedItem;
     final currentBase = _normalizeMod(current, len);
     int delta = baseIndex - currentBase; // could be negative or positive
@@ -311,7 +316,7 @@ class WheelController<T> extends FixedExtentScrollController {
     _value = _options[baseIndex];
     _valueNotifier.value = _value;
     _indexNotifier.value = baseIndex;
-    if (selectedItem != targetIndex) {
+    if (hasClients && selectedItem != targetIndex) {
       jumpToItem(targetIndex);
     }
     if (notify) _onChanged?.call(_value as T);
@@ -339,7 +344,7 @@ class WheelController<T> extends FixedExtentScrollController {
     _value = _options[baseIndex];
     _valueNotifier.value = _value;
     _indexNotifier.value = baseIndex;
-    if (selectedItem != targetIndex) {
+    if (hasClients && selectedItem != targetIndex) {
       final d = duration ?? _animationDuration;
       final c = curve ?? _animationCurve;
       await animateToItem(targetIndex, duration: d, curve: c);

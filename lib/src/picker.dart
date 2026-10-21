@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'item.dart';
@@ -328,7 +329,6 @@ class _WheelChoiceState<T> extends State<WheelChoice<T>> {
       height: viewportHeight,
       child: WheelOverlay(
         builder: widget.overlay,
-        offset: widget.header?.extent,
         extent: itemExtent,
         child: _WheelView(
           controller: _ctrl,
@@ -395,7 +395,6 @@ class _WheelChoiceState<T> extends State<WheelChoice<T>> {
           height: effectiveHeight,
           child: WheelOverlay(
             builder: widget.overlay,
-            offset: widget.header?.extent,
             extent: itemExtent,
             child: _WheelView(
               controller: _ctrl,
@@ -433,6 +432,10 @@ class _WheelChoiceState<T> extends State<WheelChoice<T>> {
 
     // If using internal controller, update it based on param changes.
     if (widget.controller == null) {
+      if (!listEquals(widget.options, oldWidget.options)) {
+        _defaultCtrl?.setOptions(widget.options);
+      }
+
       // Create internal if not yet created and needed later.
       // For value change, keep options stable and jump to the new date.
       if (widget.value != null && widget.value != oldWidget.value) {
