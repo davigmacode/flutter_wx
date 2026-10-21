@@ -34,7 +34,7 @@ class ExampleHomePage extends StatefulWidget {
 }
 
 class _ExampleHomePageState extends State<ExampleHomePage> {
-  static const _days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  // Section 1: Dates & Themes
   static const _months = [
     'Jan',
     'Feb',
@@ -49,9 +49,45 @@ class _ExampleHomePageState extends State<ExampleHomePage> {
     'Nov',
     'Dec',
   ];
-  static final _hours = List<int>.generate(12, (i) => i + 1);
-  static final _minutes = List<int>.generate(60, (i) => i);
+  static final _days = List.generate(31, (i) => '${i + 1}');
+
+  String _month = 'Jan';
+  String _day = '15';
+  int _monthIndex = 0;
+  int _dayIndex = 14;
+
+  final _monthFocus = FocusNode();
+
+  // Section 2: Time Picker & Programmatic Control
+  static final _hours = List.generate(12, (i) => i + 1);
+  static final _minutes = List.generate(60, (i) => i);
   static const _periods = ['AM', 'PM'];
+
+  int _hour = 7;
+  int _minute = 30;
+  String _period = 'AM';
+
+  late final _hourController = WheelController<int>(
+    options: _hours,
+    value: _hour,
+    loop: true,
+    onChanged: (v) => setState(() => _hour = v),
+  );
+
+  late final _minuteController = WheelController<int>(
+    options: _minutes,
+    value: _minute,
+    loop: true,
+    onChanged: (v) => setState(() => _minute = v),
+  );
+
+  late final _periodController = WheelController<String>(
+    options: _periods,
+    value: _period,
+    onChanged: (v) => setState(() => _period = v),
+  );
+
+  // Section 3: Custom Item Builder, Disabled Items & Filled Overlay
   static const _fruits = [
     'Apple',
     'Banana',
@@ -63,42 +99,24 @@ class _ExampleHomePageState extends State<ExampleHomePage> {
     'Jackfruit',
     'Kiwi',
     'Mango',
-    'Papaya',
-    'Rambutan',
   ];
+  String _fruit = 'Apple';
 
-  String _day = 'Wed';
-  String _month = 'Jan';
-  int _hour = 10;
-  int _minute = 30;
-  String _period = 'AM';
-  String _fruit = 'Durian';
-
-  final _monthFocus = FocusNode();
-
-  late final _hourController = WheelController<int>(
-    options: _hours,
-    value: _hour,
-    onChanged: (v) => setState(() => _hour = v),
-    animationDuration: const Duration(milliseconds: 300),
-    animationCurve: Curves.easeOutCubic,
+  // Section 4: Pure Reactive (No setState)
+  late final _reactiveController = WheelController<String>(
+    options: const ['Low', 'Medium', 'High', 'Critical'],
+    value: 'Medium',
   );
 
-  late final _minuteController = WheelController<int>(
-    options: _minutes,
-    value: _minute,
-    onChanged: (v) => setState(() => _minute = v),
-    animationDuration: const Duration(milliseconds: 300),
-    animationCurve: Curves.easeOutCubic,
-  );
-
-  late final _periodController = WheelController<String>(
-    options: _periods,
-    value: _period,
-    onChanged: (v) => setState(() => _period = v),
-    animationDuration: const Duration(milliseconds: 300),
-    animationCurve: Curves.easeOutCubic,
-  );
+  // Section 5: Dynamic Options & Form
+  static const _categories = {
+    'Languages': ['Dart', 'Kotlin', 'Swift', 'TypeScript', 'Rust', 'Go'],
+    'Databases': ['PostgreSQL', 'SQLite', 'Redis', 'MongoDB', 'Supabase'],
+    'Cloud': ['Google Cloud', 'AWS', 'Azure', 'Cloudflare', 'Vercel'],
+  };
+  String _selectedCategory = 'Languages';
+  String _selectedTech = 'Dart';
+  final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -111,6 +129,10 @@ class _ExampleHomePageState extends State<ExampleHomePage> {
   @override
   void dispose() {
     _monthFocus.dispose();
+    _hourController.dispose();
+    _minuteController.dispose();
+    _periodController.dispose();
+    _reactiveController.dispose();
     super.dispose();
   }
 
@@ -118,92 +140,100 @@ class _ExampleHomePageState extends State<ExampleHomePage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
+    // SECTION 1: Subtree Theming with WheelChoiceTheme
     final section1 = _Section(
-      title: 'Basic',
-      subtitle: 'Pick month and day',
+      title: '1. Subtree Theming (WheelChoiceTheme)',
+      subtitle: 'Shared itemExtent, overlays, and haptics across children',
       children: [
-        Row(
-          spacing: 12,
-          children: [
-            Expanded(
-              child: WheelChoice<String>(
-                options: _months,
-                value: _month,
-                onChanged: (v) => setState(() => _month = v),
-                itemVisible: 5,
-                overlay: WheelOverlay.outlined(inset: 12),
-                effect: const WheelEffect(
-                  useMagnifier: true,
-                  magnification: 1.05,
+        WheelChoiceTheme(
+          data: WheelChoiceThemeData(
+            itemExtent: 44,
+            itemVisible: 5,
+            overlay: WheelOverlay.outlined(inset: 8),
+            haptics: true,
+            effect: const WheelEffect(useMagnifier: true, magnification: 1.08),
+          ),
+          child: Row(
+            spacing: 12,
+            children: [
+              Expanded(
+                child: WheelChoice<String>(
+                  options: _months,
+                  value: _month,
+                  onChanged: (v) => setState(() => _month = v),
+                  onIndexChanged: (i) => setState(() => _monthIndex = i),
+                  header: const WheelHeader(child: Text('Month')),
+                  focusNode: _monthFocus,
+                  keyboard: true,
+                  loop: true,
                 ),
-                header: const WheelHeader(child: Text('Month')),
-                focusNode: _monthFocus,
-                keyboard: true,
-                haptics: true,
-                loop: true,
               ),
-            ),
-            Expanded(
-              child: WheelChoice<String>(
-                options: _days,
-                value: _day,
-                onChanged: (v) => setState(() => _day = v),
-                itemBuilder: WheelItem.delegate(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  selectedStyle: const TextStyle(fontSize: 18),
+              Expanded(
+                child: WheelChoice<String>(
+                  options: _days,
+                  value: _day,
+                  onChanged: (v) => setState(() => _day = v),
+                  onIndexChanged: (i) => setState(() => _dayIndex = i),
+                  header: const WheelHeader(child: Text('Day')),
+                  itemBuilder: WheelItem.delegate(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    selectedStyle: TextStyle(
+                      fontSize: 16,
+                      color: theme.colorScheme.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
-                itemVisible: 5,
-                overlay: WheelOverlay.outlined(inset: 12),
-                effect: const WheelEffect(
-                  useMagnifier: true,
-                  magnification: 1.05,
-                ),
-                header: const WheelHeader(child: Text('Day')),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-        Text('Selected: $_month $_day'),
+        const SizedBox(height: 4),
+        Text(
+          'Selected: $_month $_day (Month idx: $_monthIndex, Day idx: $_dayIndex)',
+          style: theme.textTheme.bodyMedium?.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
       ],
     );
 
+    // SECTION 2: Time Picker & Programmatic Navigation
     final section2 = _Section(
-      title: 'Time picker',
-      subtitle: 'Pick hour, minute, and AM/PM',
+      title: '2. Time Picker & Stepper Navigation',
+      subtitle:
+          'Programmatic next(), previous(), animateToValue, and jumpToValue',
       children: [
         SizedBox(
-          height: 300,
+          height: 220,
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Expanded(
                 child: WheelChoice<int>.raw(
                   controller: _hourController,
                   itemLabel: (v) => v.toString().padLeft(2, '0'),
-                  overlay: WheelOverlay.outlined(inset: 0),
-                  effect: WheelEffect.flat(),
                   header: const WheelHeader(child: Text('Hour')),
+                  overlay: WheelOverlay.outlined(inset: 2),
+                  effect: const WheelEffect.flat(),
                   expanded: true,
-                  // loop: true,
                 ),
               ),
               Expanded(
                 child: WheelChoice<int>.raw(
                   controller: _minuteController,
                   itemLabel: (v) => v.toString().padLeft(2, '0'),
-                  overlay: WheelOverlay.outlined(inset: 0),
-                  effect: WheelEffect.flat(),
                   header: const WheelHeader(child: Text('Minute')),
+                  overlay: WheelOverlay.outlined(inset: 2),
+                  effect: const WheelEffect.flat(),
                   expanded: true,
-                  // loop: true,
                 ),
               ),
               Expanded(
                 child: WheelChoice<String>.raw(
                   controller: _periodController,
-                  overlay: WheelOverlay.outlined(inset: 0),
-                  effect: WheelEffect.flat(),
                   header: const WheelHeader(child: Text('AM/PM')),
+                  overlay: WheelOverlay.outlined(inset: 2),
+                  effect: const WheelEffect.flat(),
                   expanded: true,
                 ),
               ),
@@ -212,92 +242,241 @@ class _ExampleHomePageState extends State<ExampleHomePage> {
         ),
         Text(
           'Selected: ${_hour.toString().padLeft(2, '0')}:${_minute.toString().padLeft(2, '0')} $_period',
+          style: theme.textTheme.bodyMedium?.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
         ),
+        const SizedBox(height: 4),
         Wrap(
           spacing: 8,
           runSpacing: 8,
           children: [
-            ElevatedButton(
+            OutlinedButton.icon(
+              onPressed: () => _hourController.previous(),
+              icon: const Icon(Icons.arrow_upward, size: 16),
+              label: const Text('Hour -1'),
+            ),
+            OutlinedButton.icon(
+              onPressed: () => _hourController.next(),
+              icon: const Icon(Icons.arrow_downward, size: 16),
+              label: const Text('Hour +1'),
+            ),
+            OutlinedButton.icon(
+              onPressed: () => _minuteController.previous(),
+              icon: const Icon(Icons.arrow_upward, size: 16),
+              label: const Text('Min -1'),
+            ),
+            OutlinedButton.icon(
+              onPressed: () => _minuteController.next(),
+              icon: const Icon(Icons.arrow_downward, size: 16),
+              label: const Text('Min +1'),
+            ),
+            FilledButton.tonal(
               onPressed: () async {
                 await Future.wait([
-                  _hourController.animateToValue(7),
-                  _minuteController.animateToValue(45),
+                  _hourController.animateToValue(12),
+                  _minuteController.animateToValue(0),
                   _periodController.animateToValue('PM'),
                 ]);
               },
-              child: const Text('Animate to 07:45 PM'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                _hourController.jumpToValue(2);
-                _minuteController.jumpToValue(11);
-                _periodController.jumpToValue('AM');
-              },
-              child: const Text('Jump to 02:11 AM'),
+              child: const Text('Animate 12:00 PM'),
             ),
           ],
         ),
       ],
     );
 
+    // SECTION 3: Custom Builder, Disabled Items & Filled Overlay
     final section3 = _Section(
-      title: 'Custom layout',
-      subtitle: 'Custom item builder wheel',
+      title: '3. Custom Builder, Disabled Items & Filled Overlay',
+      subtitle:
+          'WheelOverlay.filled, icons, badges, and disabled item skipping',
       children: [
         SizedBox(
-          height: 180,
+          height: 200,
           child: WheelChoice<String>(
             options: _fruits,
             value: _fruit,
             onChanged: (v) => setState(() => _fruit = v),
-            itemDisabled: (v) => ['Cat', 'Dog'].contains(v),
+            itemDisabled: (v) => ['Cat', 'Dog', 'Durian'].contains(v),
+            itemExtent: 44,
+            overlay: WheelOverlay.filled(
+              color: theme.colorScheme.primaryContainer.withValues(alpha: 0.4),
+              cornerRadius: 10,
+              inset: 8,
+            ),
             itemBuilder: (context, item) {
               return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Row(
                       children: [
                         Icon(
-                          Icons.circle,
-                          size: 10,
-                          color: item.selected
-                              ? theme.colorScheme.primary
-                              : item.disabled
+                          item.disabled ? Icons.block : Icons.eco,
+                          size: 18,
+                          color: item.disabled
                               ? theme.disabledColor
-                              : theme.unselectedWidgetColor,
+                              : (item.selected
+                                    ? theme.colorScheme.primary
+                                    : theme.unselectedWidgetColor),
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: 10),
                         Text(
                           item.label,
                           style: TextStyle(
                             color: item.disabled ? theme.disabledColor : null,
-                            fontWeight: item.selected ? FontWeight.bold : null,
+                            fontWeight: item.selected
+                                ? FontWeight.bold
+                                : FontWeight.normal,
                           ),
                         ),
                       ],
                     ),
-                    if (item.selected) const Icon(Icons.check_circle, size: 18),
+                    if (item.disabled)
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.errorContainer,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          'Disabled',
+                          style: TextStyle(
+                            fontSize: 10,
+                            color: theme.colorScheme.onErrorContainer,
+                          ),
+                        ),
+                      )
+                    else if (item.selected)
+                      Icon(
+                        Icons.check_circle,
+                        size: 18,
+                        color: theme.colorScheme.primary,
+                      ),
                   ],
                 ),
               );
             },
-            itemVisible: 5,
-            overlay: WheelOverlay.outlined(inset: 8),
-            effect: const WheelEffect(diameterRatio: 2.2, perspective: 0.003),
-            expanded: true,
           ),
         ),
-        Text('Selected: $_fruit'),
+        Text(
+          'Selected: $_fruit (Cat, Dog, Durian are disabled)',
+          style: theme.textTheme.bodyMedium?.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ],
+    );
+
+    // SECTION 4: Pure Reactive Listeners (No Parent setState)
+    final section4 = _Section(
+      title: '4. Pure Reactive Listeners (No Parent Rebuild)',
+      subtitle: 'Listening to valueListenable and indexListenable directly',
+      children: [
+        SizedBox(
+          height: 160,
+          child: WheelChoice<String>.raw(
+            controller: _reactiveController,
+            overlay: WheelOverlay.outlined(inset: 20),
+            itemExtent: 40,
+          ),
+        ),
+        ValueListenableBuilder<String?>(
+          valueListenable: _reactiveController.valueListenable,
+          builder: (context, val, _) {
+            return ValueListenableBuilder<int>(
+              valueListenable: _reactiveController.indexListenable,
+              builder: (context, idx, _) {
+                return Text(
+                  'Reactive Output: ${val ?? '-'} (Index: $idx) - Parent never rebuilt!',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.tertiary,
+                    fontWeight: FontWeight.bold,
+                  ),
+                );
+              },
+            );
+          },
+        ),
+      ],
+    );
+
+    // SECTION 5: Dynamic Options Updating & Form Validation
+    final currentTechOptions = _categories[_selectedCategory] ?? [];
+    final section5 = _Section(
+      title: '5. Dynamic Options & Form Field Integration',
+      subtitle: 'Options update dynamically when category changes',
+      children: [
+        SegmentedButton<String>(
+          segments: _categories.keys
+              .map((c) => ButtonSegment<String>(value: c, label: Text(c)))
+              .toList(),
+          selected: {_selectedCategory},
+          onSelectionChanged: (set) {
+            setState(() {
+              _selectedCategory = set.first;
+              _selectedTech = _categories[_selectedCategory]!.first;
+            });
+          },
+        ),
+        const SizedBox(height: 8),
+        Form(
+          key: _formKey,
+          child: FormField<String>(
+            initialValue: _selectedTech,
+            validator: (v) =>
+                (v == null || v.isEmpty) ? 'Please pick an item' : null,
+            builder: (formState) {
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  SizedBox(
+                    height: 160,
+                    child: WheelChoice<String>(
+                      options: currentTechOptions,
+                      value: _selectedTech,
+                      onChanged: (v) {
+                        setState(() => _selectedTech = v);
+                        formState.didChange(v);
+                      },
+                      overlay: WheelOverlay.outlined(inset: 16),
+                    ),
+                  ),
+                  if (formState.hasError)
+                    Text(
+                      formState.errorText!,
+                      style: TextStyle(
+                        color: theme.colorScheme.error,
+                        fontSize: 12,
+                      ),
+                    ),
+                ],
+              );
+            },
+          ),
+        ),
+        Text(
+          'Selected Tech: $_selectedCategory -> $_selectedTech',
+          style: theme.textTheme.bodyMedium?.copyWith(
+            fontWeight: FontWeight.w600,
+          ),
+        ),
       ],
     );
 
     return Scaffold(
-      appBar: AppBar(title: const Text('wheel_choice example')),
+      appBar: AppBar(title: const Text('wheel_choice showcases'), elevation: 1),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
-        child: Column(spacing: 16, children: [section1, section2, section3]),
+        child: Column(
+          spacing: 16,
+          children: [section1, section2, section3, section4, section5],
+        ),
       ),
     );
   }
@@ -318,6 +497,7 @@ class _Section extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       clipBehavior: Clip.antiAlias,
+      elevation: 0.5,
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -325,12 +505,16 @@ class _Section extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ListTile(
-              title: Text(title),
+              title: Text(
+                title,
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
               subtitle: Text(subtitle),
               contentPadding: EdgeInsets.zero,
               minVerticalPadding: 0,
               minTileHeight: 0,
             ),
+            const Divider(height: 1),
             Column(
               spacing: 8,
               crossAxisAlignment: CrossAxisAlignment.stretch,
