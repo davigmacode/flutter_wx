@@ -122,6 +122,20 @@ class _ExampleHomePageState extends State<ExampleHomePage> {
   static const _ratings = [null, 1, 2, 3, 4, 5];
   int? _rating;
 
+  // Section 7: Styled Header with WheelHeader
+  static const _currencies = [
+    'USD',
+    'EUR',
+    'GBP',
+    'JPY',
+    'IDR',
+    'SGD',
+    'AUD',
+    'CAD',
+    'CHF',
+  ];
+  String _currency = 'USD';
+
   @override
   void initState() {
     super.initState();
@@ -490,6 +504,97 @@ class _ExampleHomePageState extends State<ExampleHomePage> {
       ],
     );
 
+    // SECTION 7: Styled Header with WheelHeader
+    final section7 = _Section(
+      title: '7. Rich Header Styling (WheelHeader)',
+      subtitle:
+          'extent, decoration, align, leading icons, and badge tags in WheelHeader',
+      children: [
+        Center(
+          child: Container(
+            width: 280,
+            decoration: BoxDecoration(
+              border: Border.all(color: theme.colorScheme.outlineVariant),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: WheelChoice<String>(
+              options: _currencies,
+              value: _currency,
+              onChanged: (v) => setState(() => _currency = v),
+              itemExtent: 44,
+              itemVisible: 5,
+              header: WheelHeader(
+                extent: 48,
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primaryContainer.withValues(
+                    alpha: 0.5,
+                  ),
+                  border: Border(
+                    bottom: BorderSide(color: theme.colorScheme.outlineVariant),
+                  ),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.currency_exchange,
+                            size: 18,
+                            color: theme.colorScheme.primary,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Currency',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: theme.colorScheme.onPrimaryContainer,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.primary,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          _currency,
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: theme.colorScheme.onPrimary,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              overlay: WheelOverlay.filled(
+                color: theme.colorScheme.primary.withValues(alpha: 0.08),
+                cornerRadius: 8,
+                inset: 8,
+              ),
+              itemBuilder: WheelItem.delegate(
+                selectedStyle: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: theme.colorScheme.primary,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+
     return Scaffold(
       appBar: AppBar(title: const Text('wheel_choice showcases'), elevation: 1),
       body: SingleChildScrollView(
@@ -503,6 +608,7 @@ class _ExampleHomePageState extends State<ExampleHomePage> {
             section4,
             section5,
             section6,
+            section7,
           ],
         ),
       ),

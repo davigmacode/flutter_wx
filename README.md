@@ -128,6 +128,33 @@ WheelChoiceFormField<String>(
 )
 ```
 
+### Custom Header with `WheelHeader`
+
+Add titles, icons, or status badges directly above the picker viewport:
+
+```dart
+WheelChoice<String>(
+  options: const ['USD', 'EUR', 'GBP', 'JPY', 'IDR'],
+  value: 'USD',
+  header: WheelHeader(
+    extent: 44,
+    decoration: BoxDecoration(
+      color: Colors.blue.withValues(alpha: 0.1),
+      borderRadius: const BorderRadius.vertical(top: Radius.circular(8)),
+    ),
+    child: const Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Icon(Icons.currency_exchange, size: 16),
+        SizedBox(width: 8),
+        Text('Currency', style: TextStyle(fontWeight: FontWeight.bold)),
+      ],
+    ),
+  ),
+  overlay: WheelOverlay.outlined(inset: 16),
+)
+```
+
 ### Programmatic control
 
 Use `WheelController` to change selection by value or index and step with `next()` and `previous()`:
