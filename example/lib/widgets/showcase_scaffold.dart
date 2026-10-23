@@ -212,8 +212,15 @@ class ShowcaseCard extends StatelessWidget {
                 child: Text(
                   codeSnippet!,
                   style: theme.textTheme.bodySmall?.copyWith(
-                    fontFamily: 'monospace',
+                    fontFamily: 'Consolas',
+                    fontFamilyFallback: const [
+                      'Menlo',
+                      'Monaco',
+                      'Courier New',
+                      'monospace',
+                    ],
                     color: colorScheme.onSurfaceVariant,
+                    height: 1.4,
                   ),
                 ),
               ),

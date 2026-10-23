@@ -58,6 +58,7 @@ class WxToggleSheetTheme extends WxSheetTheme<WxToggleSheetThemeData> {
   /// ```
   static WxToggleSheetThemeData? maybeOf(BuildContext context) {
     final parent = WxSheetTheme.maybeOf<WxToggleSheetThemeData>(context);
+    if (parent == null) return null;
     return WxToggleSheetThemeData.from(parent);
   }
 

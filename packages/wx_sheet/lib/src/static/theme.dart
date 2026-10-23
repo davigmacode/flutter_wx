@@ -58,6 +58,7 @@ class WxStaticSheetTheme extends WxSheetTheme<WxStaticSheetThemeData> {
   /// ```
   static WxStaticSheetThemeData? maybeOf(BuildContext context) {
     final parent = WxSheetTheme.maybeOf<WxStaticSheetThemeData>(context);
+    if (parent == null) return null;
     return WxStaticSheetThemeData.from(parent);
   }
 

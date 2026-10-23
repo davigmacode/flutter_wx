@@ -58,6 +58,7 @@ class WxTapSheetTheme extends WxSheetTheme<WxTapSheetThemeData> {
   /// ```
   static WxTapSheetThemeData? maybeOf(BuildContext context) {
     final parent = WxSheetTheme.maybeOf<WxTapSheetThemeData>(context);
+    if (parent == null) return null;
     return WxTapSheetThemeData.from(parent);
   }
 

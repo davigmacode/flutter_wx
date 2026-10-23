@@ -13,12 +13,11 @@ class WxSheetThemeToggleAdaptive extends WxSheetThemeToggle {
 
   @override
   get baseTheme {
-    WxSheetThemeToggle theme = WxSheetThemeToggleM2(context);
-    if (isAndroid && useMaterial3) {
-      theme = WxSheetThemeToggleM3(context);
-    } else if (isIOS) {
-      theme = WxSheetThemeToggleIOS(context);
+    if (isIOS) {
+      return WxSheetThemeToggleIOS(context);
+    } else if (useMaterial3) {
+      return WxSheetThemeToggleM3(context);
     }
-    return theme;
+    return WxSheetThemeToggleM2(context);
   }
 }

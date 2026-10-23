@@ -154,7 +154,13 @@ ChronoView(
                       style: TextStyle(
                         fontSize: 40,
                         fontWeight: FontWeight.w900,
-                        fontFamily: 'monospace',
+                        fontFamily: 'Consolas',
+                        fontFamilyFallback: const [
+                          'Menlo',
+                          'Monaco',
+                          'Courier New',
+                          'monospace',
+                        ],
                         color: Theme.of(context).colorScheme.onPrimaryContainer,
                       ),
                     );

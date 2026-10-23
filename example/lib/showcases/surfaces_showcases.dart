@@ -665,7 +665,13 @@ final isNativePressed = nativeStates.contains(WidgetState.pressed);
                       child: Text(
                         'Mapped Native WidgetStates: ${nativeStates.isEmpty ? "{}" : nativeStates.map((s) => s.name).toSet()}',
                         style: theme.textTheme.bodyMedium?.copyWith(
-                          fontFamily: 'monospace',
+                          fontFamily: 'Consolas',
+                          fontFamilyFallback: const [
+                            'Menlo',
+                            'Monaco',
+                            'Courier New',
+                            'monospace',
+                          ],
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -744,40 +750,45 @@ class _WxSheetShowcaseState extends State<WxSheetShowcase> {
           subtitle: 'Pure visual container with Material 3 variants: tonal, elevated, filled, and outlined.',
           codeSnippet: '''
 WxStaticSheet(
-  width: 100,
-  height: 90,
+  minWidth: 100,
+  height: 80,
   variant: WxSheetVariant.tonal,
+  padding: const EdgeInsets.symmetric(horizontal: 16),
   child: Center(child: Text('Tonal')),
 )''',
           child: Wrap(
-            spacing: 12,
-            runSpacing: 12,
+            spacing: 16,
+            runSpacing: 16,
             alignment: WrapAlignment.center,
             children: [
               WxStaticSheet(
-                width: 100,
+                minWidth: 100,
                 height: 80,
+                padding: EdgeInsets.symmetric(horizontal: 16),
                 variant: WxSheetVariant.tonal,
                 alignment: Alignment.center,
                 child: Text('Tonal', style: TextStyle(fontWeight: FontWeight.bold)),
               ),
               WxStaticSheet(
-                width: 100,
+                minWidth: 100,
                 height: 80,
+                padding: EdgeInsets.symmetric(horizontal: 16),
                 variant: WxSheetVariant.elevated,
                 alignment: Alignment.center,
                 child: Text('Elevated', style: TextStyle(fontWeight: FontWeight.bold)),
               ),
               WxStaticSheet(
-                width: 100,
+                minWidth: 100,
                 height: 80,
+                padding: EdgeInsets.symmetric(horizontal: 16),
                 variant: WxSheetVariant.filled,
                 alignment: Alignment.center,
                 child: Text('Filled', style: TextStyle(fontWeight: FontWeight.bold)),
               ),
               WxStaticSheet(
-                width: 100,
+                minWidth: 100,
                 height: 80,
+                padding: EdgeInsets.symmetric(horizontal: 16),
                 variant: WxSheetVariant.outlined,
                 alignment: Alignment.center,
                 child: Text('Outlined', style: TextStyle(fontWeight: FontWeight.bold)),

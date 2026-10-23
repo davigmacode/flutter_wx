@@ -13,12 +13,11 @@ class WxSheetThemeTapAdaptive extends WxSheetThemeTap {
 
   @override
   get baseTheme {
-    WxSheetThemeTap theme = WxSheetThemeTapM2(context);
-    if (isAndroid && useMaterial3) {
-      theme = WxSheetThemeTapM3(context);
-    } else if (isIOS) {
-      theme = WxSheetThemeTapIOS(context);
+    if (isIOS) {
+      return WxSheetThemeTapIOS(context);
+    } else if (useMaterial3) {
+      return WxSheetThemeTapM3(context);
     }
-    return theme;
+    return WxSheetThemeTapM2(context);
   }
 }

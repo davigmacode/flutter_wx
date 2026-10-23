@@ -127,18 +127,14 @@ mixin WxSheetThemePreset<T extends WxSheetThemeData<T>> on WxSheetThemeData<T> {
       final resolvedBase = baseStyle(data);
       final resolvedVariant = variantStyleResolver(data);
       final resolvedSize = sizeStyleResolver(data.effectiveSize);
+      final currentResolved =
+          resolvedBase.merge(resolvedVariant).merge(resolvedSize);
       if (baseTheme != null) {
-        final themeBaseStyle = baseTheme!.baseStyle(data);
-        final themeVariantStyle = baseTheme!.variantStyleResolver(data);
-        final themeSizeStyle = baseTheme!.sizeStyleResolver(data.effectiveSize);
-        return themeBaseStyle
-            .merge(resolvedBase)
-            .merge(themeVariantStyle)
-            .merge(resolvedVariant)
-            .merge(themeSizeStyle)
-            .merge(resolvedSize);
+        final themeStyle =
+            baseTheme!.styleResolver?.call(data) ?? const WxSheetStyle();
+        return themeStyle.merge(currentResolved);
       }
-      return resolvedBase.merge(resolvedVariant).merge(resolvedSize);
+      return currentResolved;
     };
   }
 

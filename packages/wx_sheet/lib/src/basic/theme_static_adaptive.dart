@@ -13,12 +13,11 @@ class WxSheetThemeStaticAdaptive extends WxSheetThemeStatic {
 
   @override
   get baseTheme {
-    WxSheetThemeStatic theme = WxSheetThemeStaticM2(context);
-    if (isAndroid && useMaterial3) {
-      theme = WxSheetThemeStaticM3(context);
-    } else if (isIOS) {
-      theme = WxSheetThemeStaticIOS(context);
+    if (isIOS) {
+      return WxSheetThemeStaticIOS(context);
+    } else if (useMaterial3) {
+      return WxSheetThemeStaticM3(context);
     }
-    return theme;
+    return WxSheetThemeStaticM2(context);
   }
 }
