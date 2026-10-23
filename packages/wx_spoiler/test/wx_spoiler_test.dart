@@ -1,8 +1,62 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:wx_text_spoiler/wx_text_spoiler.dart';
+import 'package:wx_spoiler/wx_spoiler.dart';
 
 void main() {
+  group('WxSpoiler', () {
+    testWidgets('toggles blur/expansion on tap', (tester) async {
+      bool? isExpandedResult;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: WxSpoiler(
+              expanded: false,
+              onExpanded: (value) => isExpandedResult = value,
+              child: const Text('Hidden Secret Content'),
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('Hidden Secret Content'), findsOneWidget);
+      expect(isExpandedResult, isNull);
+
+      // Tap spoiler to reveal
+      await tester.tap(find.byType(WxSpoiler));
+      await tester.pumpAndSettle();
+
+      expect(isExpandedResult, isTrue);
+
+      // Tap spoiler to conceal again
+      await tester.tap(find.byType(WxSpoiler));
+      await tester.pumpAndSettle();
+
+      expect(isExpandedResult, isFalse);
+    });
+
+    testWidgets('toggles with custom placeholder', (tester) async {
+      await tester.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: WxSpoiler(
+              expanded: false,
+              placeholder: Text('Click to reveal spoiler'),
+              child: Text('Secret revealed!'),
+            ),
+          ),
+        ),
+      );
+
+      expect(find.text('Click to reveal spoiler'), findsOneWidget);
+
+      await tester.tap(find.byType(WxSpoiler));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Secret revealed!'), findsOneWidget);
+    });
+  });
+
   group('WxSpoilerText', () {
     testWidgets('toggles visibility and fires onExpanded callback', (tester) async {
       bool? isExpandedResult;

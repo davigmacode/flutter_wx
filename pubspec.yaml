@@ -21,7 +21,7 @@ workspace:
   - packages/wx_divider
   - packages/wx_text
   - packages/wx_text_animated
-  - packages/wx_text_spoiler
+  - packages/wx_spoiler
   - example
 
 dev_dependencies:
