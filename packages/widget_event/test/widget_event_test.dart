@@ -295,4 +295,68 @@ void main() {
       controller.dispose();
     });
   });
+
+  group('WidgetState Bridge Tests', () {
+    test('Converts individual WidgetEvent <-> WidgetState accurately', () {
+      expect(WidgetEvent.hovered.toWidgetState(), equals(WidgetState.hovered));
+      expect(WidgetEvent.focused.toWidgetState(), equals(WidgetState.focused));
+      expect(WidgetEvent.pressed.toWidgetState(), equals(WidgetState.pressed));
+      expect(WidgetEvent.dragged.toWidgetState(), equals(WidgetState.dragged));
+      expect(WidgetEvent.selected.toWidgetState(), equals(WidgetState.selected));
+      expect(WidgetEvent.disabled.toWidgetState(), equals(WidgetState.disabled));
+      expect(WidgetEvent.error.toWidgetState(), equals(WidgetState.error));
+
+      // Custom or unmapped events return null
+      expect(WidgetEvent.loading.toWidgetState(), isNull);
+      expect(WidgetEvent.indeterminate.toWidgetState(), isNull);
+      expect(const WidgetEvent('custom').toWidgetState(), isNull);
+
+      // From WidgetState
+      expect(WidgetState.hovered.toWidgetEvent(), equals(WidgetEvent.hovered));
+      expect(WidgetState.pressed.toWidgetEvent(), equals(WidgetEvent.pressed));
+      expect(WidgetState.disabled.toWidgetEvent(), equals(WidgetEvent.disabled));
+    });
+
+    test('Set<WidgetEvent> <-> Set<WidgetState> batch conversion works', () {
+      final events = {WidgetEvent.hovered, WidgetEvent.loading, WidgetEvent.pressed};
+      final states = events.toWidgetStates();
+      expect(states, equals({WidgetState.hovered, WidgetState.pressed}));
+
+      final backToEvents = states.toWidgetEvents();
+      expect(backToEvents, equals({WidgetEvent.hovered, WidgetEvent.pressed}));
+    });
+
+    test('Two-way real-time controller bridge synchronizes states', () {
+      final eventController = WidgetEventController({WidgetEvent.disabled, WidgetEvent.loading});
+      final statesController = WidgetEventStatesBridge.toWidgetStatesController(eventController);
+
+      expect(statesController.value, equals({WidgetState.disabled}));
+
+      // Mutate from WidgetEventController
+      eventController.add(WidgetEvent.pressed);
+      expect(statesController.value, equals({WidgetState.disabled, WidgetState.pressed}));
+
+      // Mutate from native WidgetStatesController
+      statesController.update(WidgetState.hovered, true);
+      expect(eventController.value.contains(WidgetEvent.hovered), isTrue);
+      // Ensure loading state was preserved during native sync
+      expect(eventController.value.contains(WidgetEvent.loading), isTrue);
+
+      eventController.dispose();
+      statesController.dispose();
+    });
+
+    test('DrivenProperty adapts to native WidgetStateProperty seamlessly', () {
+      final driven = DrivenProperty.by<Color>((events) {
+        if (WidgetEvent.isPressed(events)) return Colors.red;
+        if (WidgetEvent.isHovered(events)) return Colors.blue;
+        return Colors.green;
+      });
+
+      final nativeProperty = driven.toWidgetStateProperty();
+      expect(nativeProperty.resolve({WidgetState.pressed}), equals(Colors.red));
+      expect(nativeProperty.resolve({WidgetState.hovered}), equals(Colors.blue));
+      expect(nativeProperty.resolve({}), equals(Colors.green));
+    });
+  });
 }
