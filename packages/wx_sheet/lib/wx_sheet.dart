@@ -1,4 +1,4 @@
-library wx_sheet;
+library;
 
 export 'src/basic/main.dart';
 export 'src/static/main.dart';

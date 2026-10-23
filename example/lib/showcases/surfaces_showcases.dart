@@ -716,3 +716,133 @@ class _EventBadge extends StatelessWidget {
     );
   }
 }
+
+class WxSheetShowcase extends StatefulWidget {
+  const WxSheetShowcase({super.key});
+
+  @override
+  State<WxSheetShowcase> createState() => _WxSheetShowcaseState();
+}
+
+class _WxSheetShowcaseState extends State<WxSheetShowcase> {
+  bool _selected = false;
+  int _counter = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return ShowcaseScaffold(
+      packageName: 'wx_sheet',
+      version: '4.8.0',
+      description:
+          'Universal foundational container primitive combining box styling, touch anchors, tiles, and checkmarks into static, tap, and toggle surfaces.',
+      children: [
+        const ShowcaseCard(
+          title: 'Static Sheet Variants',
+          subtitle: 'Pure visual container with Material 3 variants: tonal, elevated, filled, and outlined.',
+          codeSnippet: '''
+WxStaticSheet(
+  width: 100,
+  height: 90,
+  variant: WxSheetVariant.tonal,
+  child: Center(child: Text('Tonal')),
+)''',
+          child: Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            alignment: WrapAlignment.center,
+            children: [
+              WxStaticSheet(
+                width: 100,
+                height: 80,
+                variant: WxSheetVariant.tonal,
+                alignment: Alignment.center,
+                child: Text('Tonal', style: TextStyle(fontWeight: FontWeight.bold)),
+              ),
+              WxStaticSheet(
+                width: 100,
+                height: 80,
+                variant: WxSheetVariant.elevated,
+                alignment: Alignment.center,
+                child: Text('Elevated', style: TextStyle(fontWeight: FontWeight.bold)),
+              ),
+              WxStaticSheet(
+                width: 100,
+                height: 80,
+                variant: WxSheetVariant.filled,
+                alignment: Alignment.center,
+                child: Text('Filled', style: TextStyle(fontWeight: FontWeight.bold)),
+              ),
+              WxStaticSheet(
+                width: 100,
+                height: 80,
+                variant: WxSheetVariant.outlined,
+                alignment: Alignment.center,
+                child: Text('Outlined', style: TextStyle(fontWeight: FontWeight.bold)),
+              ),
+            ],
+          ),
+        ),
+        ShowcaseCard(
+          title: 'WxTapSheet (Clickable Surface)',
+          subtitle: 'Interactive surface combining container styling and touch event feedback.',
+          codeSnippet: '''
+WxTapSheet(
+  onPressed: () => setState(() => _counter++),
+  variant: WxSheetVariant.tonal,
+  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+  child: Row(...),
+)''',
+          child: Center(
+            child: WxTapSheet(
+              onPressed: () => setState(() => _counter++),
+              variant: WxSheetVariant.tonal,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.touch_app_rounded, color: colorScheme.primary),
+                  const SizedBox(width: 12),
+                  Text(
+                    'Tapped $_counter times (Click to Increment)',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        ShowcaseCard(
+          title: 'WxToggleSheet (Selectable Surface)',
+          subtitle: 'Toggleable sheet integrating animated checkmark and selection state.',
+          codeSnippet: '''
+WxToggleSheet(
+  selected: _selected,
+  onSelected: (val) => setState(() => _selected = val),
+  variant: WxSheetVariant.outlined,
+  child: const Text('Toggle Selection'),
+)''',
+          child: Center(
+            child: WxToggleSheet(
+              selected: _selected,
+              onSelected: (val) => setState(() => _selected = val),
+              variant: WxSheetVariant.outlined,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              child: Text(
+                _selected ? 'Selected State (Active)' : 'Unselected State (Tap to Toggle)',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: _selected ? colorScheme.primary : colorScheme.onSurface,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}

@@ -1,4 +1,4 @@
-library animated_checkmark;
+library;
 
 export 'package:animated_checkmark/animated_checkmark.dart';
 export 'src/driven/checkmark.dart';

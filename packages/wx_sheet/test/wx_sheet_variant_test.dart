@@ -39,7 +39,7 @@ void testSheet<T extends WxSheetThemeData<T>>({
   Color? severity,
   required ThemePresetBuilder<T> themeBuilder,
 }) {
-  final title = [variant?.value, severity?.value]
+  final title = [variant?.value, severity?.toARGB32()]
       .where((test) => test != null)
       .join(' and ');
   testWidgets(

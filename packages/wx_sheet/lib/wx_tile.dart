@@ -1,3 +1,3 @@
-library wx_tile;
+library;
 
 export 'package:wx_tile/wx_tile.dart';

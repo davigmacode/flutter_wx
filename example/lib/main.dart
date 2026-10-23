@@ -149,6 +149,15 @@ class _ShowroomMainShellState extends State<ShowroomMainShell> {
         builder: (context) => const WxTileShowcase(),
       ),
       PackageItem(
+        id: 'wx_sheet',
+        name: 'wx_sheet',
+        version: '4.8.0',
+        summary: 'Universal foundational container primitive combining box styling, touch anchors, tiles, and checkmarks.',
+        category: PackageCategory.surfaces,
+        icon: Icons.layers_outlined,
+        builder: (context) => const WxSheetShowcase(),
+      ),
+      PackageItem(
         id: 'wx_avatar',
         name: 'wx_avatar',
         version: '3.1.0',
@@ -625,7 +634,7 @@ class _ShowroomMainShellState extends State<ShowroomMainShell> {
                       spacing: 12,
                       runSpacing: 12,
                       children: [
-                        _buildStatChip(Icons.inventory_2_rounded, '28 Modular Packages'),
+                        _buildStatChip(Icons.inventory_2_rounded, '29 Modular Packages'),
                         _buildStatChip(Icons.check_circle_rounded, '100% Test Pass Rate'),
                         _buildStatChip(Icons.verified_rounded, '0 Analyzer Warnings'),
                         _buildStatChip(Icons.speed_rounded, 'Zero External Overhead'),

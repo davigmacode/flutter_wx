@@ -16,7 +16,7 @@ class DrivenCheckmark extends Checkmark implements DrivenProperty<Widget> {
   });
 
   @override
-  resolve(events) {
+  Widget resolve(Set<WidgetEvent> events) {
     return Checkmark(
       curve: curve,
       duration: duration,

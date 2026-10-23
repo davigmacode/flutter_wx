@@ -1,3 +1,3 @@
-library wx_box;
+library;
 
 export 'package:wx_box/wx_box.dart';
