@@ -509,23 +509,27 @@ class _WxAnchorRenderState extends State<_WxAnchorRender>
   }
 
   @protected
-  void populateWidgetEvents() {
-    widgetEvents.update(
-      {WidgetEvent.disabled: widget.disabled},
-      forceNotify: true,
-    );
+  void populateWidgetEvents({bool notify = false}) {
+    final changed = widget.disabled
+        ? widgetEvents.value.add(WidgetEvent.disabled)
+        : widgetEvents.value.remove(WidgetEvent.disabled);
+    if (changed) {
+      setStyle();
+      if (notify) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            widgetEvents.notifyListeners();
+          }
+        });
+      }
+    }
   }
 
   @override
   void initState() {
     super.initState();
     initWidgetEvents(widget.eventsController);
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    populateWidgetEvents();
+    populateWidgetEvents(notify: false);
   }
 
   @override
@@ -533,7 +537,9 @@ class _WxAnchorRenderState extends State<_WxAnchorRender>
     if (mounted) {
       super.didUpdateWidget(oldWidget);
       updateWidgetEvents(widget.eventsController);
-      populateWidgetEvents();
+      if (oldWidget.disabled != widget.disabled) {
+        populateWidgetEvents(notify: true);
+      }
     }
   }
 

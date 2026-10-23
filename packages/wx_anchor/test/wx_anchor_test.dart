@@ -133,5 +133,45 @@ void main() {
       expect(theme.style.scale, equals(1.1));
       expect(theme.style.opacity, equals(0.9));
     });
+
+    testWidgets('works with ListenableBuilder without markNeedsBuild during build error', (tester) async {
+      final controller = WidgetEventController();
+      late StateSetter triggerSetState;
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: StatefulBuilder(
+              builder: (context, setState) {
+                triggerSetState = setState;
+                return Column(
+                  children: [
+                    WxAnchor(
+                      eventsController: controller,
+                      child: const Text('Target'),
+                    ),
+                    ListenableBuilder(
+                      listenable: controller,
+                      builder: (context, _) {
+                        return Text('Events: ${controller.value.length}');
+                      },
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        ),
+      );
+
+      // Now trigger rebuild of parent!
+      triggerSetState(() {});
+      await tester.pump();
+
+      expect(find.text('Target'), findsOneWidget);
+      expect(find.text('Events: 0'), findsOneWidget);
+
+      controller.dispose();
+    });
   });
 }

@@ -507,7 +507,7 @@ WxAnchor(
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              'Tapped \$_tapCount times • Scale & ripple feedback active',
+                              'Tapped $_tapCount times • Scale & ripple feedback active',
                               style: theme.textTheme.bodySmall?.copyWith(
                                 color: colorScheme.onSurfaceVariant,
                               ),
