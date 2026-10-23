@@ -1,0 +1,27 @@
+{
+  "dart.flutterSdkPath": ".fvm\\versions\\3.22.0",
+  "search.exclude": {
+    "**/.fvm": true
+  },
+  "files.watcherExclude": {
+    "**/.fvm": true
+  },
+  "[dart]": {
+    "editor.defaultFormatter": "Dart-Code.dart-code",
+    "editor.formatOnSave": true
+  },
+  "cSpell.words": [
+    "autofocus",
+    "Cupertino",
+    "davigmacode",
+    "Diagnosticable",
+    "Irfan",
+    "lerp",
+    "lerped",
+    "LTWH",
+    "pote",
+    "Taufik",
+    "Vigma",
+    "widgetarian"
+  ]
+}
