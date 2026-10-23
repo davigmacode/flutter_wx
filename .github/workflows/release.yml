@@ -1,0 +1,42 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry-run:
+        description: 'Run dry-run only without publishing'
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Bootstrap Workspace
+        run: dart pub get
+
+      - name: Activate Melos
+        run: dart pub global activate melos
+
+      - name: Publish to pub.dev (Dry Run)
+        if: ${{ inputs.dry-run }}
+        run: melos publish --dry-run --yes
+
+      - name: Publish to pub.dev
+        if: ${{ !inputs.dry-run }}
+        run: melos publish --yes

@@ -1,6 +1,6 @@
 import 'package:animated_repeatable/animated_repeatable.dart';
 import 'package:flutter/widgets.dart';
-import '../widget.dart';
+import 'package:wx_text/wx_text.dart';
 
 /// Used within the [WxAnimatedText] widget to specify
 /// the animation function that controls how the text widget

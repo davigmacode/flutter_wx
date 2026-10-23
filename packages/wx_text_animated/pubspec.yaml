@@ -1,0 +1,36 @@
+name: wx_text_animated
+description: Seamless repeatable and triggered text animations for Flutter.
+version: 1.0.0
+homepage: https://github.com/davigmacode/flutter_wx
+repository: https://github.com/davigmacode/flutter_wx/tree/main/packages/wx_text_animated
+issue_tracker: https://github.com/davigmacode/flutter_wx/issues
+
+topics:
+  - text
+  - animated
+  - animation
+  - typewriter
+  - widgetarian
+
+funding:
+  - https://buymeacoffee.com/davigmacode
+  - https://ko-fi.com/davigmacode
+
+environment:
+  sdk: '>=3.5.0 <4.0.0'
+  flutter: '>=3.24.0'
+
+resolution: workspace
+
+dependencies:
+  flutter:
+    sdk: flutter
+  wx_text: ^4.0.0
+  animated_repeatable: ^1.2.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:

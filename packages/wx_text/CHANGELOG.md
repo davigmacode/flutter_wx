@@ -1,3 +1,10 @@
+## 4.0.0
+
+* **Breaking Change**: Zero-dependency core refactor. `WxSpoilerText` moved to `wx_text_spoiler` package, and `WxAnimatedText` moved to `wx_text_animated` package.
+* **Architecture**: Integrated into `flutter_wx` Dart 3.5+ Native Workspace monorepo.
+* **Dependencies**: Removed `animated_repeatable` dependency; `wx_text` now depends purely on Flutter SDK.
+* **Exports**: Cleaned library exports to provide core typography, outlines, gradient, filters, and constraints.
+
 ## 3.1.0
 
 * **Dependency**: Upgraded to `animated_repeatable: ^1.2.0` with support for `disableAnimations`.

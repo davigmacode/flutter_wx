@@ -3,6 +3,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:wx_text/wx_text.dart';
+import 'package:wx_text_spoiler/wx_text_spoiler.dart';
+import 'package:wx_text_animated/wx_text_animated.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 void main() {

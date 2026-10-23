@@ -36,7 +36,7 @@ class WxSpoilerController extends ChangeNotifier {
   /// This can be used to update the UI of widgets that are listening to changes
   /// in the spoiler's visibility state. The callback receives the new visibility
   /// state (`true` for expanded, `false` for collapsed).
-  ValueSetter? onExpanded;
+  ValueChanged<bool>? onExpanded;
 
   /// Expands the spoiler content.
   void expand() => expanded = true;

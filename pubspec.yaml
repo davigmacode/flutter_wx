@@ -1,0 +1,15 @@
+name: flutter_wx_workspace
+publish_to: none
+
+environment:
+  sdk: '>=3.5.0 <4.0.0'
+
+workspace:
+  - packages/wx_text
+  - packages/wx_text_spoiler
+  - packages/wx_text_animated
+  - example
+
+dev_dependencies:
+  melos: ^6.3.0
+  flutter_lints: ^5.0.0

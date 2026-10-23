@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart';
-import '../widget.dart';
+import 'package:wx_text/wx_text.dart';
 import 'controller.dart';
 
 /// Function signature for building a custom spoiler widget.
@@ -129,7 +129,7 @@ class WxSpoilerText extends WxText {
   /// This can be used to update the UI of widgets that are listening to changes
   /// in the spoiler's visibility state. The callback receives the new visibility
   /// state (`true` for expanded, `false` for collapsed).
-  final ValueSetter? onExpanded;
+  final ValueChanged<bool>? onExpanded;
 
   /// Determines whether to disable all the filter when text collapsed.
   final bool filterDisabledOnCollapsed;
@@ -142,7 +142,11 @@ class WxSpoilerText extends WxText {
 
   /// Default builder that uses GestureDetector to enable tapping on the wrapped content
   static const defaultWrapper = _defaultWrapper;
-  static Widget _defaultWrapper(context, text, toggle) {
+  static Widget _defaultWrapper(
+    BuildContext context,
+    Widget text,
+    VoidCallback toggle,
+  ) {
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
@@ -196,7 +200,7 @@ class _WxSpoilerView extends StatefulWidget {
 
   final WxSpoilerController? controller;
   final bool expanded;
-  final ValueSetter? onExpanded;
+  final ValueChanged<bool>? onExpanded;
   final Duration duration;
   final WxSpoilerBuilder wrapper;
   final Widget collapsedText;

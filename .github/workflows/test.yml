@@ -1,0 +1,33 @@
+name: Test
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: 'stable'
+          cache: true
+
+      - name: Bootstrap Workspace
+        run: dart pub get
+
+      - name: Activate Melos
+        run: dart pub global activate melos
+
+      - name: Analyze packages
+        run: melos run analyze
+
+      - name: Run tests with coverage
+        run: melos run test

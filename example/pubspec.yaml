@@ -1,0 +1,27 @@
+name: wx_text_example
+description: "Example showroom application for flutter_wx packages."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.5.0 <4.0.0'
+  flutter: '>=3.24.0'
+
+resolution: workspace
+
+dependencies:
+  flutter:
+    sdk: flutter
+  wx_text: ^4.0.0
+  wx_text_spoiler: ^1.0.0
+  wx_text_animated: ^1.0.0
+  url_launcher: ^6.2.5
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true
