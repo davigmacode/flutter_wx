@@ -1,0 +1,25 @@
+{
+  "search.exclude": {
+    "**/.fvm": true
+  },
+  "files.watcherExclude": {
+    "**/.fvm": true
+  },
+  "dart.flutterSdkPath": ".fvm\\versions\\3.19.3",
+  "[dart]": {
+    "editor.defaultFormatter": "Dart-Code.dart-code",
+    "editor.formatOnSave": true
+  },
+  "cSpell.words": [
+    "dartpad",
+    "Diagnosticable",
+    "Irfan",
+    "lerp",
+    "Schyler",
+    "Taufik",
+    "textable",
+    "Themeable",
+    "Vigma",
+    "widgetarian"
+  ]
+}
