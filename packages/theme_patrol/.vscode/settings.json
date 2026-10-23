@@ -1,0 +1,28 @@
+{
+  "dart.flutterSdkPath": ".fvm\\versions\\3.22.0",
+  "search.exclude": {
+    "**/.fvm": true
+  },
+  "files.watcherExclude": {
+    "**/.fvm": true
+  },
+  "[dart]": {
+    "editor.defaultFormatter": "Dart-Code.dart-code",
+    "editor.formatOnSave": true
+  },
+  "cSpell.words": [
+    "charcode",
+    "checkmark",
+    "colorpicker",
+    "cupertino",
+    "Diagnosticable",
+    "Irfan",
+    "LTRB",
+    "pote",
+    "Schyler",
+    "Taufik",
+    "toggleable",
+    "Vigma",
+    "widgetarian"
+  ]
+}
