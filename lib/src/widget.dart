@@ -6,23 +6,31 @@ class MarqueeTransition extends StatefulWidget {
     this.repeat = -1,
     this.pause = false,
     this.mirror = false,
-    this.delay = Duration.zero,
-    this.duration = const Duration(milliseconds: 50000),
     this.direction = AxisDirection.right,
+    this.curve = Curves.linear,
+    this.delay = Duration.zero,
+    required this.duration,
+    this.reverseCurve,
+    this.reverseDelay,
+    this.reverseDuration,
     this.padding,
     this.divider,
-    required this.child,
+    required this.children,
   });
 
   final int repeat;
   final bool pause;
   final bool mirror;
+  final AxisDirection direction;
+  final Curve curve;
   final Duration delay;
   final Duration duration;
-  final AxisDirection direction;
+  final Curve? reverseCurve;
+  final Duration? reverseDelay;
+  final Duration? reverseDuration;
   final EdgeInsetsGeometry? padding;
   final Widget? divider;
-  final Widget child;
+  final List<Widget> children;
 
   @override
   State<MarqueeTransition> createState() => MarqueeTransitionState();
@@ -66,7 +74,7 @@ class MarqueeTransitionState extends State<MarqueeTransition> {
         height: axis == Axis.vertical ? 10 : null,
       );
 
-  void _animate(_) {
+  void _animate() {
     if (isMirror) {
       _animateMirror();
     } else {
@@ -86,29 +94,28 @@ class MarqueeTransitionState extends State<MarqueeTransition> {
     await controller.animateTo(
       maxExtent,
       duration: widget.duration,
-      curve: Curves.linear,
+      curve: widget.curve,
     );
 
     if (!isAvailable) return;
-    await Future.delayed(widget.delay);
+    await Future.delayed(widget.reverseDelay ?? widget.delay);
     await controller.animateTo(
       minExtent,
-      duration: widget.duration,
-      curve: Curves.linear,
+      duration: widget.reverseDuration ?? widget.duration,
+      curve: widget.reverseCurve ?? widget.curve,
     );
   }
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
 
-    WidgetsBinding.instance.addPostFrameCallback(_animate);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _animate());
   }
 
   @override
-  void didUpdateWidget(covariant MarqueeTransition oldWidget) {
-    // TODO: implement didUpdateWidget
+  void didUpdateWidget(MarqueeTransition oldWidget) {
+    _animate();
     super.didUpdateWidget(oldWidget);
   }
 
@@ -127,21 +134,20 @@ class MarqueeTransitionState extends State<MarqueeTransition> {
 
   @override
   Widget build(BuildContext context) {
-    Widget child = Flex(
-      direction: axis,
-      children: [
-        widget.child,
-        widget.divider ?? defaultDivider,
-        widget.child,
-      ],
-    );
+    final children = isNotMirror
+        ? [...widget.children, ...widget.children]
+        : widget.children;
 
     return SingleChildScrollView(
       scrollDirection: axis,
       controller: controller,
       padding: widget.padding,
       physics: const NeverScrollableScrollPhysics(),
-      child: child,
+      primary: false,
+      child: Flex(
+        direction: axis,
+        children: children,
+      ),
     );
   }
 }
