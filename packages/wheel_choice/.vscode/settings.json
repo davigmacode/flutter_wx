@@ -1,0 +1,13 @@
+{
+  "dart.flutterSdkPath": ".fvm\\versions\\3.41.7",
+  "search.exclude": {
+    "**/.fvm": true
+  },
+  "files.watcherExclude": {
+    "**/.fvm": true
+  },
+  "[dart]": {
+    "editor.defaultFormatter": "Dart-Code.dart-code",
+    "editor.formatOnSave": true
+  }
+}

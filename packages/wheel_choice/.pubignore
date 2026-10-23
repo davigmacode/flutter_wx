@@ -1,0 +1,11 @@
+build/
+coverage/
+media/
+*.iml
+.cspell.json
+.fvmrc
+.fvm/
+example/*
+!example/lib
+!example/pubspec.yaml
+!example/README.md
