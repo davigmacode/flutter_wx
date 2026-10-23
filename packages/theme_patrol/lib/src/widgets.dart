@@ -6,10 +6,10 @@ import 'model.dart';
 
 class ThemeConsumer extends StatelessWidget {
   const ThemeConsumer({
-    Key? key,
+    super.key,
     required this.builder,
     this.child,
-  }) : super(key: key);
+  });
 
   /// Builder that gets called when the theme changes
   final ThemeBuilder builder;
@@ -33,18 +33,17 @@ class ThemeConsumer extends StatelessWidget {
 class ThemeProvider extends InheritedNotifier<ThemeController>
     with Diagnosticable {
   const ThemeProvider({
-    Key? key,
+    super.key,
     required ThemeController controller,
-    required Widget child,
-  }) : super(key: key, notifier: controller, child: child);
+    required super.child,
+  }) : super(notifier: controller);
 
   ThemeProvider.builder({
-    Key? key,
+    super.key,
     required ThemeController controller,
     required ThemeBuilder builder,
     Widget? child,
   }) : super(
-          key: key,
           notifier: controller,
           child: ThemeConsumer(
             builder: builder,
@@ -85,7 +84,7 @@ class ThemePatrol extends StatelessWidget with Diagnosticable {
   /// If the use case is multiple theme with dark mode,
   /// provide [themes], [initialThemes], and [initialMode]
   ThemePatrol({
-    Key? key,
+    super.key,
     ThemeData? light,
     ThemeData? dark,
     ThemeExtensionIterable? extensions,
@@ -115,8 +114,7 @@ class ThemePatrol extends StatelessWidget with Diagnosticable {
           onModeChanged: onModeChanged,
           onColorChanged: onColorChanged,
           onChanged: onChanged,
-        ),
-        super(key: key);
+        );
 
   /// Builder that gets called when the theme changes
   final ThemeBuilder builder;

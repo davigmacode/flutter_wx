@@ -76,7 +76,7 @@ class ThemeController extends ChangeNotifier {
       'The available themes should not empty, provide [themes] or [light] or [dark]',
     );
     initialTheme =
-        initialTheme == null ? available.entries.first.key : initialTheme;
+        initialTheme ?? available.entries.first.key;
     assert(
       available[initialTheme] != null,
       'The [initialTheme] should include in provided [themes]',
@@ -231,23 +231,23 @@ class ThemeController extends ChangeNotifier {
 
   /// Replace the available themes with new value
   void setThemes(ThemeMap themes) {
-    this.available = themes;
+    available = themes;
     notifyListeners();
-    this._onAvailableChanged?.call(this);
+    _onAvailableChanged?.call(this);
   }
 
   /// Update or insert one or multiple theme(s) to the available themes
   void mergeThemes(ThemeMap themes) {
-    this.available.addAll(themes);
+    available.addAll(themes);
     notifyListeners();
-    this._onAvailableChanged?.call(this);
+    _onAvailableChanged?.call(this);
   }
 
   /// Remove a theme by it's key from the available themes
   void removeTheme(String name) {
-    this.available.remove(name);
+    available.remove(name);
     notifyListeners();
-    this._onAvailableChanged?.call(this);
+    _onAvailableChanged?.call(this);
   }
 
   /// Set the current selected theme
@@ -256,10 +256,10 @@ class ThemeController extends ChangeNotifier {
       available[name] != null,
       'The [initialTheme] should include in provided [themes]',
     );
-    this.selected = name;
+    selected = name;
     notifyListeners();
-    this._onThemeChanged?.call(this);
-    this._onChanged?.call(this);
+    _onThemeChanged?.call(this);
+    _onChanged?.call(this);
   }
 
   void selectIndex(int index) {
@@ -293,16 +293,16 @@ class ThemeController extends ChangeNotifier {
   void toColor(Color? color) {
     this.color = color;
     notifyListeners();
-    this._onColorChanged?.call(this);
-    this._onChanged?.call(this);
+    _onColorChanged?.call(this);
+    _onChanged?.call(this);
   }
 
   /// Set the theme mode
   void toMode(ThemeMode mode) {
     this.mode = mode;
     notifyListeners();
-    this._onModeChanged?.call(this);
-    this._onChanged?.call(this);
+    _onModeChanged?.call(this);
+    _onChanged?.call(this);
   }
 
   /// Set theme mode to [ThemeMode.light]
@@ -329,14 +329,14 @@ class ThemeController extends ChangeNotifier {
 
   /// Reset all values to the initial provided value
   void reset() {
-    this.selected = initialTheme;
-    this.mode = initialMode;
-    this.color = null;
+    selected = initialTheme;
+    mode = initialMode;
+    color = null;
     notifyListeners();
-    this._onThemeChanged?.call(this);
-    this._onModeChanged?.call(this);
-    this._onColorChanged?.call(this);
-    this._onChanged?.call(this);
+    _onThemeChanged?.call(this);
+    _onModeChanged?.call(this);
+    _onColorChanged?.call(this);
+    _onChanged?.call(this);
   }
 
   /// Reset the selected theme to the initial provided value

@@ -1,4 +1,4 @@
-library wx_divider;
+library;
 
 export 'src/types.dart';
 export 'src/widget.dart';

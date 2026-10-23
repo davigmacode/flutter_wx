@@ -1,5 +1,5 @@
-build/
 media/
-example/*
-!example/lib
-!example/README.md
+build/
+.dart_tool/
+.fvm/
+coverage/

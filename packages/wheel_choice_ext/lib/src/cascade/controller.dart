@@ -172,7 +172,7 @@ class WheelCascadeController<T> extends ChangeNotifier {
         if (level + 1 < _depth) {
           _loadLevel(level + 1, initialValues: initialValues);
         }
-      }).catchError((err) {
+      }).catchError((Object err) {
         if (_disposed || _requestTokens[level] != token) return;
         _loadingLevels[level] = false;
         _errorLevels[level] = err;

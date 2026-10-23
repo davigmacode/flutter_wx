@@ -1,4 +1,4 @@
-library overlap_stack;
+library;
 
 export 'src/widget.dart';
 export 'src/types.dart';

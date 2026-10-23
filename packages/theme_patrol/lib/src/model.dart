@@ -144,8 +144,8 @@ class ThemeConfig with Diagnosticable {
   ColorScheme colorSchemeOf(BuildContext context) {
     final Brightness brightness = Theme.of(context).brightness;
     return brightness == Brightness.dark
-        ? this.darkData.colorScheme
-        : this.data.colorScheme;
+        ? darkData.colorScheme
+        : data.colorScheme;
   }
 
   @override

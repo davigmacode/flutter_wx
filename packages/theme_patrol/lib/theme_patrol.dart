@@ -1,4 +1,4 @@
-library theme_patrol;
+library;
 
 export 'src/types.dart';
 export 'src/model.dart';

@@ -128,7 +128,7 @@ void main() {
 
     await tester.pumpWidget(
       _wrap(
-        WheelChoice<String>(
+        const WheelChoice<String>(
           options: ['X', 'Y', 'Z'],
           value: 'X',
           effect: effect,
@@ -340,10 +340,10 @@ void main() {
   ) async {
     await tester.pumpWidget(
       _wrap(
-        SizedBox(
+        const SizedBox(
           height: 300,
           child: WheelChoice<String>(
-            options: const ['One', 'Two', 'Three', 'Four', 'Five'],
+            options: ['One', 'Two', 'Three', 'Four', 'Five'],
             itemVisible: 5,
             itemExtent: 40.0,
             expanded: true,
@@ -409,12 +409,12 @@ void main() {
   ) async {
     await tester.pumpWidget(
       _wrap(
-        WheelChoiceTheme(
-          data: const WheelChoiceThemeData(
+        const WheelChoiceTheme(
+          data: WheelChoiceThemeData(
             itemExtent: 52.0,
             itemVisible: 3,
           ),
-          child: const WheelChoice<String>(
+          child: WheelChoice<String>(
             options: ['Alpha', 'Beta', 'Gamma'],
           ),
         ),
@@ -534,9 +534,9 @@ void main() {
 
     testWidgets('WheelChoiceTheme wrap and updateShouldNotify', (tester) async {
       const themeData = WheelChoiceThemeData(itemExtent: 42);
-      final themeWidget = WheelChoiceTheme(
+      final themeWidget = const WheelChoiceTheme(
         data: themeData,
-        child: const SizedBox(),
+        child: SizedBox(),
       );
 
       expect(themeWidget.updateShouldNotify(themeWidget), isFalse);
@@ -599,7 +599,7 @@ void main() {
       expect(defaultApplied.align, Alignment.centerLeft);
 
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: h1,
           ),
@@ -1034,14 +1034,14 @@ void main() {
     testWidgets('expanded horizontal picker adapts to maxWidth',
         (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
+        const MaterialApp(
           home: Scaffold(
             body: Center(
               child: SizedBox(
                 width: 300,
                 height: 80,
                 child: WheelChoice<int>(
-                  options: const [1, 2, 3, 4, 5],
+                  options: [1, 2, 3, 4, 5],
                   value: 3,
                   scrollDirection: Axis.horizontal,
                   expanded: true,

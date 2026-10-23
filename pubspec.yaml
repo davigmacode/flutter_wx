@@ -10,10 +10,18 @@ workspace:
   - packages/animated_repeatable
   - packages/animated_switcher_transitions
   - packages/animated_transform
+  - packages/chronograph
+  - packages/disclosure
+  - packages/lerp
+  - packages/overlap_stack
+  - packages/theme_patrol
+  - packages/wheel_choice
+  - packages/wheel_choice_ext
   - packages/wx_box
+  - packages/wx_divider
   - packages/wx_text
-  - packages/wx_text_spoiler
   - packages/wx_text_animated
+  - packages/wx_text_spoiler
   - example
 
 dev_dependencies:

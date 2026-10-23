@@ -14,7 +14,7 @@ void main() {
     });
 
     graph.start();
-    await Future.delayed(const Duration(seconds: 4));
+    await Future<void>.delayed(const Duration(seconds: 4));
 
     expect(
       values.last.inSeconds,
@@ -37,7 +37,7 @@ void main() {
     });
 
     graph.start();
-    await Future.delayed(const Duration(seconds: 6));
+    await Future<void>.delayed(const Duration(seconds: 6));
 
     expect(values.last.inSeconds, equals(0), reason: 'Timer did not reach 0');
     expect(

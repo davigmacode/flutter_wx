@@ -1,4 +1,4 @@
-library lerp;
+library;
 
 export 'dart:ui' show lerpDouble;
 

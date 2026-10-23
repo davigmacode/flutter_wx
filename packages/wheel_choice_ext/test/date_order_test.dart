@@ -59,14 +59,14 @@ void main() {
   });
   testWidgets('WheelDateOrder.of uses MDY for en_US', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
-        locale: const Locale('en', 'US'),
-        localizationsDelegates: const [
+      const MaterialApp(
+        locale: Locale('en', 'US'),
+        localizationsDelegates: [
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,
         ],
-        supportedLocales: const [
+        supportedLocales: [
           Locale('en', 'US'),
           Locale('id', 'ID'),
           Locale('ja', 'JP'),
@@ -80,14 +80,14 @@ void main() {
 
   testWidgets('WheelDateOrder.of uses DMY for id', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
-        locale: const Locale('id'),
-        localizationsDelegates: const [
+      const MaterialApp(
+        locale: Locale('id'),
+        localizationsDelegates: [
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,
         ],
-        supportedLocales: const [
+        supportedLocales: [
           Locale('en', 'US'),
           Locale('id'),
           Locale('ja'),
@@ -101,14 +101,14 @@ void main() {
 
   testWidgets('WheelDateOrder.of uses YMD for ja', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
-        locale: const Locale('ja'),
-        localizationsDelegates: const [
+      const MaterialApp(
+        locale: Locale('ja'),
+        localizationsDelegates: [
           GlobalMaterialLocalizations.delegate,
           GlobalWidgetsLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,
         ],
-        supportedLocales: const [
+        supportedLocales: [
           Locale('en', 'US'),
           Locale('id'),
           Locale('ja'),
