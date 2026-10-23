@@ -1,0 +1,7 @@
+media/
+build/
+.dart_tool/
+.fvm/
+coverage/
+example/*
+!example/lib
