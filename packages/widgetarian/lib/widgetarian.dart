@@ -19,7 +19,6 @@ export 'package:wx_avatar/wx_avatar.dart';
 export 'package:wx_badge/wx_badge.dart';
 export 'package:wx_box/wx_box.dart';
 export 'package:wx_divider/wx_divider.dart';
-export 'package:wx_layout/wx_layout.dart' hide WxBox, WxAnimatedBox, AnimatedBoxState;
 export 'package:wx_spoiler/wx_spoiler.dart';
 export 'package:wx_text/wx_text.dart';
 export 'package:wx_text_animated/wx_text_animated.dart';

@@ -25,7 +25,6 @@ workspace:
   - packages/wx_badge
   - packages/wx_box
   - packages/wx_divider
-  - packages/wx_layout
   - packages/wx_spoiler
   - packages/wx_text
   - packages/wx_text_animated
