@@ -1,0 +1,81 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Showroom App (example)",
+      "cwd": "example",
+      "request": "launch",
+      "type": "dart"
+    },
+    {
+      "name": "Showroom App (Profile)",
+      "cwd": "example",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "profile"
+    },
+    {
+      "name": "Showroom App (Release)",
+      "cwd": "example",
+      "request": "launch",
+      "type": "dart",
+      "flutterMode": "release"
+    },
+    {
+      "name": "Example: wx_text",
+      "cwd": "packages/wx_text",
+      "program": "example/main.dart",
+      "request": "launch",
+      "type": "dart"
+    },
+    {
+      "name": "Example: wx_text_spoiler",
+      "cwd": "packages/wx_text_spoiler",
+      "program": "example/main.dart",
+      "request": "launch",
+      "type": "dart"
+    },
+    {
+      "name": "Example: wx_text_animated",
+      "cwd": "packages/wx_text_animated",
+      "program": "example/main.dart",
+      "request": "launch",
+      "type": "dart"
+    },
+    {
+      "name": "Example: animated_repeatable",
+      "cwd": "packages/animated_repeatable",
+      "program": "example/main.dart",
+      "request": "launch",
+      "type": "dart"
+    },
+    {
+      "name": "Tests: wx_text",
+      "cwd": "packages/wx_text",
+      "program": "test/wx_text_test.dart",
+      "request": "launch",
+      "type": "dart"
+    },
+    {
+      "name": "Tests: wx_text_spoiler",
+      "cwd": "packages/wx_text_spoiler",
+      "program": "test/wx_text_spoiler_test.dart",
+      "request": "launch",
+      "type": "dart"
+    },
+    {
+      "name": "Tests: wx_text_animated",
+      "cwd": "packages/wx_text_animated",
+      "program": "test/wx_text_animated_test.dart",
+      "request": "launch",
+      "type": "dart"
+    },
+    {
+      "name": "Tests: animated_repeatable",
+      "cwd": "packages/animated_repeatable",
+      "program": "test/animated_repeatable_test.dart",
+      "request": "launch",
+      "type": "dart"
+    }
+  ]
+}
