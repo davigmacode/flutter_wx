@@ -11,6 +11,7 @@ The official monorepo for the `wx_*` ecosystem of Flutter UI component libraries
 
 | Package | Version | Description | Dependencies |
 | :--- | :--- | :--- | :--- |
+| [`animated_repeatable`](./packages/animated_repeatable) | [![pub package](https://img.shields.io/pub/v/animated_repeatable.svg)](https://pub.dev/packages/animated_repeatable) | Smooth repeatable, reversible, and triggered animations with customizable easing curves and transitions. | Flutter SDK (Zero external dependencies) |
 | [`wx_text`](./packages/wx_text) | [![pub package](https://img.shields.io/pub/v/wx_text.svg)](https://pub.dev/packages/wx_text) | Core Flutter text utility featuring Material 3 typography shortcuts, gradient shaders, outline strokes, and pattern filters. | Flutter SDK (Zero external dependencies) |
 | [`wx_text_spoiler`](./packages/wx_text_spoiler) | [![pub package](https://img.shields.io/pub/v/wx_text_spoiler.svg)](https://pub.dev/packages/wx_text_spoiler) | Expandable and collapsible spoiler / read-more text widget with reactive controller. | `wx_text` |
 | [`wx_text_animated`](./packages/wx_text_animated) | [![pub package](https://img.shields.io/pub/v/wx_text_animated.svg)](https://pub.dev/packages/wx_text_animated) | Seamless typography animations (typing, shimmer, zoom, slide, shake, fade). | `wx_text`, `animated_repeatable` |

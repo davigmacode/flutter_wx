@@ -5,6 +5,7 @@ environment:
   sdk: '>=3.5.0 <4.0.0'
 
 workspace:
+  - packages/animated_repeatable
   - packages/wx_text
   - packages/wx_text_spoiler
   - packages/wx_text_animated
