@@ -304,6 +304,15 @@ class _ShowroomMainShellState extends State<ShowroomMainShell> {
         ),
       ),
       PackageItem(
+        id: 'widget_event',
+        name: 'widget_event',
+        version: '2.0.1',
+        summary: 'Extensible event-driven state orchestration with built-in loading and driven resolvers.',
+        category: PackageCategory.utilities,
+        icon: Icons.hub_rounded,
+        builder: (context) => const WidgetEventShowcase(),
+      ),
+      PackageItem(
         id: 'wx_utils',
         name: 'wx_utils',
         version: '0.0.5',
@@ -587,7 +596,7 @@ class _ShowroomMainShellState extends State<ShowroomMainShell> {
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      'Explore 25 composable, zero-dependency Flutter packages spanning typography, animations, selection sheets, custom pickers, and layout tiles under one ecosystem.',
+                      'Explore 26 composable Flutter packages spanning typography, animations, selection sheets, custom pickers, event state orchestration, and layout tiles under one ecosystem.',
                       style: theme.textTheme.bodyLarge?.copyWith(
                         color: colorScheme.onSurfaceVariant,
                         height: 1.6,

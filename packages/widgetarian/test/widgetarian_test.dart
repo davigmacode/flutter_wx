@@ -22,6 +22,11 @@ void main() {
       expect(find.text('Widgetarian Text'), findsOneWidget);
       expect(find.text('W'), findsOneWidget);
       expect(find.text('Tile'), findsOneWidget);
+
+      final controller = WidgetEventController();
+      controller.add(WidgetEvent.loading);
+      expect(controller.value.contains(WidgetEvent.loading), isTrue);
+      controller.dispose();
     });
   });
 }

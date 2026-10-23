@@ -25,7 +25,7 @@ abstract class DrivenColor extends Color implements DrivenProperty<Color> {
 }
 
 class _DrivenColor extends DrivenColor {
-  _DrivenColor(this._resolver) : super(_resolver({}).value);
+  _DrivenColor(this._resolver) : super(_resolver({}).toARGB32());
 
   final DrivenPropertyResolver<Color> _resolver;
 

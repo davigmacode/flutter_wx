@@ -103,5 +103,5 @@ class WidgetEvent {
   }
 }
 
-/// Alias to Set<WidgetEvent>
+/// Alias to `Set<WidgetEvent>`
 typedef WidgetEvents = Set<WidgetEvent>;

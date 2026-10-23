@@ -1,4 +1,4 @@
-library widget_event;
+library;
 
 export 'src/event.dart';
 export 'src/mixin.dart';

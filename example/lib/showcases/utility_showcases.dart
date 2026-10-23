@@ -409,3 +409,120 @@ class _LerpShowcaseState extends State<LerpShowcase> {
     );
   }
 }
+
+class WidgetEventShowcase extends StatefulWidget {
+  const WidgetEventShowcase({super.key});
+
+  @override
+  State<WidgetEventShowcase> createState() => _WidgetEventShowcaseState();
+}
+
+class _WidgetEventShowcaseState extends State<WidgetEventShowcase> {
+  final WidgetEventController _controller = WidgetEventController();
+
+  @override
+  void initState() {
+    super.initState();
+    _controller.addListener(() => setState(() {}));
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final activeEvents = _controller.value;
+
+    final resolvedColor = DrivenProperty.by<Color>((events) {
+      if (WidgetEvent.isDisabled(events)) return Colors.grey;
+      if (WidgetEvent.isErrored(events)) return Colors.red;
+      if (WidgetEvent.isLoading(events)) return Colors.deepOrange;
+      if (WidgetEvent.isPressed(events)) return Colors.amber;
+      if (WidgetEvent.isHovered(events)) return Colors.cyan;
+      if (WidgetEvent.isSelected(events)) return Colors.teal;
+      return Colors.blue;
+    }).resolve(activeEvents);
+
+    return ShowcaseScaffold(
+      packageName: 'widget_event',
+      version: '2.0.1',
+      description:
+          'Extensible event-driven state orchestration for Flutter widgets. Super-set of WidgetState with built-in loading, indeterminate, error, and driven property resolvers.',
+      children: [
+        ShowcaseCard(
+          title: 'Event State Controller & Driven Resolver',
+          subtitle: 'Toggle active states to see real-time driven evaluation.',
+          codeSnippet: '''
+final controller = WidgetEventController();
+
+// Driven property resolver
+final color = DrivenProperty.by<Color>((events) {
+  if (WidgetEvent.isLoading(events)) return Colors.deepOrange;
+  if (WidgetEvent.isPressed(events)) return Colors.amber;
+  return Colors.blue;
+}).resolve(controller.value);''',
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  _eventChip(WidgetEvent.hovered, 'Hovered'),
+                  _eventChip(WidgetEvent.focused, 'Focused'),
+                  _eventChip(WidgetEvent.pressed, 'Pressed'),
+                  _eventChip(WidgetEvent.selected, 'Selected'),
+                  _eventChip(WidgetEvent.disabled, 'Disabled'),
+                  _eventChip(WidgetEvent.error, 'Error'),
+                  _eventChip(WidgetEvent.loading, 'Loading'),
+                  _eventChip(const WidgetEvent('custom'), 'Custom: "custom"'),
+                ],
+              ),
+              const SizedBox(height: 20),
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: resolvedColor,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Builder(
+                      builder: (context) {
+                        final spinner = const DrivenSpinner(size: 28, color: Colors.white).resolve(activeEvents);
+                        return spinner ?? const Icon(Icons.touch_app_rounded, color: Colors.white, size: 28);
+                      },
+                    ),
+                    const SizedBox(width: 12),
+                    Text(
+                      'Active Events: [${activeEvents.map((e) => e.value).join(', ')}]',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _eventChip(WidgetEvent event, String label) {
+    final isActive = _controller.value.contains(event);
+    return FilterChip(
+      label: Text(label),
+      selected: isActive,
+      onSelected: (_) => _controller.toggle(event),
+    );
+  }
+}

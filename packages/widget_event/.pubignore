@@ -1,1 +1,6 @@
+.dart_tool/
 .fvm/
+.idea/
+.vscode/
+build/
+pubspec.lock
