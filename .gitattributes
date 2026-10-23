@@ -1,0 +1,22 @@
+# Auto-detect text files and perform LF normalization
+* text=auto eol=lf
+
+# Ignore example app platform boilerplate from GitHub language statistics
+example/android/** linguist-vendored
+example/ios/** linguist-vendored
+example/linux/** linguist-vendored
+example/macos/** linguist-vendored
+example/web/** linguist-vendored
+example/windows/** linguist-vendored
+example/build/** linguist-vendored
+
+# Ignore global platform runners and documentation
+**/android/** linguist-vendored
+**/ios/** linguist-vendored
+**/linux/** linguist-vendored
+**/macos/** linguist-vendored
+**/web/** linguist-vendored
+**/windows/** linguist-vendored
+**/build/** linguist-vendored
+**/media/** linguist-vendored
+docs/** linguist-documentation
