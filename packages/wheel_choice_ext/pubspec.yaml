@@ -1,0 +1,36 @@
+name: wheel_choice_ext
+description: "Composite wheel-shaped date and time picker widgets for Flutter with multi-column support, locale ordering, subtree theming, form field integration, and reactive controllers."
+version: 0.1.0
+homepage: https://davigmacode.github.io/flutter_wheel_choice_ext
+repository: https://github.com/davigmacode/flutter_wheel_choice_ext
+issue_tracker: https://github.com/davigmacode/flutter_wheel_choice_ext/issues
+
+topics:
+  - wheel
+  - picker
+  - date-picker
+  - time-picker
+  - scroll
+
+funding:
+  - https://buymeacoffee.com/davigmacode
+  - https://ko-fi.com/davigmacode
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+  flutter: ">=3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  wheel_choice: ^1.3.0
+  intl: ^0.20.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  flutter_localizations:
+    sdk: flutter
+
+flutter:
