@@ -1,4 +1,4 @@
-library wx_avatar;
+library;
 
 export 'src/style.dart';
 export 'src/theme_data.dart';

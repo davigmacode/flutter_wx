@@ -1,4 +1,4 @@
-final diacriticsMap = {};
+final Map<String, String> diacriticsMap = <String, String>{};
 
 String normalized(String source) {
   return _removeDiacritics(source).toLowerCase();
@@ -9,12 +9,12 @@ String _removeDiacritics(String str) {
     for (var i = 0; i < defaultDiacritics.length; i++) {
       var letters = defaultDiacritics[i]['letters'];
       for (var j = 0; j < letters!.length; j++) {
-        diacriticsMap[letters[j]] = defaultDiacritics[i]['base'];
+        diacriticsMap[letters[j]] = defaultDiacritics[i]['base']!;
       }
     }
   }
   return str.replaceAllMapped(diacriticsRegExp, (a) {
-    return diacriticsMap[a.group(0)] ?? a.group(0);
+    return diacriticsMap[a.group(0)] ?? a.group(0) ?? '';
   });
 }
 

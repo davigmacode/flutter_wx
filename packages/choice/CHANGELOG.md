@@ -1,3 +1,39 @@
+## 2.3.3
+
+* Migrated to `flutter_wx` monorepo workspace
+* Updated Flutter SDK constraint to `>=3.24.0` and Dart SDK to `>=3.5.0 <4.0.0`
+* Updated lints to `flutter_lints: ^5.0.0`
+
+## 2.3.2
+
+* Removed screenshots and example from package archive
+
+## 2.3.1
+
+* Fixed error when search had special characters
+* Removed WillPopScope since it's not working yet
+
+## 2.3.0
+
+* Added untitled anchor/trigger widget
+* Added option to custom placeholder of the anchor/trigger widget
+* Added option to custom separator value text
+
+## 2.0.0
+
+* Added groupable choice items that can be sorted
+* Added group list, item, header builder, and predefined widget
+* Added choice anchor and value text widget
+* Added value chips widget
+* Adjust `itemSkip` callback parameters
+* Replaced `trigger` term with `anchor`
+* Replaced `createWidget` with `createSpacer`
+* Renamed most of `createBuilder` constructor with `create`
+* Improved choice and search controller construction
+* Improved selected many logic
+* Keep focus search field on submit and cross faded search toggle icon
+* Fixed search field spacing and replaceable leading widget
+
 ## 1.3.2
 
 * Re-render-able modal widget

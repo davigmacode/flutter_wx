@@ -23,7 +23,7 @@ class ChoiceModalFooter extends StatelessWidget {
     EdgeInsetsGeometry? padding,
     CrossAxisAlignment crossAxisAlignment = CrossAxisAlignment.center,
     MainAxisAlignment mainAxisAlignment = MainAxisAlignment.end,
-    required List<ChoiceStateBuilder> children,
+    required List<ChoiceStateBuilder<T>> children,
   }) {
     return (state) {
       return ChoiceModalFooter(

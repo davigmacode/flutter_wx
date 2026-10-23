@@ -35,7 +35,7 @@ class _AnimatedIconThemeState
     _dataTween = visitor(
       _dataTween,
       widget.data,
-      (dynamic value) => WxTextTileThemeDataTween(begin: value),
+      (dynamic value) => WxTextTileThemeDataTween(begin: value as WxTextTileThemeData?),
     ) as WxTextTileThemeDataTween?;
   }
 

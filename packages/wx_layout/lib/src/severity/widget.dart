@@ -10,10 +10,10 @@ class ColorTheme extends InheritedTheme {
   /// Creates a theme that controls
   /// how descendant alerts should look like.
   const ColorTheme({
-    Key? key,
+    super.key,
     required this.data,
-    required Widget child,
-  }) : super(key: key, child: child);
+    required super.child,
+  });
 
   /// Creates an [ColorTheme] that controls the style of
   /// descendant widgets, and merges in the current [ColorTheme], if any.

@@ -13,6 +13,10 @@ class ChoiceAnchor extends ListTile {
     super.onTap,
   });
 
+  static String _getDefaultPlaceholder(bool multiple) {
+    return multiple ? 'Select one or more' : 'Select';
+  }
+
   static ChoiceAnchorBuilder<T> create<T>({
     Widget? title,
     Widget? leading,
@@ -20,12 +24,13 @@ class ChoiceAnchor extends ListTile {
     bool? loading,
     bool? inline,
     bool? dense,
+    String? placeholder,
     int? valueTruncate,
   }) {
     return (state, openModal) {
       final value = ChoiceValueText(
         value: state.value,
-        placeholder: state.multiple ? 'Select one or more' : 'Select',
+        placeholder: placeholder ?? _getDefaultPlaceholder(state.multiple),
         truncate: valueTruncate ?? (inline == true ? 1 : 2),
       );
       final effectiveTrailingIcon = loading != true
@@ -43,6 +48,33 @@ class ChoiceAnchor extends ListTile {
       return ChoiceAnchor(
         title: title ?? (state.title != null ? Text(state.title!) : null),
         subtitle: inline == true ? null : value,
+        leading: leading,
+        trailing: effectiveTrailing,
+        dense: dense,
+        onTap: loading != true ? openModal : null,
+      );
+    };
+  }
+
+  static ChoiceAnchorBuilder<T> createUntitled<T>({
+    Widget? leading,
+    Widget? trailing,
+    bool? loading,
+    bool? dense,
+    String? placeholder,
+    int? valueTruncate,
+  }) {
+    return (state, openModal) {
+      final value = ChoiceValueText(
+        value: state.value,
+        placeholder: placeholder ?? _getDefaultPlaceholder(state.multiple),
+        truncate: valueTruncate,
+      );
+      final effectiveTrailing = loading != true
+          ? trailing ?? defaultTrailingIcon
+          : defaultTrailingSpinner;
+      return ChoiceAnchor(
+        title: value,
         leading: leading,
         trailing: effectiveTrailing,
         dense: dense,

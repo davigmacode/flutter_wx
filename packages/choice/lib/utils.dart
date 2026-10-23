@@ -1,4 +1,4 @@
-library choice_utils;
+library;
 
 export 'src/utils/accent.dart';
 export 'src/utils/debounce.dart';

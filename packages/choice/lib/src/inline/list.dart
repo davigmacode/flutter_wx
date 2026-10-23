@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:choice/selection.dart';
+import 'group.dart';
 import 'placeholder.dart';
 import 'error.dart';
 import 'loader.dart';
@@ -11,12 +12,17 @@ class ChoiceList<T> extends StatelessWidget {
     required this.itemCount,
     required this.itemBuilder,
     this.itemSkip,
+    this.itemGroup,
     this.dividerBuilder,
     this.leadingBuilder,
     this.trailingBuilder,
     this.placeholderBuilder,
     this.errorBuilder,
     this.loaderBuilder,
+    this.groupSort,
+    this.groupBuilder,
+    this.groupItemBuilder,
+    this.groupHeaderBuilder,
     this.builder,
     this.loading = false,
     this.error = false,
@@ -41,7 +47,12 @@ class ChoiceList<T> extends StatelessWidget {
   /// {@template choice.list.itemSkip}
   /// Called to specify which indices to skip when building choice item
   /// {@endtemplate}
-  final ChoiceSkipCallback? itemSkip;
+  final ChoiceSkipResolver<T>? itemSkip;
+
+  /// {@template choice.list.itemGroup}
+  /// Called to enable grouped choices and specify group name of choice item
+  /// {@endtemplate}
+  final ChoiceGroupResolver? itemGroup;
 
   /// {@template choice.list.dividerBuilder}
   /// Called to build divider item
@@ -73,10 +84,33 @@ class ChoiceList<T> extends StatelessWidget {
   /// {@endtemplate}
   final ChoiceStateBuilder<T>? loaderBuilder;
 
+  /// {@template choice.list.groupBuilder}
+  /// Called to build the grouped list of choice items
+  /// {@endtemplate}
+  final ChoiceGroupBuilder? groupBuilder;
+
+  /// {@template choice.list.groupItemBuilder}
+  /// Called to build the grouped item of choice items
+  /// {@endtemplate}
+  final ChoiceGroupItemBuilder? groupItemBuilder;
+
+  /// {@template choice.list.groupHeaderBuilder}
+  /// Called to build the grouped header of choice items
+  /// {@endtemplate}
+  final ChoiceGroupHeaderBuilder<T>? groupHeaderBuilder;
+
+  /// {@template choice.list.groupSort}
+  /// If provided, sort group by the given callback
+  /// {@endtemplate}
+  final ChoiceGroupSortResolver? groupSort;
+
   /// {@template choice.list.builder}
   /// Called to build the list of choice items
   /// {@endtemplate}
   final ChoiceListBuilder? builder;
+
+  /// Indicates whether the choice items is grouped
+  bool get isGrouped => itemGroup != null;
 
   /// Indicates whether the choice list has divider item
   bool get hasDivider => dividerBuilder != null;
@@ -89,15 +123,160 @@ class ChoiceList<T> extends StatelessWidget {
 
   static final defaultBuilder = createWrapped();
 
-  static bool defaultItemSkip(String? keyword, int i) => false;
+  static final defaultGroupBuilder = ChoiceGroup.createList();
+
+  static final defaultGroupItemBuilder = ChoiceGroup.createItem();
+
+  static bool defaultItemSkip<T>(ChoiceController<T> state, int i) => false;
+
+  ChoiceSkipResolver<T> get effectiveItemSkip => itemSkip ?? defaultItemSkip;
+
+  ChoiceStateBuilder<T> get effectiveLoadingBuilder {
+    return loaderBuilder ?? ChoiceListLoader.createCircularLoader();
+  }
+
+  ChoiceStateBuilder<T> get effectivePlaceholderBuilder {
+    return placeholderBuilder ?? ChoiceListPlaceholder.create();
+  }
+
+  ChoiceStateBuilder<T> get effectiveErrorBuilder {
+    return errorBuilder ??
+        ChoiceListError.create(
+          message: 'The choice list failed to load',
+        );
+  }
+
+  ChoiceListBuilder get effectiveListBuilder => builder ?? defaultBuilder;
+
+  ChoiceGroupBuilder get effectiveGroupBuilder =>
+      groupBuilder ?? defaultGroupBuilder;
+
+  ChoiceGroupItemBuilder get effectiveGroupItemBuilder =>
+      groupItemBuilder ?? defaultGroupItemBuilder;
+
+  ChoiceGroupHeaderBuilder<T> get effectiveGroupHeaderBuilder =>
+      groupHeaderBuilder ?? ChoiceGroup.createHeader<T>();
+
+  List<ChoiceItemBuilder?> _resolveSkippedItems(ChoiceController<T> state) {
+    return List<ChoiceItemBuilder?>.generate(
+      itemCount,
+      (i) => !effectiveItemSkip(state, i) ? () => itemBuilder(state, i) : null,
+    );
+  }
+
+  List<ChoiceItemBuilder> _resolveDividedItems(
+    ChoiceController<T> state,
+    List<ChoiceItemBuilder> items,
+  ) {
+    if (hasDivider) {
+      final count = items.length;
+      for (var i = count - 1; i > 0; i--) {
+        items.insert(i, () => dividerBuilder!(state));
+      }
+    }
+    return items;
+  }
+
+  List<ChoiceItemBuilder> _resolveComposedItems(
+    ChoiceController<T> state,
+    List<ChoiceItemBuilder?> items,
+  ) {
+    final composedItems = <ChoiceItemBuilder>[
+      if (hasLeading) () => leadingBuilder!(state),
+      ...items.whereType<ChoiceItemBuilder>(),
+      if (hasTrailing) () => trailingBuilder!(state),
+    ];
+    return _resolveDividedItems(state, composedItems);
+  }
+
+  Widget _buildLayout(
+    ChoiceController<T> state,
+    bool isEmpty,
+    Widget Function() listBuilder,
+  ) {
+    return !loading
+        ? !error
+            ? itemCount > 0
+                ? listBuilder()
+                : effectivePlaceholderBuilder(state)
+            : effectiveErrorBuilder(state)
+        : effectiveLoadingBuilder(state);
+  }
+
+  Widget _buildNonGrouped(
+    ChoiceController<T> state,
+    List<ChoiceItemBuilder?> items,
+  ) {
+    final itemBuilders = _resolveComposedItems(state, items);
+    final itemCount = itemBuilders.length;
+    return _buildLayout(
+      state,
+      itemBuilders.isEmpty,
+      () => effectiveListBuilder.call(
+        (i) => itemBuilders[i](),
+        itemCount,
+      ),
+    );
+  }
+
+  Widget _buildGrouped(
+    ChoiceController<T> state,
+    List<ChoiceItemBuilder?> items,
+  ) {
+    /// name => index => builder
+    final Map<String, Map<int, ChoiceItemBuilder>> groups = {};
+    for (var i = 0; i < items.length; i++) {
+      final item = items[i];
+      if (item != null) {
+        final name = itemGroup!(i);
+        groups[name] = {
+          ...?groups[name],
+          ...{i: item}
+        };
+      }
+    }
+    final groupEntries = groups.entries.toList();
+    if (groupSort != null) {
+      groupEntries.sort((a, b) => groupSort!(a.key, b.key));
+    }
+    return _buildLayout(
+      state,
+      groups.isEmpty,
+      () => effectiveGroupBuilder.call(
+        (i) {
+          final entry = groupEntries.elementAt(i);
+          final groupName = entry.key;
+          final groupIndexedBuilders = entry.value;
+          final groupBuilders = groupIndexedBuilders.values;
+          final groupIndices = groupIndexedBuilders.keys.toList();
+          final header = effectiveGroupHeaderBuilder(groupName, groupIndices);
+          final choices = effectiveListBuilder.call(
+            (j) => groupBuilders.elementAt(j)(),
+            groupBuilders.length,
+          );
+          return effectiveGroupItemBuilder(header, choices);
+        },
+        groupEntries.length,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final state = ChoiceProvider.of<T>(context);
+    final itemBuilders = _resolveSkippedItems(state);
+    return isGrouped
+        ? _buildGrouped(state, itemBuilders)
+        : _buildNonGrouped(state, itemBuilders);
+  }
 
   static ChoiceListBuilder createWrapped({
     Axis direction = Axis.horizontal,
     WrapAlignment alignment = WrapAlignment.start,
     EdgeInsetsGeometry padding = EdgeInsets.zero,
-    double spacing = 0.0,
+    double spacing = 10.0,
     WrapAlignment runAlignment = WrapAlignment.start,
-    double runSpacing = 0.0,
+    double runSpacing = 10.0,
     WrapCrossAlignment crossAxisAlignment = WrapCrossAlignment.start,
     TextDirection? textDirection,
     VerticalDirection verticalDirection = VerticalDirection.down,
@@ -210,69 +389,5 @@ class ChoiceList<T> extends StatelessWidget {
             ),
       );
     };
-  }
-
-  List<ChoiceItemBuilder> _resolveDividedItems(
-    ChoiceController<T> state,
-    List<ChoiceItemBuilder> items,
-  ) {
-    if (hasDivider) {
-      final count = items.length;
-      for (var i = count - 1; i > 0; i--) {
-        items.insert(i, () => dividerBuilder!(state));
-      }
-    }
-    return items;
-  }
-
-  List<ChoiceItemBuilder> _resolveSearchedItems(ChoiceController<T> state) {
-    final effectiveItemSkip = itemSkip ?? defaultItemSkip;
-    return List<ChoiceItemBuilder?>.generate(
-      itemCount,
-      (i) => !effectiveItemSkip(state.search?.value, i)
-          ? () => itemBuilder(state, i)
-          : null,
-    ).whereType<ChoiceItemBuilder>().toList();
-  }
-
-  List<ChoiceItemBuilder> _resolveItems(ChoiceController<T> state) {
-    final items = <ChoiceItemBuilder>[
-      if (hasLeading) () => leadingBuilder!(state),
-      ..._resolveSearchedItems(state),
-      if (hasTrailing) () => trailingBuilder!(state),
-    ];
-    return _resolveDividedItems(state, items);
-  }
-
-  ChoiceStateBuilder<T> get effectiveLoadingBuilder {
-    return loaderBuilder ?? ChoiceListLoader.createCircularLoader();
-  }
-
-  ChoiceStateBuilder<T> get effectivePlaceholderBuilder {
-    return placeholderBuilder ?? ChoiceListPlaceholder.create();
-  }
-
-  ChoiceStateBuilder<T> get effectiveErrorBuilder {
-    return errorBuilder ??
-        ChoiceListError.create(
-          message: 'The choice list failed to load',
-        );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final state = ChoiceProvider.of<T>(context);
-    final itemBuildersPool = _resolveItems(state);
-    final itemCount = itemBuildersPool.length;
-    return !loading
-        ? !error
-            ? itemCount > 0
-                ? (builder ?? defaultBuilder).call(
-                    (i) => itemBuildersPool[i](),
-                    itemCount,
-                  )
-                : effectivePlaceholderBuilder(state)
-            : effectiveErrorBuilder(state)
-        : effectiveLoadingBuilder(state);
   }
 }

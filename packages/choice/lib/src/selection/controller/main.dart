@@ -51,6 +51,29 @@ class ChoiceController<T> extends ChangeNotifier {
       });
   }
 
+  static ChoiceController<T> createModalController<T>({
+    required BuildContext modalContext,
+    required ChoiceController<T> rootController,
+    bool searchable = false,
+    ValueChanged<String>? onSearch,
+  }) {
+    return rootController.copyWith(
+      search: ChoiceSearchController.create(
+        context: modalContext,
+        searchable: searchable,
+        onChanged: onSearch,
+      ),
+      onCloseModal: (value) {
+        Navigator.maybePop(modalContext, value);
+      },
+      onChanged: (value) {
+        if (!rootController.confirmation) {
+          rootController.replace(value);
+        }
+      },
+    );
+  }
+
   /// Creates a copy of this [ChoiceController] but with
   /// the given fields replaced with the new values
   ChoiceController<T> copyWith({
@@ -67,8 +90,8 @@ class ChoiceController<T> extends ChangeNotifier {
   }) {
     return ChoiceController<T>(
       value: value ?? this.value,
-      onChanged: onChanged ?? this._onChanged,
-      onCloseModal: onCloseModal ?? this._onCloseModal,
+      onChanged: onChanged ?? _onChanged,
+      onCloseModal: onCloseModal ?? _onCloseModal,
       multiple: multiple ?? this.multiple,
       clearable: clearable ?? this.clearable,
       confirmation: confirmation ?? this.confirmation,
@@ -169,6 +192,9 @@ class ChoiceController<T> extends ChangeNotifier {
   /// {@endtemplate}
   final ValueChanged<List<T>>? _onChanged;
 
+  /// {@template choice.onCloseModal}
+  /// Called to close modal
+  /// {@endtemplate}
   late final ValueChanged<List<T>?>? _onCloseModal;
 
   /// {@template choice.title}
@@ -265,17 +291,17 @@ class ChoiceController<T> extends ChangeNotifier {
 
   /// Toggle select each element of [choices] collection
   void selectMany(List<T> choices, [bool? active]) {
-    active ??= false;
+    active ??= !any(choices);
     if (active) {
-      replace(choices);
+      addMany(choices);
     } else {
-      removeAll(choices);
+      removeMany(choices);
     }
   }
 
   /// Toggle select [choice] value
   void select(T choice, [bool? active]) {
-    active = active ?? !selected(choice);
+    active ??= !selected(choice);
     if (active) {
       if (multiple) {
         add(choice);
@@ -298,6 +324,14 @@ class ChoiceController<T> extends ChangeNotifier {
     }
   }
 
+  void addMany(List<T> choices) {
+    if (!every(choices)) {
+      _value.addAll(choices);
+      notifyListeners();
+      _onChanged?.call(value);
+    }
+  }
+
   /// Removes [choice] from [value] collection
   void remove(T choice) {
     if (!clearable && _value.length == 1) return;
@@ -309,7 +343,7 @@ class ChoiceController<T> extends ChangeNotifier {
   }
 
   /// Removes each element of [choices] from [value] collection
-  void removeAll(List<T> choices) {
+  void removeMany(List<T> choices) {
     if (!clearable && every(choices)) return;
 
     _value.removeAll(choices);
@@ -335,7 +369,7 @@ class ChoiceController<T> extends ChangeNotifier {
     }
   }
 
-  void closeModal({confirmed = true, VoidCallback? onClosed}) {
+  void closeModal({bool confirmed = true, VoidCallback? onClosed}) {
     search?.detach();
     _onCloseModal?.call(confirmed == true ? value : null);
     onClosed?.call();

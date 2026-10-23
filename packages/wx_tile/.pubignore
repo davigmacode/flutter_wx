@@ -1,3 +1,6 @@
-media/
-example/*
-!example/lib
+﻿media/
+build/
+.dart_tool/
+.fvm/
+coverage/
+

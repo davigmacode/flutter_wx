@@ -20,12 +20,12 @@ class ChoiceText extends StatelessWidget {
   /// Default constructor
   const ChoiceText(
     this.text, {
-    Key? key,
+    super.key,
     this.style,
     this.highlight,
     this.highlightColor,
     this.caseSensitive = false,
-  }) : super(key: key);
+  });
 
   /// Default highlight color
   ///
@@ -41,7 +41,9 @@ class ChoiceText extends StatelessWidget {
 
     final TextStyle defaultTextStyle = DefaultTextStyle.of(context).style;
     final TextStyle textStyle = defaultTextStyle.merge(style);
-    final Pattern pattern = RegExp(q, caseSensitive: caseSensitive);
+    final String highlightEscaped = RegExp.escape(q);
+    final Pattern pattern =
+        RegExp(highlightEscaped, caseSensitive: caseSensitive);
     int start = 0;
     int indexOfHighlight;
     List<TextSpan> spans = [];

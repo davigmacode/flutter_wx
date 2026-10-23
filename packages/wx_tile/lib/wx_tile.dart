@@ -1,4 +1,4 @@
-library wx_tile;
+library;
 
 export 'src/tile/main.dart';
 export 'src/text_tile/main.dart';

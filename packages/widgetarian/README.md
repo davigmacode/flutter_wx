@@ -1,43 +1,78 @@
-![Pub Version](https://img.shields.io/pub/v/widgetarian) ![GitHub](https://img.shields.io/github/license/davigmacode/flutter_widgetarian)
+# Widgetarian
 
+[![Pub Version](https://img.shields.io/pub/v/widgetarian)](https://pub.dev/packages/widgetarian)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-Widgetarian is a UI kit that is not hardcoded to any specific platform or design system, customization by extensible theme preset and event-driven style mechanism, and comes with tons of cool stuff and intuitive API.
+**Widgetarian** is the official umbrella UI toolkit for Flutter, consolidating the best composable, reactive, and beautifully styled components under a single import.
 
-## Features
+## What's Included
 
-* No hardcoded to any specific platform or design system
-* Theme preset for some famous platform
-* Custom or create theme preset to fit your needs
-* Easier event-driven style mechanism than MaterialState
-* Built-in intuitive event-driven style engine
-* Built-in powerful theme provider
-* Tons of cool stuff with intuitive API built from scratch
+Widgetarian re-exports and integrates the entire modular ecosystem:
 
-## Preview
+| Package | Description |
+|---|---|
+| [`wx_text`](https://pub.dev/packages/wx_text) | Advanced text styling, gradients, outlines, filters, and variants |
+| [`wx_text_animated`](https://pub.dev/packages/wx_text_animated) | Smooth animated typography transitions |
+| [`wx_spoiler`](https://pub.dev/packages/wx_spoiler) | Collapsible text and blurred spoiler widgets |
+| [`choice`](https://pub.dev/packages/choice) | Flexible inline and prompted single/multiple selection chips & sheets |
+| [`wx_avatar`](https://pub.dev/packages/wx_avatar) | Customizable avatars with shapes, fallbacks, and badges |
+| [`wx_badge`](https://pub.dev/packages/wx_badge) | Positioned notification and counter badges |
+| [`wx_box`](https://pub.dev/packages/wx_box) | Highly configurable decorated container boxes |
+| [`wx_tile`](https://pub.dev/packages/wx_tile) | Modular ListTile replacement with custom leading, trailing, and alignment |
+| [`wx_divider`](https://pub.dev/packages/wx_divider) | Enhanced dividers with spacing, custom lines, and headers |
+| [`wx_layout`](https://pub.dev/packages/wx_layout) | Layout utilities including `WxGap`, `WxBox`, and sheets |
+| [`fancy_border`](https://pub.dev/packages/fancy_border) | Gradient, dotted, and dashed border decorators |
+| [`marquee_transition`](https://pub.dev/packages/marquee_transition) | Smooth continuous text and widget marquee transitions |
+| [`theme_patrol`](https://pub.dev/packages/theme_patrol) | Declarative theme mode manager and theme switcher |
+| [`wheel_choice`](https://pub.dev/packages/wheel_choice) | iOS-style scrollable wheel pickers |
+| [`disclosure`](https://pub.dev/packages/disclosure) | Accordion and collapsible disclosure panels |
+| [`animated_checkmark`](https://pub.dev/packages/animated_checkmark) | Smooth drawn SVG-style checkmark animations |
+| [`animated_repeatable`](https://pub.dev/packages/animated_repeatable) | Looping and pulsing animation wrappers |
+| [`animated_switcher_transitions`](https://pub.dev/packages/animated_switcher_transitions) | Rich transition effects for AnimatedSwitcher |
+| [`animated_transform`](https://pub.dev/packages/animated_transform) | Implicitly animated scale, rotate, and translate transforms |
+| [`animated_icon_theme`](https://pub.dev/packages/animated_icon_theme) | Animated icon theme transitions |
+| [`overlap_stack`](https://pub.dev/packages/overlap_stack) | Stacking overlapping avatar/card lists |
+| [`chronograph`](https://pub.dev/packages/chronograph) | Precision stopwatch and timer utilities |
+| [`lerp`](https://pub.dev/packages/lerp) | Linear interpolation primitives |
+| [`wx_utils`](https://pub.dev/packages/wx_utils) | Color contrasting and common UI utilities |
 
-[![Preview](https://github.com/davigmacode/flutter_widgetarian/raw/main/media/preview.gif)](https://davigmacode.github.io/flutter_widgetarian)
+## Installation
 
-[Demo](https://davigmacode.github.io/flutter_widgetarian)
+```yaml
+dependencies:
+  widgetarian: ^1.0.0
+```
 
-## Usage
+## Quick Start
 
-For a complete usage, please see the [example](https://pub.dev/packages/widgetarian#-example-tab-).
+Import everything with a single line:
 
-To read more about classes and other references used by `widgetarian`, see the [API Reference](https://pub.dev/documentation/widgetarian/latest/).
+```dart
+import 'package:flutter/material.dart';
+import 'package:widgetarian/widgetarian.dart';
 
-## TODO
+class MyScreen extends StatelessWidget {
+  const MyScreen({super.key});
 
-* Anchor effect likes ripple or sparkle
-* [smart_select](https://pub.dev/packages/smart_select) adoption with more intuitive API
-* Adaptive Drawer, Cards, Skeleton, and many more cool widget
-* Improve API docs
-* Build a landing page
-* Upload example to play store and app store
-* Build community, create discord server or something else.
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: WxListTile(
+          leading: const WxAvatar.circle(child: Text('W')),
+          title: const WxText.titleMedium('Widgetarian App'),
+          subtitle: const Text('All widgets under one clean namespace'),
+          trailing: const WxBadge(
+            content: Text('PRO'),
+            child: Icon(Icons.star, color: Colors.amber),
+          ),
+        ),
+      ),
+    );
+  }
+}
+```
 
+## License
 
-## Sponsoring
-
-<a href="https://nowpayments.io/donation/widgetarian" target="_blank"><img width="250" src="https://nowpayments.io/images/embeds/donation-button-white.svg" alt="Crypto donation button by NOWPayments"></a>
-
-I'm working on my packages on my free-time, but I don't have as much time as I would. If this package or any other package I created is helping you, please consider to sponsor me so that I can take time to read the issues, fix bugs, merge pull requests and add features to these packages.
+MIT © [davigmacode](https://github.com/davigmacode)

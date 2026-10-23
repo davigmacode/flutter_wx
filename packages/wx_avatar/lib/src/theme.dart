@@ -12,10 +12,10 @@ class WxAvatarTheme extends InheritedTheme {
   /// Creates a theme that controls
   /// how descendant [WxAvatarTheme]s should look like.
   const WxAvatarTheme({
-    Key? key,
+    super.key,
     required this.data,
-    required Widget child,
-  }) : super(key: key, child: child);
+    required super.child,
+  });
 
   /// Creates an [WxAvatarTheme] that controls the style of
   /// descendant widgets, and merges in the current [WxAvatarTheme], if any.

@@ -3,7 +3,7 @@ import '../border/widget.dart';
 
 class WxBox extends StatelessWidget {
   const WxBox({
-    Key? key,
+    super.key,
     this.width,
     this.height,
     this.constraints,
@@ -23,7 +23,7 @@ class WxBox extends StatelessWidget {
     this.elevation,
     this.tooltip,
     this.child,
-  }) : super(key: key);
+  });
 
   final Widget? child;
   final double? width;

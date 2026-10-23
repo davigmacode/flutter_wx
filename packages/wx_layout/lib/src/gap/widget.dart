@@ -37,8 +37,8 @@ import 'package:flutter/widgets.dart';
 class WxGap extends StatelessWidget {
   const WxGap(
     this.size, {
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   final double size;
 

@@ -1,4 +1,4 @@
-library choice_prompt;
+library;
 
 export 'src/prompt/types.dart';
 export 'src/prompt/delegate.dart';

@@ -1,4 +1,4 @@
-library wx_layout;
+library;
 
 export 'src/border/main.dart';
 export 'src/box/main.dart';

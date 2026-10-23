@@ -1,4 +1,4 @@
-library wx_badge;
+library;
 
 export 'src/style.dart';
 export 'src/types.dart';

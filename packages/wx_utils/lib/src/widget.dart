@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 
 class WxNullWidget extends StatelessWidget {
-  const WxNullWidget([Key? key]) : super(key: key);
+  const WxNullWidget({super.key});
 
   @override
   Widget build(BuildContext context) {

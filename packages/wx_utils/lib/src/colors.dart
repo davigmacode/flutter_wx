@@ -54,6 +54,7 @@ abstract class WxColors {
     final relativeLuminance = color.computeLuminance();
     final luminance = (relativeLuminance + 0.05) * (relativeLuminance + 0.05);
     final isLight = luminance > kLuminanceThreshold;
+    // ignore: deprecated_member_use
     final isOpaque = color.opacity > kOpaqueThreshold;
 
     return isLight
@@ -80,6 +81,7 @@ abstract class WxColors {
   /// with the alpha channel replaced with
   /// the given opacity (which ranges from 0.0 to 1.0).
   static Color? withOpacity(Color? color, double? opacity) {
+    // ignore: deprecated_member_use
     return opacity != null ? color?.withOpacity(opacity) : color;
   }
 

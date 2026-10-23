@@ -2,13 +2,13 @@ import 'package:flutter/widgets.dart';
 
 class WxBorder extends StatelessWidget {
   const WxBorder({
-    Key? key,
+    super.key,
     this.textDirection,
     this.isForeground = true,
     this.inflate,
     required this.shape,
     this.child,
-  }) : super(key: key);
+  });
 
   final TextDirection? textDirection;
   final bool isForeground;

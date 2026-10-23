@@ -90,7 +90,7 @@ class MarqueeTransitionState extends State<MarqueeTransition> {
     final double minExtent = controller.position.minScrollExtent;
 
     if (!isAvailable) return;
-    await Future.delayed(widget.delay);
+    await Future<void>.delayed(widget.delay);
     await controller.animateTo(
       maxExtent,
       duration: widget.duration,
@@ -98,7 +98,7 @@ class MarqueeTransitionState extends State<MarqueeTransition> {
     );
 
     if (!isAvailable) return;
-    await Future.delayed(widget.reverseDelay ?? widget.delay);
+    await Future<void>.delayed(widget.reverseDelay ?? widget.delay);
     await controller.animateTo(
       minExtent,
       duration: widget.reverseDuration ?? widget.duration,

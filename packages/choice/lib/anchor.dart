@@ -1,4 +1,4 @@
-library choice_anchor;
+library;
 
 export 'src/anchor/main.dart';
 export 'src/anchor/value.dart';

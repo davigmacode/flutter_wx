@@ -1,3 +1,3 @@
-library marquee_transition;
+library;
 
 export 'src/widget.dart';

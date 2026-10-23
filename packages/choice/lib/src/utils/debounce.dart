@@ -14,7 +14,7 @@ class Debounce {
   Debounce({this.delay = const Duration(milliseconds: 250)});
 
   /// run the function
-  run(VoidCallback action, {Duration? delay}) {
+  void run(VoidCallback action, {Duration? delay}) {
     _timer?.cancel();
     _timer = Timer(delay ?? this.delay, action);
   }

@@ -35,7 +35,7 @@ class _AnimatedListTileThemeState
     _dataTween = visitor(
       _dataTween,
       widget.data,
-      (dynamic value) => WxListTileThemeDataTween(begin: value),
+      (dynamic value) => WxListTileThemeDataTween(begin: value as WxListTileThemeData?),
     ) as WxListTileThemeDataTween?;
   }
 

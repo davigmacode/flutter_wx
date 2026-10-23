@@ -7,14 +7,14 @@ import '../utils/main.dart';
 
 class SheetRender extends StatefulWidget {
   const SheetRender({
-    Key? key,
+    super.key,
     required this.theme,
     this.style,
     this.curve,
     this.duration,
     this.tooltip,
     this.child,
-  }) : super(key: key);
+  });
 
   final WxSheetThemeData theme;
   final WxSheetStyle? style;

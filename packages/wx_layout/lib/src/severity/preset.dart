@@ -19,13 +19,13 @@ class ColorThemeDefaults extends ColorThemeData {
 
   Color get unselectedWidgetColor => appTheme.unselectedWidgetColor;
 
-  Color get background => colorScheme.background;
+  Color get background => colorScheme.surface;
   Color get outline => colorScheme.outline;
   Color get shadow => colorScheme.shadow;
 
   Color get surface => colorScheme.surface;
   Color get surfaceTint => colorScheme.surfaceTint;
-  Color get surfaceVariant => colorScheme.surfaceVariant;
+  Color get surfaceVariant => colorScheme.surfaceContainerHighest;
   Color get onSurface => colorScheme.onSurface;
   Color get onSurfaceVariant => colorScheme.onSurfaceVariant;
 

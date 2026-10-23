@@ -1,4 +1,4 @@
-library choice;
+library;
 
 export 'selection.dart';
 export 'inline.dart';

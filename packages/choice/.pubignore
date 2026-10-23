@@ -1,1 +1,6 @@
-.fvm/flutter_sdk
+﻿media/
+build/
+.dart_tool/
+.fvm/
+coverage/
+

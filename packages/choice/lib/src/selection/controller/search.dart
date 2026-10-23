@@ -22,13 +22,6 @@ class ChoiceSearchController extends ChangeNotifier {
     this.onChanged,
   });
 
-  /// Create a controller of the search value and how it behaves
-  ChoiceSearchController.defaults({
-    required BuildContext context,
-    this.onChanged,
-  })  : onAttach = defaultOnAttach(context),
-        onDetach = defaultOnDetach(context);
-
   /// Called when search attached
   ///
   /// Usually function to add history to route
@@ -43,7 +36,7 @@ class ChoiceSearchController extends ChangeNotifier {
   ///   }
   /// )
   /// ```
-  final ValueChanged<ChoiceSearchController> onAttach;
+  final ValueSetter<ChoiceSearchController> onAttach;
 
   /// Called when search attached
   ///
@@ -56,10 +49,10 @@ class ChoiceSearchController extends ChangeNotifier {
   ///   }
   /// )
   /// ```
-  final ValueChanged<ChoiceSearchController> onDetach;
+  final ValueSetter<ChoiceSearchController> onDetach;
 
   /// Called when search value changed
-  final ValueChanged<String>? onChanged;
+  final ValueSetter<String>? onChanged;
 
   /// Debounce used in search text on changed
   final Debounce _debounce = Debounce();
@@ -124,6 +117,21 @@ class ChoiceSearchController extends ChangeNotifier {
     } else {
       _apply(val);
     }
+  }
+
+  /// Create a nullable search controller with build context
+  static ChoiceSearchController? create({
+    required BuildContext context,
+    bool searchable = false,
+    ValueSetter<String>? onChanged,
+  }) {
+    return searchable
+        ? ChoiceSearchController(
+            onAttach: defaultOnAttach(context),
+            onDetach: defaultOnDetach(context),
+            onChanged: onChanged,
+          )
+        : null;
   }
 
   static ValueChanged<ChoiceSearchController> defaultOnAttach(

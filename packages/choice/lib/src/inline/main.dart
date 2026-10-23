@@ -94,12 +94,17 @@ class InlineChoice<T> extends ChoiceList<T> {
     required super.itemCount,
     required super.itemBuilder,
     super.itemSkip,
+    super.itemGroup,
     super.dividerBuilder,
     super.leadingBuilder,
     super.trailingBuilder,
     super.placeholderBuilder,
     super.loaderBuilder,
     super.errorBuilder,
+    super.groupSort,
+    super.groupBuilder,
+    super.groupItemBuilder,
+    super.groupHeaderBuilder,
     ChoiceListBuilder? listBuilder,
   }) : super(builder: listBuilder);
 
@@ -172,12 +177,17 @@ class InlineChoice<T> extends ChoiceList<T> {
     required super.itemCount,
     required super.itemBuilder,
     super.itemSkip,
+    super.itemGroup,
     super.dividerBuilder,
     super.leadingBuilder,
     super.trailingBuilder,
     super.placeholderBuilder,
     super.loaderBuilder,
     super.errorBuilder,
+    super.groupSort,
+    super.groupBuilder,
+    super.groupItemBuilder,
+    super.groupHeaderBuilder,
     ChoiceListBuilder? listBuilder,
   })  : multiple = false,
         value = ChoiceSingle.value(value),
@@ -253,12 +263,17 @@ class InlineChoice<T> extends ChoiceList<T> {
     required super.itemCount,
     required super.itemBuilder,
     super.itemSkip,
+    super.itemGroup,
     super.dividerBuilder,
     super.leadingBuilder,
     super.trailingBuilder,
     super.placeholderBuilder,
     super.loaderBuilder,
     super.errorBuilder,
+    super.groupSort,
+    super.groupBuilder,
+    super.groupItemBuilder,
+    super.groupHeaderBuilder,
     ChoiceListBuilder? listBuilder,
   })  : multiple = true,
         super(builder: listBuilder);
@@ -268,8 +283,6 @@ class InlineChoice<T> extends ChoiceList<T> {
 
   /// {@macro choice.clearable}
   final bool clearable;
-
-  // final bool loading;
 
   /// {@macro choice.value}
   final List<T> value;

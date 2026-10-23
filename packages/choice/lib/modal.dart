@@ -1,4 +1,4 @@
-library choice_modal;
+library;
 
 export 'src/modal/types.dart';
 export 'src/modal/header.dart';

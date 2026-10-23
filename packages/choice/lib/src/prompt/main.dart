@@ -3,8 +3,8 @@ import 'package:choice/selection.dart';
 import 'package:choice/inline.dart';
 import 'package:choice/modal.dart';
 import 'package:choice/anchor.dart';
+import 'package:choice/utils.dart';
 import 'delegate.dart';
-import 'headless.dart';
 import 'types.dart';
 
 /// Widget to create prompted choice with single or multiple selection
@@ -112,12 +112,17 @@ class PromptedChoice<T> extends StatefulWidget {
     required this.itemCount,
     required this.itemBuilder,
     this.itemSkip,
+    this.itemGroup,
     this.dividerBuilder,
     this.leadingBuilder,
     this.trailingBuilder,
     this.placeholderBuilder,
     this.errorBuilder,
     this.loaderBuilder,
+    this.groupSort,
+    this.groupBuilder,
+    this.groupItemBuilder,
+    this.groupHeaderBuilder,
     this.listBuilder,
     this.modalHeaderBuilder,
     this.modalFooterBuilder,
@@ -215,12 +220,17 @@ class PromptedChoice<T> extends StatefulWidget {
     required this.itemCount,
     required this.itemBuilder,
     this.itemSkip,
+    this.itemGroup,
     this.dividerBuilder,
     this.leadingBuilder,
     this.trailingBuilder,
     this.placeholderBuilder,
     this.errorBuilder,
     this.loaderBuilder,
+    this.groupSort,
+    this.groupBuilder,
+    this.groupItemBuilder,
+    this.groupHeaderBuilder,
     this.listBuilder,
     this.modalHeaderBuilder,
     this.modalFooterBuilder,
@@ -317,12 +327,17 @@ class PromptedChoice<T> extends StatefulWidget {
     required this.itemCount,
     required this.itemBuilder,
     this.itemSkip,
+    this.itemGroup,
     this.dividerBuilder,
     this.leadingBuilder,
     this.trailingBuilder,
     this.placeholderBuilder,
     this.errorBuilder,
     this.loaderBuilder,
+    this.groupSort,
+    this.groupBuilder,
+    this.groupItemBuilder,
+    this.groupHeaderBuilder,
     this.listBuilder,
     this.modalHeaderBuilder,
     this.modalFooterBuilder,
@@ -365,7 +380,10 @@ class PromptedChoice<T> extends StatefulWidget {
   final IndexedChoiceStateBuilder<T> itemBuilder;
 
   /// {@macro choice.list.itemSkip}
-  final ChoiceSkipCallback? itemSkip;
+  final ChoiceSkipResolver<T>? itemSkip;
+
+  /// {@macro choice.list.itemGroup}
+  final ChoiceGroupResolver? itemGroup;
 
   /// {@macro choice.list.dividerBuilder}
   final ChoiceStateBuilder<T>? dividerBuilder;
@@ -384,6 +402,18 @@ class PromptedChoice<T> extends StatefulWidget {
 
   /// {@macro choice.list.loaderBuilder}
   final ChoiceStateBuilder<T>? loaderBuilder;
+
+  /// {@macro choice.list.groupSort}
+  final ChoiceGroupSortResolver? groupSort;
+
+  /// {@macro choice.list.groupBuilder}
+  final ChoiceGroupBuilder? groupBuilder;
+
+  /// {@macro choice.list.groupItemBuilder}
+  final ChoiceGroupItemBuilder? groupItemBuilder;
+
+  /// {@macro choice.list.groupHeaderBuilder}
+  final ChoiceGroupHeaderBuilder<T>? groupHeaderBuilder;
 
   /// {@macro choice.list.builder}
   final ChoiceListBuilder? listBuilder;
@@ -420,6 +450,36 @@ class PromptedChoice<T> extends StatefulWidget {
 
   static final defaultListBuilder = ChoiceList.createVirtualized();
 
+  Widget get modal {
+    return ChoiceModal<T>(
+      fit: modalFit,
+      headerBuilder: modalHeaderBuilder,
+      footerBuilder: modalFooterBuilder,
+      separatorBuilder: modalSeparatorBuilder,
+      bodyBuilder: (state) {
+        return ChoiceList<T>(
+          loading: loading,
+          error: error,
+          itemSkip: itemSkip,
+          itemGroup: itemGroup,
+          itemCount: itemCount,
+          itemBuilder: itemBuilder,
+          dividerBuilder: dividerBuilder,
+          leadingBuilder: leadingBuilder,
+          trailingBuilder: trailingBuilder,
+          placeholderBuilder: placeholderBuilder,
+          errorBuilder: errorBuilder,
+          loaderBuilder: loaderBuilder,
+          groupSort: groupSort,
+          groupBuilder: groupBuilder,
+          groupItemBuilder: groupItemBuilder,
+          groupHeaderBuilder: groupHeaderBuilder,
+          builder: listBuilder ?? PromptedChoice.defaultListBuilder,
+        );
+      },
+    );
+  }
+
   @override
   State<PromptedChoice<T>> createState() => _PromptedChoiceState<T>();
 }
@@ -427,38 +487,38 @@ class PromptedChoice<T> extends StatefulWidget {
 class _PromptedChoiceState<T> extends State<PromptedChoice<T>> {
   StateSetter? _rebuildModal;
 
+  ChoicePromptDelegate<T> get effectivePromptDelegate =>
+      widget.promptDelegate ?? ChoicePrompt.delegatePopupDialog<T>();
+
+  ChoicePromptBuilder<T> get effectiveAnchorBuilder =>
+      widget.anchorBuilder ?? ChoiceAnchor.create();
+
   VoidCallback createOpenModal(
     BuildContext context,
     ChoiceController<T> state,
   ) {
     return () async {
-      final res = await createPrompt<T>(
-          context: context,
-          title: state.title,
-          multiple: state.multiple,
-          clearable: state.clearable,
-          confirmation: state.confirmation,
-          loading: state.loading,
-          error: state.error,
-          value: state.value,
-          delegate: widget.promptDelegate ?? ChoicePrompt.delegatePopupDialog(),
-          itemSkip: widget.itemSkip,
-          itemCount: widget.itemCount,
-          itemBuilder: widget.itemBuilder,
-          dividerBuilder: widget.dividerBuilder,
-          leadingBuilder: widget.leadingBuilder,
-          trailingBuilder: widget.trailingBuilder,
-          placeholderBuilder: widget.placeholderBuilder,
-          errorBuilder: widget.errorBuilder,
-          loaderBuilder: widget.loaderBuilder,
-          listBuilder: widget.listBuilder,
-          modalHeaderBuilder: widget.modalHeaderBuilder,
-          modalFooterBuilder: widget.modalFooterBuilder,
-          modalSeparatorBuilder: widget.modalSeparatorBuilder,
-          modalFit: widget.modalFit,
-          onShow: (rebuildModal) {
-            _rebuildModal = rebuildModal;
-          });
+      final res = await effectivePromptDelegate(
+        context,
+        Builder(
+          builder: (modalContext) {
+            return ChoiceProvider<T>(
+              controller: ChoiceController.createModalController(
+                modalContext: modalContext,
+                rootController: state,
+                searchable: widget.searchable,
+                onSearch: widget.onSearch,
+              ),
+              child: SafeStatefulBuilder(
+                builder: (_, setModalState) {
+                  _rebuildModal = setModalState;
+                  return widget.modal;
+                },
+              ),
+            );
+          },
+        ),
+      );
       if (res != null) {
         state.replace(res);
       }
@@ -469,7 +529,7 @@ class _PromptedChoiceState<T> extends State<PromptedChoice<T>> {
   void didUpdateWidget(covariant PromptedChoice<T> oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (widget != oldWidget) {
+    if (widget.modal != oldWidget.modal) {
       Future.delayed(Duration.zero, () async {
         _rebuildModal?.call(() {});
       });
@@ -489,45 +549,8 @@ class _PromptedChoiceState<T> extends State<PromptedChoice<T>> {
         value: widget.value,
         onChanged: widget.onChanged,
       ),
-      builder: (state, _) {
-        final anchorBuilder = widget.anchorBuilder ?? ChoiceAnchor.create();
-        return anchorBuilder(state, createOpenModal(context, state));
-        // return ChoicePrompt<T>(
-        //   searchable: widget.searchable,
-        //   onSearch: widget.onSearch,
-        //   delegate: widget.promptDelegate,
-        //   builder: widget.anchorBuilder ?? ChoiceAnchor.create(),
-        //   modal: ChoiceModal<T>(
-        //     selectionBuilder: (modalContext) => state.copyWith(
-        //       search: widget.searchable
-        //           ? ChoiceSearchController.defaults(
-        //               context: modalContext,
-        //               onChanged: widget.onSearch,
-        //             )
-        //           : null,
-        //       onChanged: widget.onChanged,
-        //       onCloseModal: (value) {
-        //         Navigator.maybePop(modalContext, value);
-        //       },
-        //     ),
-        //     loading: widget.loading,
-        //     error: widget.error,
-        //     itemSkip: widget.itemSkip,
-        //     itemCount: widget.itemCount,
-        //     itemBuilder: widget.itemBuilder,
-        //     dividerBuilder: widget.dividerBuilder,
-        //     leadingBuilder: widget.leadingBuilder,
-        //     trailingBuilder: widget.trailingBuilder,
-        //     placeholderBuilder: widget.placeholderBuilder,
-        //     errorBuilder: widget.errorBuilder,
-        //     loaderBuilder: widget.loaderBuilder,
-        //     listBuilder: widget.listBuilder,
-        //     headerBuilder: widget.modalHeaderBuilder,
-        //     footerBuilder: widget.modalFooterBuilder,
-        //     separatorBuilder: widget.modalSeparatorBuilder,
-        //     fit: widget.modalFit,
-        //   ),
-        // );
+      builder: (state, child) {
+        return effectiveAnchorBuilder(state, createOpenModal(context, state));
       },
     );
   }

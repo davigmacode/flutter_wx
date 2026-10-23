@@ -6,8 +6,8 @@ class ChoiceProvider<T> extends InheritedNotifier<ChoiceController<T>> {
   const ChoiceProvider({
     super.key,
     required ChoiceController<T> controller,
-    required Widget child,
-  }) : super(notifier: controller, child: child);
+    required super.child,
+  }) : super(notifier: controller);
 
   ChoiceProvider.builder({
     super.key,

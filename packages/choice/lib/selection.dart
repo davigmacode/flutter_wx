@@ -1,4 +1,4 @@
-library choice_selection;
+library;
 
 export 'src/selection/controller/main.dart';
 export 'src/selection/controller/search.dart';

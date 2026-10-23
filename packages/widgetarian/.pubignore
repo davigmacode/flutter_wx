@@ -1,0 +1,6 @@
+legacy/
+media/
+build/
+.dart_tool/
+.fvm/
+coverage/
