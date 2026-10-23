@@ -1,4 +1,4 @@
-library animated_icon_theme;
+library;
 
 import 'package:flutter/widgets.dart';
 

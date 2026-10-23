@@ -1,4 +1,4 @@
-library animated_checkmark;
+library;
 
 export 'src/raw.dart';
 export 'src/painter.dart';

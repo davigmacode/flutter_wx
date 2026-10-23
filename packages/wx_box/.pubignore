@@ -1,11 +1,5 @@
+media/
 build/
-coverage/
 .dart_tool/
 .fvm/
-.idea/
-.vscode/
-*.iml
-media/
-example/*
-!example/lib
-!example/README.md
+coverage/

@@ -11,7 +11,7 @@ class RawCheckmark extends CustomPaint {
   /// The [progress], [color], [weight], [rounded], and [size] parameters
   /// allow customization of the checkmark's appearance.
   RawCheckmark({
-    Key? key,
+    super.key,
     double? progress,
     Color? color,
     double? weight,
@@ -20,7 +20,6 @@ class RawCheckmark extends CustomPaint {
     bool? drawDash,
     double? size,
   }) : super(
-          key: key,
           size: size != null ? Size.square(size) : Size.zero,
           painter: CheckmarkPainter(
             progress: progress,

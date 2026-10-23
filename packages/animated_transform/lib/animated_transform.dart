@@ -1,4 +1,4 @@
-library animated_transform;
+library;
 
 import 'package:flutter/widgets.dart';
 
@@ -79,38 +79,38 @@ class AnimatedTransformState
     _tweenOffset = visitor(
       _tweenOffset,
       widget.offset,
-      (dynamic value) => Tween<Offset>(begin: value),
+      (dynamic value) => Tween<Offset>(begin: value as Offset?),
     ) as Tween<Offset>?;
 
     _tweenScale = visitor(
       _tweenScale,
       widget.scale,
-      (dynamic value) => Tween<double>(begin: value),
+      (dynamic value) => Tween<double>(begin: value as double?),
     ) as Tween<double>?;
 
     _tweenRotateZ = visitor(
       _tweenRotateZ,
       widget.rotate,
-      (dynamic value) => Tween<double>(begin: value),
+      (dynamic value) => Tween<double>(begin: value as double?),
     ) as Tween<double>?;
 
     _tweenRotateX = visitor(
       _tweenRotateX,
       widget.flipY ? _pi : 0.0,
-      (dynamic value) => Tween<double>(begin: value),
+      (dynamic value) => Tween<double>(begin: value as double?),
     ) as Tween<double>?;
 
     _tweenRotateY = visitor(
       _tweenRotateY,
       widget.flipX ? _pi : 0.0,
-      (dynamic value) => Tween<double>(begin: value),
+      (dynamic value) => Tween<double>(begin: value as double?),
     ) as Tween<double>?;
 
     _tweenAlignment = visitor(
       _tweenAlignment,
       widget.alignment,
       (dynamic value) =>
-          AlignmentGeometryTween(begin: value as AlignmentGeometry),
+          AlignmentGeometryTween(begin: value as AlignmentGeometry?),
     ) as AlignmentGeometryTween?;
   }
 
@@ -123,9 +123,10 @@ class AnimatedTransformState
     final rotateZ = _tweenRotateZ?.evaluate(animation) ?? 0.0;
     final alignment = _tweenAlignment?.evaluate(animation);
 
+    final s = scale > 0 ? scale : 0.0;
     final transform = Matrix4.identity()
-      ..translate(offset.dx, offset.dy)
-      ..scale(scale > 0 ? scale : 0.0)
+      ..translateByDouble(offset.dx, offset.dy, 0.0, 1.0)
+      ..scaleByDouble(s, s, 1.0, 1.0)
       ..rotateZ(_getRadiansFromDegrees(rotateZ))
       ..rotateX(rotateX)
       ..rotateY(rotateY);

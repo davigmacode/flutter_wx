@@ -65,25 +65,25 @@ class CheckmarkRenderState extends AnimatedWidgetBaseState<CheckmarkRender> {
           : widget.checked
               ? 1.0
               : 0.0,
-      (dynamic value) => Tween<double>(begin: value),
+      (dynamic value) => Tween<double>(begin: value as double),
     ) as Tween<double>?;
 
     weight = visitor(
       weight,
       widget.effectiveWeight,
-      (dynamic value) => Tween<double>(begin: value),
+      (dynamic value) => Tween<double>(begin: value as double),
     ) as Tween<double>?;
 
     size = visitor(
       size,
       widget.size,
-      (dynamic value) => Tween<double?>(begin: value),
+      (dynamic value) => Tween<double?>(begin: value as double?),
     ) as Tween<double?>?;
 
     color = visitor(
       color,
       widget.color,
-      (dynamic value) => ColorTween(begin: value),
+      (dynamic value) => ColorTween(begin: value as Color?),
     ) as ColorTween?;
   }
 

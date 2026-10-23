@@ -282,61 +282,64 @@ class AnimatedBoxState extends AnimatedWidgetBaseState<WxAnimatedBox> {
     widthTween = visitor(
       widthTween,
       widget.width,
-      (dynamic value) => Tween<double?>(begin: value),
+      (dynamic value) => Tween<double?>(begin: value as double?),
     ) as Tween<double?>?;
 
     heightTween = visitor(
       heightTween,
       widget.height,
-      (dynamic value) => Tween<double?>(begin: value),
+      (dynamic value) => Tween<double?>(begin: value as double?),
     ) as Tween<double?>?;
 
     constraintsTween = visitor(
       constraintsTween,
       widget.constraints,
-      (dynamic value) => BoxConstraintsTween(begin: value),
+      (dynamic value) => BoxConstraintsTween(begin: value as BoxConstraints?),
     ) as BoxConstraintsTween?;
 
     alignmentTween = visitor(
       alignmentTween,
       widget.alignment,
-      (dynamic value) => AlignmentGeometryTween(begin: value),
+      (dynamic value) =>
+          AlignmentGeometryTween(begin: value as AlignmentGeometry?),
     ) as AlignmentGeometryTween?;
 
     paddingTween = visitor(
       paddingTween,
       widget.padding,
-      (value) => EdgeInsetsGeometryTween(begin: value),
+      (dynamic value) =>
+          EdgeInsetsGeometryTween(begin: value as EdgeInsetsGeometry?),
     ) as EdgeInsetsGeometryTween?;
 
     marginTween = visitor(
       marginTween,
       widget.margin,
-      (value) => EdgeInsetsGeometryTween(begin: value),
+      (dynamic value) =>
+          EdgeInsetsGeometryTween(begin: value as EdgeInsetsGeometry?),
     ) as EdgeInsetsGeometryTween?;
 
     decorationTween = visitor(
       decorationTween,
       decoration,
-      (dynamic value) => DecorationTween(begin: value),
+      (dynamic value) => DecorationTween(begin: value as Decoration?),
     ) as DecorationTween;
 
     elevationColorTween = visitor(
       elevationColorTween,
       widget.elevationColor,
-      (dynamic value) => ColorTween(begin: value),
+      (dynamic value) => ColorTween(begin: value as Color?),
     ) as ColorTween?;
 
     elevationTween = visitor(
       elevationTween,
       widget.elevation,
-      (dynamic value) => Tween<double?>(begin: value),
+      (dynamic value) => Tween<double?>(begin: value as double?),
     ) as Tween<double?>?;
 
     borderShapeTween = visitor(
       borderShapeTween,
       borderShape,
-      (dynamic value) => ShapeBorderTween(begin: value),
+      (dynamic value) => ShapeBorderTween(begin: value as ShapeBorder?),
     ) as ShapeBorderTween?;
   }
 

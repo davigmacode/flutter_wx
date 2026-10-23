@@ -5,7 +5,12 @@ environment:
   sdk: '>=3.5.0 <4.0.0'
 
 workspace:
+  - packages/animated_checkmark
+  - packages/animated_icon_theme
   - packages/animated_repeatable
+  - packages/animated_switcher_transitions
+  - packages/animated_transform
+  - packages/wx_box
   - packages/wx_text
   - packages/wx_text_spoiler
   - packages/wx_text_animated
