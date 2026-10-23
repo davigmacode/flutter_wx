@@ -1,6 +1,6 @@
 name: flutter_wx
 repository: https://github.com/davigmacode/flutter_wx
-sdkPath: .fvm/flutter_sdk
+sdkPath: auto
 
 packages:
   - packages/**
