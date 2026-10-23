@@ -1,0 +1,5 @@
+media/
+build/
+coverage/
+example/*
+!example/lib
