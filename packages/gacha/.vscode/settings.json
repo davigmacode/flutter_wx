@@ -1,0 +1,31 @@
+{
+  "dart.flutterSdkPath": ".fvm\\versions\\3.29.0",
+  "search.exclude": {
+    "**/.fvm": true
+  },
+  "files.watcherExclude": {
+    "**/.fvm": true
+  },
+  "[dart]": {
+    "editor.defaultFormatter": "Dart-Code.dart-code",
+    "editor.formatOnSave": true
+  },
+  "cSpell.words": [
+    "davigmacode",
+    "Diagnosticable",
+    "gacha",
+    "Irfan",
+    "lerp",
+    "lerped",
+    "LTRB",
+    "LTWH",
+    "pote",
+    "Reclip",
+    "rrect",
+    "STEB",
+    "subosito",
+    "Taufik",
+    "Vigma",
+    "Widgetarian"
+]
+}
