@@ -1,0 +1,1 @@
+Provide common functionalities that can be reused across different parts of the Widgetarian codebase.
