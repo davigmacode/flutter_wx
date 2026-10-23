@@ -34,6 +34,7 @@ dependencies:
   chronograph: ^1.0.2
   disclosure: ^2.2.0
   fancy_border: ^0.0.3
+  gacha: ^1.0.0
   lerp: ^0.0.2
   marquee_transition: ^0.1.0
   overlap_stack: ^1.0.1

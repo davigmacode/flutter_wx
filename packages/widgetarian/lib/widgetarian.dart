@@ -9,6 +9,7 @@ export 'package:choice/choice.dart';
 export 'package:chronograph/chronograph.dart';
 export 'package:disclosure/disclosure.dart';
 export 'package:fancy_border/fancy_border.dart';
+export 'package:gacha/gacha.dart';
 export 'package:lerp/lerp.dart';
 export 'package:marquee_transition/marquee_transition.dart';
 export 'package:overlap_stack/overlap_stack.dart';
