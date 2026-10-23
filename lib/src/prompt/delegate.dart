@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:choice/selection.dart';
 import 'package:choice/utils.dart';
+import 'headless.dart';
 import 'types.dart';
 
 class ChoicePrompt<T> extends StatefulWidget {

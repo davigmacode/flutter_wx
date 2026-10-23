@@ -22,6 +22,13 @@ class ChoiceSearchController extends ChangeNotifier {
     this.onChanged,
   });
 
+  /// Create a controller of the search value and how it behaves
+  ChoiceSearchController.defaults({
+    required BuildContext context,
+    this.onChanged,
+  })  : onAttach = defaultOnAttach(context),
+        onDetach = defaultOnDetach(context);
+
   /// Called when search attached
   ///
   /// Usually function to add history to route
@@ -36,7 +43,7 @@ class ChoiceSearchController extends ChangeNotifier {
   ///   }
   /// )
   /// ```
-  final ValueSetter<ChoiceSearchController> onAttach;
+  final ValueChanged<ChoiceSearchController> onAttach;
 
   /// Called when search attached
   ///
@@ -49,10 +56,10 @@ class ChoiceSearchController extends ChangeNotifier {
   ///   }
   /// )
   /// ```
-  final ValueSetter<ChoiceSearchController> onDetach;
+  final ValueChanged<ChoiceSearchController> onDetach;
 
   /// Called when search value changed
-  final ValueSetter<String>? onChanged;
+  final ValueChanged<String>? onChanged;
 
   /// Debounce used in search text on changed
   final Debounce _debounce = Debounce();
@@ -117,5 +124,28 @@ class ChoiceSearchController extends ChangeNotifier {
     } else {
       _apply(val);
     }
+  }
+
+  static ValueChanged<ChoiceSearchController> defaultOnAttach(
+    BuildContext context,
+  ) {
+    return (state) {
+      // add history to route, so back button will appear
+      // and when physical back button pressed
+      // will close the search bar instead of close the modal
+      LocalHistoryEntry entry = LocalHistoryEntry(
+        onRemove: state.deactivate,
+      );
+      ModalRoute.of(context)?.addLocalHistoryEntry(entry);
+    };
+  }
+
+  static ValueChanged<ChoiceSearchController> defaultOnDetach(
+    BuildContext context,
+  ) {
+    return (state) {
+      // remove search from route history
+      Navigator.pop(context);
+    };
   }
 }

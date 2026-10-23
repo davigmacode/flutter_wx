@@ -1,26 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:choice/selection.dart';
+import 'package:choice/inline.dart';
+import 'package:choice/utils.dart';
 import 'header.dart';
 import 'search.dart';
 import 'footer.dart';
 import 'separator.dart';
 import 'button.dart';
 
-class ChoiceModal<T> extends StatelessWidget {
-  const ChoiceModal({
+class ChoiceModal<T> extends ChoiceList<T> {
+  ChoiceModal({
     super.key,
-    required this.bodyBuilder,
+    required this.selectionBuilder,
+    required super.itemCount,
+    required super.itemBuilder,
+    super.itemSkip,
+    super.dividerBuilder,
+    super.leadingBuilder,
+    super.trailingBuilder,
+    super.placeholderBuilder,
+    super.errorBuilder,
+    super.loaderBuilder,
+    super.loading = false,
+    super.error = false,
     this.headerBuilder,
     this.footerBuilder,
     this.separatorBuilder,
     this.onWillClose,
+    this.onShow,
     this.fit = FlexFit.loose,
-  });
+    ChoiceListBuilder? listBuilder,
+  }) : super(builder: listBuilder ?? defaultListBuilder);
 
-  /// {@template choice.modal.bodyBuilder}
-  /// Called to build modal body widget
-  /// {@endtemplate}
-  final ChoiceStateBuilder<T> bodyBuilder;
+  static final defaultListBuilder = ChoiceList.createVirtualized();
+
+  final ChoiceController<T> Function(BuildContext context) selectionBuilder;
 
   /// {@template choice.modal.headerBuilder}
   /// Called to build modal header widget
@@ -43,6 +57,8 @@ class ChoiceModal<T> extends StatelessWidget {
   /// If the callback returns a Future that resolves to false, the enclosing route will not be popped.
   /// {@endtemplate}
   final Future<bool> Function()? onWillClose;
+
+  final ValueSetter<StateSetter>? onShow;
 
   /// {@template choice.modal.fit}
   /// How a flexible modal body is inscribed into the available space.
@@ -85,19 +101,25 @@ class ChoiceModal<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: onWillClose,
-      child: ChoiceConsumer<T>(builder: (state, _) {
-        return Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            headerBuilder?.call(state),
-            if (headerBuilder != null) separatorBuilder?.call(state),
-            Flexible(fit: fit, child: bodyBuilder(state)),
-            if (footerBuilder != null) separatorBuilder?.call(state),
-            footerBuilder?.call(state),
-          ].whereType<Widget>().toList(),
-        );
-      }),
+      child: ChoiceProvider<T>.builder(
+        controller: selectionBuilder(context),
+        builder: (state, _) {
+          return SafeStatefulBuilder(builder: (_, rebuild) {
+            onShow?.call(rebuild);
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                headerBuilder?.call(state),
+                if (headerBuilder != null) separatorBuilder?.call(state),
+                Flexible(fit: fit, child: super.build(context)),
+                if (footerBuilder != null) separatorBuilder?.call(state),
+                footerBuilder?.call(state),
+              ].whereType<Widget>().toList(),
+            );
+          });
+        },
+      ),
     );
   }
 }
