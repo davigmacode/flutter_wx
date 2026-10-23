@@ -1,3 +1,3 @@
-library animated_transform;
+library;
 
 export 'package:animated_transform/animated_transform.dart';

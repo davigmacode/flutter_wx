@@ -174,7 +174,7 @@ class RenderOverlay extends RenderProxyBox {
     canvas.save();
     canvas.translate(offset.dx, offset.dy);
 
-    final paint = Paint()..color = color.withOpacity(opacity);
+    final paint = Paint()..color = color.withValues(alpha: opacity);
     final origin = Offset.zero & size;
     final rect = Rect.fromCenter(
       center: origin.center,

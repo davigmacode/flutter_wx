@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:wx_anchor/wx_anchor.dart';
-import 'package:wx_text/wx_text.dart';
 
 void main() {
   runApp(const MyApp());
@@ -30,18 +29,13 @@ class MyHomePage extends StatelessWidget {
     return Wrapper(
       children: <Widget>[
         const SizedBox(height: 40),
-        const WxText.displayMedium(
+        Text(
           'WxAnchor',
-          gradient: LinearGradient(
-            colors: [
-              Colors.green,
-              Colors.blue,
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          fontWeight: FontWeight.bold,
-          letterSpacing: -2,
+          style: Theme.of(context).textTheme.displayMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: Colors.blue,
+                letterSpacing: -2,
+              ),
         ),
         const SizedBox(height: 40),
         Example(
@@ -163,7 +157,7 @@ class Example extends StatelessWidget {
       children: [
         Padding(
           padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
-          child: WxText.labelLarge(title),
+          child: Text(title, style: Theme.of(context).textTheme.labelLarge),
         ),
         Card.outlined(
           child: SizedBox(

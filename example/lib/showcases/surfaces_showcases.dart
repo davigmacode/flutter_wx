@@ -413,3 +413,306 @@ OverlapStack(
     );
   }
 }
+
+class WxAnchorShowcase extends StatefulWidget {
+  const WxAnchorShowcase({super.key});
+
+  @override
+  State<WxAnchorShowcase> createState() => _WxAnchorShowcaseState();
+}
+
+class _WxAnchorShowcaseState extends State<WxAnchorShowcase> {
+  late final WidgetEventController _eventController;
+  int _tapCount = 0;
+  bool _disabled = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _eventController = WidgetEventController();
+  }
+
+  @override
+  void dispose() {
+    _eventController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return ShowcaseScaffold(
+      packageName: 'wx_anchor',
+      version: '2.1.1',
+      description:
+          'Universal click and touch responsive surface with built-in visual feedback (scale, opacity, overlays), cursor handling, and state orchestration.',
+      children: [
+        ShowcaseCard(
+          title: 'Interactive Anchor Card',
+          subtitle: 'Touch-responsive card with smooth scale and overlay feedback.',
+          codeSnippet: '''
+WxAnchor(
+  borderRadius: BorderRadius.circular(16),
+  scale: 0.97,
+  overlay: true,
+  overlayColor: Theme.of(context).colorScheme.primary,
+  eventsController: _eventController,
+  onTap: () => setState(() => _tapCount++),
+  child: ...
+)''',
+          child: Column(
+            children: [
+              WxAnchor(
+                borderRadius: BorderRadius.circular(16),
+                scale: 0.97,
+                overlay: true,
+                overlayColor: colorScheme.primary,
+                eventsController: _eventController,
+                disabled: _disabled,
+                onTap: () => setState(() => _tapCount++),
+                child: Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: colorScheme.outlineVariant.withValues(alpha: 0.5),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: colorScheme.primaryContainer,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.touch_app_rounded,
+                          color: colorScheme.onPrimaryContainer,
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Tap or Hover This Anchor',
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              'Tapped \$_tapCount times • Scale & ripple feedback active',
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Icon(
+                        Icons.chevron_right_rounded,
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              ListenableBuilder(
+                listenable: _eventController,
+                builder: (context, _) {
+                  final events = _eventController.value;
+                  return Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      Text(
+                        'Live Events:',
+                        style: theme.textTheme.labelMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      _EventBadge(
+                        label: 'Hovered',
+                        active: events.contains(WidgetEvent.hovered),
+                        color: Colors.blue,
+                      ),
+                      _EventBadge(
+                        label: 'Pressed',
+                        active: events.contains(WidgetEvent.pressed),
+                        color: Colors.orange,
+                      ),
+                      _EventBadge(
+                        label: 'Focused',
+                        active: events.contains(WidgetEvent.focused),
+                        color: Colors.purple,
+                      ),
+                      _EventBadge(
+                        label: 'Disabled',
+                        active: events.contains(WidgetEvent.disabled),
+                        color: Colors.red,
+                      ),
+                    ],
+                  );
+                },
+              ),
+              const SizedBox(height: 12),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  FilterChip(
+                    label: const Text('Toggle Disabled'),
+                    selected: _disabled,
+                    onSelected: (val) => setState(() => _disabled = val),
+                  ),
+                  const SizedBox(width: 12),
+                  OutlinedButton.icon(
+                    onPressed: () => setState(() => _tapCount = 0),
+                    icon: const Icon(Icons.refresh_rounded, size: 16),
+                    label: const Text('Reset Count'),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        ShowcaseCard(
+          title: 'Circular Anchors & Custom Overlays',
+          subtitle: 'Circular action anchors with customized ripple radius and icons.',
+          codeSnippet: '''
+WxAnchor.circle(
+  overlayRadius: 28,
+  overlayColor: Colors.deepPurple,
+  onTap: () {},
+  child: Icon(Icons.favorite_rounded),
+)''',
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              WxAnchor.circle(
+                overlayRadius: 28,
+                overlayColor: Colors.pink,
+                scale: 0.88,
+                onTap: () {},
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Icon(Icons.favorite_rounded, color: Colors.pink.shade400, size: 28),
+                ),
+              ),
+              WxAnchor.circle(
+                overlayRadius: 28,
+                overlayColor: Colors.amber,
+                scale: 0.88,
+                onTap: () {},
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Icon(Icons.star_rounded, color: Colors.amber.shade600, size: 28),
+                ),
+              ),
+              WxAnchor.circle(
+                overlayRadius: 28,
+                overlayColor: Colors.blue,
+                scale: 0.88,
+                onTap: () {},
+                child: const Padding(
+                  padding: EdgeInsets.all(12),
+                  child: Icon(Icons.share_rounded, color: Colors.blue, size: 28),
+                ),
+              ),
+              WxAnchor.circle(
+                overlayRadius: 28,
+                overlayColor: Colors.green,
+                scale: 0.88,
+                onTap: () {},
+                child: const Padding(
+                  padding: EdgeInsets.all(12),
+                  child: Icon(Icons.bookmark_rounded, color: Colors.green, size: 28),
+                ),
+              ),
+            ],
+          ),
+        ),
+        ShowcaseCard(
+          title: 'WidgetStatesController Bridge Integration',
+          subtitle: 'Seamless two-way bridge connecting WxAnchor events to Flutter native WidgetState.',
+          codeSnippet: '''
+// Convert WidgetEvents to native Flutter WidgetStates in real-time
+final nativeStates = _eventController.value.toWidgetStates();
+final isNativePressed = nativeStates.contains(WidgetState.pressed);
+''',
+          child: ListenableBuilder(
+            listenable: _eventController,
+            builder: (context, _) {
+              final nativeStates = _eventController.value.toWidgetStates();
+              return Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: colorScheme.surfaceContainer,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.hub_rounded, color: colorScheme.primary),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        'Mapped Native WidgetStates: ${nativeStates.isEmpty ? "{}" : nativeStates.map((s) => s.name).toSet()}',
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          fontFamily: 'monospace',
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _EventBadge extends StatelessWidget {
+  final String label;
+  final bool active;
+  final MaterialColor color;
+
+  const _EventBadge({
+    required this.label,
+    required this.active,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: active ? color.shade100 : Colors.transparent,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: active ? color.shade700 : Colors.grey.shade400,
+          width: active ? 1.5 : 1,
+        ),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          fontSize: 12,
+          fontWeight: active ? FontWeight.bold : FontWeight.normal,
+          color: active ? color.shade900 : Colors.grey.shade600,
+        ),
+      ),
+    );
+  }
+}

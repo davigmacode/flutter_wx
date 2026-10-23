@@ -1,3 +1,3 @@
-library wx_utils;
+library;
 
 export 'package:wx_utils/wx_utils.dart';

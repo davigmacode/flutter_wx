@@ -1,3 +1,7 @@
+.dart_tool/
+.fvm/
+.idea/
+.vscode/
+build/
+pubspec.lock
 media/
-example/*
-!example/lib

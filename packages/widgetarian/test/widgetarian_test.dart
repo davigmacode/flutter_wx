@@ -6,13 +6,14 @@ void main() {
   group('Widgetarian Umbrella Package', () {
     testWidgets('exports and instantiates key components', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
+        MaterialApp(
           home: Scaffold(
             body: Column(
               children: [
-                WxText('Widgetarian Text'),
-                WxAvatar.circle(child: Text('W')),
-                WxTile(child: Text('Tile')),
+                const WxText('Widgetarian Text'),
+                const WxAvatar.circle(child: Text('W')),
+                const WxTile(child: Text('Tile')),
+                WxAnchor(child: const Text('Anchor')),
               ],
             ),
           ),
@@ -22,6 +23,7 @@ void main() {
       expect(find.text('Widgetarian Text'), findsOneWidget);
       expect(find.text('W'), findsOneWidget);
       expect(find.text('Tile'), findsOneWidget);
+      expect(find.text('Anchor'), findsOneWidget);
 
       final controller = WidgetEventController();
       controller.add(WidgetEvent.loading);

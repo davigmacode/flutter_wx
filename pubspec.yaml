@@ -23,6 +23,7 @@ workspace:
   - packages/wheel_choice_ext
   - packages/widget_event
   - packages/widgetarian
+  - packages/wx_anchor
   - packages/wx_avatar
   - packages/wx_badge
   - packages/wx_box

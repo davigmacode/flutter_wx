@@ -17,6 +17,7 @@ export 'package:theme_patrol/theme_patrol.dart';
 export 'package:wheel_choice/wheel_choice.dart';
 export 'package:wheel_choice_ext/wheel_choice_ext.dart';
 export 'package:widget_event/widget_event.dart';
+export 'package:wx_anchor/wx_anchor.dart';
 export 'package:wx_avatar/wx_avatar.dart';
 export 'package:wx_badge/wx_badge.dart';
 export 'package:wx_box/wx_box.dart';

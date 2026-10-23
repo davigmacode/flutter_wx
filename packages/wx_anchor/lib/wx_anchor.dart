@@ -1,4 +1,4 @@
-library wx_anchor;
+library;
 
 export 'src/event.dart';
 export 'src/style.dart';

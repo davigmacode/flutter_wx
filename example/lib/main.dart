@@ -113,6 +113,15 @@ class _ShowroomMainShellState extends State<ShowroomMainShell> {
 
       // Surfaces & Layout
       PackageItem(
+        id: 'wx_anchor',
+        name: 'wx_anchor',
+        version: '2.1.1',
+        summary: 'Interactive touch and click anchor surface with visual feedback and event orchestration.',
+        category: PackageCategory.surfaces,
+        icon: Icons.ads_click_rounded,
+        builder: (context) => const WxAnchorShowcase(),
+      ),
+      PackageItem(
         id: 'wx_box',
         name: 'wx_box',
         version: '4.2.1',
@@ -607,7 +616,7 @@ class _ShowroomMainShellState extends State<ShowroomMainShell> {
                       spacing: 12,
                       runSpacing: 12,
                       children: [
-                        _buildStatChip(Icons.inventory_2_rounded, '25 Modular Packages'),
+                        _buildStatChip(Icons.inventory_2_rounded, '27 Modular Packages'),
                         _buildStatChip(Icons.check_circle_rounded, '100% Test Pass Rate'),
                         _buildStatChip(Icons.verified_rounded, '0 Analyzer Warnings'),
                         _buildStatChip(Icons.speed_rounded, 'Zero External Overhead'),
