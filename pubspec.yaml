@@ -21,6 +21,7 @@ workspace:
   - packages/theme_patrol
   - packages/wheel_choice
   - packages/wheel_choice_ext
+  - packages/widget_driven
   - packages/widget_event
   - packages/widgetarian
   - packages/wx_anchor

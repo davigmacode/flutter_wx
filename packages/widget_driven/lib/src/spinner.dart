@@ -1,13 +1,8 @@
 import 'package:flutter/material.dart';
-
-import '../event.dart';
 import 'child.dart';
 import 'spinner_theme.dart';
 
 /// A circular spinner that can be driven by a `DrivenWidget`.
-///
-/// Displays a circular progress indicator when the associated `DrivenWidget`
-/// indicates loading state.
 class DrivenSpinner extends DrivenChild<Widget?> {
   /// Creates a `DrivenSpinner`.
   const DrivenSpinner({
@@ -39,7 +34,7 @@ class DrivenSpinner extends DrivenChild<Widget?> {
   final bool? rounded;
 
   @override
-  get atLoading {
+  Widget? get atLoading {
     return Builder(builder: (context) {
       final theme = DrivenSpinnerTheme.of(context);
       final effectiveSize = size ?? theme.size;
@@ -59,10 +54,5 @@ class DrivenSpinner extends DrivenChild<Widget?> {
         ),
       );
     });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return resolve({WidgetEvent.loading})!;
   }
 }

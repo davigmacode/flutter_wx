@@ -247,30 +247,7 @@ void main() {
     });
   });
 
-  group('Driven Widgets & Components Tests', () {
-    test('DrivenSpinner resolves atLoading state', () {
-      const spinner = DrivenSpinner(size: 24, color: Colors.blue);
-      expect(spinner.resolve({}), isNull);
-      expect(spinner.resolve({WidgetEvent.loading}), isNotNull);
-    });
-
-    test('DrivenChild resolves different children based on events', () {
-      const driven = DrivenChild<Widget?>(
-        Text('Default'),
-        atPressed: Text('Pressed'),
-        atLoading: Text('Loading'),
-      );
-
-      final defaultWidget = driven.resolve({}) as Text;
-      expect(defaultWidget.data, equals('Default'));
-
-      final pressedWidget = driven.resolve({WidgetEvent.pressed}) as Text;
-      expect(pressedWidget.data, equals('Pressed'));
-
-      final loadingWidget = driven.resolve({WidgetEvent.loading}) as Text;
-      expect(loadingWidget.data, equals('Loading'));
-    });
-
+  group('WidgetEventMixin Tests', () {
     testWidgets('WidgetEventMixin responds to controller changes and triggers rebuild', (tester) async {
       final controller = WidgetEventController();
 

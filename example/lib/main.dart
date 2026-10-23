@@ -313,6 +313,15 @@ class _ShowroomMainShellState extends State<ShowroomMainShell> {
         ),
       ),
       PackageItem(
+        id: 'widget_driven',
+        name: 'widget_driven',
+        version: '1.0.0',
+        summary: 'Reactive event-driven widgets, builders, spinners, and animated transitions based on WidgetEvents.',
+        category: PackageCategory.utilities,
+        icon: Icons.dynamic_feed_rounded,
+        builder: (context) => const WidgetDrivenShowcase(),
+      ),
+      PackageItem(
         id: 'widget_event',
         name: 'widget_event',
         version: '2.0.1',
@@ -616,7 +625,7 @@ class _ShowroomMainShellState extends State<ShowroomMainShell> {
                       spacing: 12,
                       runSpacing: 12,
                       children: [
-                        _buildStatChip(Icons.inventory_2_rounded, '27 Modular Packages'),
+                        _buildStatChip(Icons.inventory_2_rounded, '28 Modular Packages'),
                         _buildStatChip(Icons.check_circle_rounded, '100% Test Pass Rate'),
                         _buildStatChip(Icons.verified_rounded, '0 Analyzer Warnings'),
                         _buildStatChip(Icons.speed_rounded, 'Zero External Overhead'),

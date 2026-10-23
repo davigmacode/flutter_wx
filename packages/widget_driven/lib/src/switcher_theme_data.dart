@@ -2,13 +2,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 /// Defines the visual properties of [DrivenSwitcher].
-///
-/// Descendant widgets obtain the current [DrivenSwitcherThemeData] object using
-/// `DrivenSwitcherTheme.of(context)`. Instances of [DrivenSwitcherThemeData]
-/// can be customized with [DrivenSwitcherThemeData.copyWith] or [DrivenSwitcherThemeData.merge].
 class DrivenSwitcherThemeData extends ThemeExtension<DrivenSwitcherThemeData>
     with Diagnosticable {
-  /// Whether the switcher's stroke is rounded.
+  /// Whether to maintain keys during switching.
   final bool maintainKey;
 
   /// The duration of the switch animation.
@@ -29,13 +25,6 @@ class DrivenSwitcherThemeData extends ThemeExtension<DrivenSwitcherThemeData>
   /// The builder function used to customize the layout of the AnimatedSwitcher.
   final AnimatedSwitcherLayoutBuilder? layoutBuilder;
 
-  /// The default transition builder for the DrivenSwitcher.
-  static const defaultTransitionBuilder =
-      AnimatedSwitcher.defaultTransitionBuilder;
-
-  /// The default layout builder for the DrivenSwitcher.
-  static const defaultLayoutBuilder = AnimatedSwitcher.defaultLayoutBuilder;
-
   /// Creates a theme data that can be used for [DrivenSwitcherTheme].
   const DrivenSwitcherThemeData({
     this.duration,
@@ -47,7 +36,7 @@ class DrivenSwitcherThemeData extends ThemeExtension<DrivenSwitcherThemeData>
     this.maintainKey = true,
   });
 
-  /// Creates a [DrivenSwitcherThemeData] from another one that probably null.
+  /// Creates a [DrivenSwitcherThemeData] from another one that is probably null.
   DrivenSwitcherThemeData.from([
     DrivenSwitcherThemeData? other,
     DrivenSwitcherThemeData fallback = const DrivenSwitcherThemeData(),
@@ -55,13 +44,11 @@ class DrivenSwitcherThemeData extends ThemeExtension<DrivenSwitcherThemeData>
         reverseDuration = other?.reverseDuration ?? fallback.reverseDuration,
         switchInCurve = other?.switchInCurve ?? fallback.switchInCurve,
         switchOutCurve = other?.switchOutCurve ?? fallback.switchOutCurve,
-        transitionBuilder =
-            other?.transitionBuilder ?? fallback.transitionBuilder,
+        transitionBuilder = other?.transitionBuilder ?? fallback.transitionBuilder,
         layoutBuilder = other?.layoutBuilder ?? fallback.layoutBuilder,
         maintainKey = other?.maintainKey ?? fallback.maintainKey;
 
-  /// Creates a copy of this [DrivenSwitcherThemeData] but with
-  /// the given fields replaced with the new values.
+  /// Creates a copy of this [DrivenSwitcherThemeData] with replaced fields.
   @override
   DrivenSwitcherThemeData copyWith({
     Duration? duration,
@@ -83,12 +70,24 @@ class DrivenSwitcherThemeData extends ThemeExtension<DrivenSwitcherThemeData>
     );
   }
 
-  /// Creates a copy of this [DrivenSwitcherThemeData] but with
-  /// the given fields replaced with the new values.
-  DrivenSwitcherThemeData merge(DrivenSwitcherThemeData? other) {
-    // if null return current object
+  /// Linearly interpolate with another [DrivenSwitcherThemeData].
+  @override
+  DrivenSwitcherThemeData lerp(DrivenSwitcherThemeData? other, double t) {
     if (other == null) return this;
+    return DrivenSwitcherThemeData(
+      duration: t < 0.5 ? duration : other.duration,
+      reverseDuration: t < 0.5 ? reverseDuration : other.reverseDuration,
+      switchInCurve: t < 0.5 ? switchInCurve : other.switchInCurve,
+      switchOutCurve: t < 0.5 ? switchOutCurve : other.switchOutCurve,
+      transitionBuilder: t < 0.5 ? transitionBuilder : other.transitionBuilder,
+      layoutBuilder: t < 0.5 ? layoutBuilder : other.layoutBuilder,
+      maintainKey: t < 0.5 ? maintainKey : other.maintainKey,
+    );
+  }
 
+  /// Merges this with another [DrivenSwitcherThemeData].
+  DrivenSwitcherThemeData merge(DrivenSwitcherThemeData? other) {
+    if (other == null) return this;
     return copyWith(
       duration: other.duration,
       reverseDuration: other.reverseDuration,
@@ -101,44 +100,37 @@ class DrivenSwitcherThemeData extends ThemeExtension<DrivenSwitcherThemeData>
   }
 
   @override
-  DrivenSwitcherThemeData lerp(DrivenSwitcherThemeData? other, double t) {
-    if (other is! DrivenSwitcherThemeData) return this;
-    return DrivenSwitcherThemeData(
-      duration: t < 0.5 ? duration : other.duration,
-      reverseDuration: t < 0.5 ? reverseDuration : other.reverseDuration,
-      switchInCurve: t < 0.5 ? switchInCurve : other.switchInCurve,
-      switchOutCurve: t < 0.5 ? switchOutCurve : other.switchOutCurve,
-      transitionBuilder: t < 0.5 ? transitionBuilder : other.transitionBuilder,
-      layoutBuilder: t < 0.5 ? layoutBuilder : other.layoutBuilder,
-      maintainKey: t < 0.5 ? maintainKey : other.maintainKey,
-    );
-  }
-
-  Map<String, dynamic> toMap() => {
-        'duration': duration,
-        'reverseDuration': reverseDuration,
-        'switchInCurve': switchInCurve,
-        'switchOutCurve': switchOutCurve,
-        'transitionBuilder': transitionBuilder,
-        'layoutBuilder': layoutBuilder,
-        'maintainKey': maintainKey,
-      };
-
-  @override
   bool operator ==(Object other) {
+    if (identical(this, other)) return true;
     if (other.runtimeType != runtimeType) return false;
     return other is DrivenSwitcherThemeData &&
-        mapEquals(other.toMap(), toMap());
+        other.duration == duration &&
+        other.reverseDuration == reverseDuration &&
+        other.switchInCurve == switchInCurve &&
+        other.switchOutCurve == switchOutCurve &&
+        other.transitionBuilder == transitionBuilder &&
+        other.layoutBuilder == layoutBuilder &&
+        other.maintainKey == maintainKey;
   }
 
   @override
-  int get hashCode => Object.hashAll(toMap().values);
+  int get hashCode => Object.hash(
+        duration,
+        reverseDuration,
+        switchInCurve,
+        switchOutCurve,
+        transitionBuilder,
+        layoutBuilder,
+        maintainKey,
+      );
 
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
-    toMap().entries.forEach((el) {
-      properties.add(DiagnosticsProperty(el.key, el.value, defaultValue: null));
-    });
+    properties.add(DiagnosticsProperty<Duration?>('duration', duration));
+    properties.add(DiagnosticsProperty<Duration?>('reverseDuration', reverseDuration));
+    properties.add(DiagnosticsProperty<Curve?>('switchInCurve', switchInCurve));
+    properties.add(DiagnosticsProperty<Curve?>('switchOutCurve', switchOutCurve));
+    properties.add(DiagnosticsProperty<bool>('maintainKey', maintainKey));
   }
 }

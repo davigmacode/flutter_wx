@@ -33,8 +33,23 @@ class _WidgetEventExampleAppState extends State<WidgetEventExampleApp> {
               AnimatedBuilder(
                 animation: _controller,
                 builder: (context, _) {
-                  final spinner = const DrivenSpinner(size: 48, color: Colors.blue).resolve(_controller.value);
-                  return spinner ?? const Icon(Icons.refresh, size: 48);
+                  final active = _controller.value;
+                  final color = DrivenColor.by((events) {
+                    if (events.contains(WidgetEvent.loading)) return Colors.orange;
+                    return Colors.blue;
+                  }).resolve(active);
+
+                  return Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: color,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      'State: ${active.isEmpty ? "Idle" : active.map((e) => e.value).join(", ")}',
+                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                    ),
+                  );
                 },
               ),
               const SizedBox(height: 24),

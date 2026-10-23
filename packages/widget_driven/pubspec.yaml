@@ -1,0 +1,35 @@
+name: widget_driven
+description: Reactive event-driven widgets that automatically adapt their appearance, builders, spinners, and animated transitions based on WidgetEvents.
+version: 1.0.0
+homepage: https://github.com/davigmacode/flutter_wx
+repository: https://github.com/davigmacode/flutter_wx/tree/main/packages/widget_driven
+issue_tracker: https://github.com/davigmacode/flutter_wx/issues
+
+topics:
+  - ui
+  - event-driven
+  - widgets
+  - animation
+  - widgetarian
+
+funding:
+  - https://buymeacoffee.com/davigmacode
+  - https://ko-fi.com/davigmacode
+
+environment:
+  sdk: '>=3.5.0 <4.0.0'
+  flutter: '>=3.24.0'
+
+resolution: workspace
+
+dependencies:
+  flutter:
+    sdk: flutter
+  widget_event: ^2.0.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:

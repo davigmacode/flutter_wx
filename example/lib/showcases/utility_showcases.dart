@@ -526,3 +526,204 @@ final color = DrivenProperty.by<Color>((events) {
     );
   }
 }
+
+class WidgetDrivenShowcase extends StatefulWidget {
+  const WidgetDrivenShowcase({super.key});
+
+  @override
+  State<WidgetDrivenShowcase> createState() => _WidgetDrivenShowcaseState();
+}
+
+class _WidgetDrivenShowcaseState extends State<WidgetDrivenShowcase> {
+  late final WidgetEventController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = WidgetEventController();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return ShowcaseScaffold(
+      packageName: 'widget_driven',
+      version: '1.0.0',
+      description:
+          'Reactive event-driven widgets, builders, spinners, and animated transitions that adapt dynamically to active WidgetEvents.',
+      children: [
+        ShowcaseCard(
+          title: 'DrivenBuilder',
+          subtitle: 'Clean reactive builder reading events directly from WidgetEventController.',
+          codeSnippet: '''
+DrivenBuilder(
+  controller: _controller,
+  builder: (context, events, child) {
+    final isLoading = events.contains(WidgetEvent.loading);
+    return ElevatedButton.icon(
+      onPressed: () => _controller.toggle(WidgetEvent.loading),
+      icon: isLoading ? const DrivenSpinner(size: 16) : const Icon(Icons.send_rounded),
+      label: Text(isLoading ? 'Processing...' : 'Send Request'),
+    );
+  },
+)''',
+          child: Column(
+            children: [
+              DrivenBuilder(
+                controller: _controller,
+                builder: (context, events, child) {
+                  final isLoading = events.contains(WidgetEvent.loading);
+                  final isDisabled = events.contains(WidgetEvent.disabled);
+                  final isError = events.contains(WidgetEvent.error);
+
+                  Color cardColor = colorScheme.surfaceContainerHighest;
+                  if (isLoading) cardColor = colorScheme.primaryContainer;
+                  if (isError) cardColor = colorScheme.errorContainer;
+
+                  return Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: cardColor,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: colorScheme.outlineVariant.withValues(alpha: 0.5)),
+                    ),
+                    child: Row(
+                      children: [
+                        if (isLoading)
+                          const DrivenSpinner(size: 28, width: 3)
+                        else if (isError)
+                          Icon(Icons.error_outline_rounded, color: colorScheme.error, size: 28)
+                        else
+                          Icon(
+                            isDisabled ? Icons.lock_outline_rounded : Icons.check_circle_outline_rounded,
+                            color: colorScheme.primary,
+                            size: 28,
+                          ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                isLoading
+                                    ? 'State: Processing Action...'
+                                    : isError
+                                        ? 'State: Error Occurred'
+                                        : isDisabled
+                                            ? 'State: Component Disabled'
+                                            : 'State: Ready & Interactive',
+                                style: theme.textTheme.titleMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                'Active Events: ${events.isEmpty ? "{none}" : events.map((e) => e.value).toSet()}',
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: colorScheme.onSurfaceVariant,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(height: 16),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  FilterChip(
+                    label: const Text('Toggle Loading'),
+                    selected: _controller.value.contains(WidgetEvent.loading),
+                    onSelected: (_) => _controller.toggle(WidgetEvent.loading),
+                  ),
+                  FilterChip(
+                    label: const Text('Toggle Disabled'),
+                    selected: _controller.value.contains(WidgetEvent.disabled),
+                    onSelected: (_) => _controller.toggle(WidgetEvent.disabled),
+                  ),
+                  FilterChip(
+                    label: const Text('Toggle Error'),
+                    selected: _controller.value.contains(WidgetEvent.error),
+                    onSelected: (_) => _controller.toggle(WidgetEvent.error),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        ShowcaseCard(
+          title: 'DrivenSwitcher & Animated Transitions',
+          subtitle: 'AnimatedSwitcher that automatically morphs between child widgets as events change.',
+          codeSnippet: '''
+DrivenSwitcher(
+  const Text('Submit Order'),
+  atLoading: const DrivenSpinner(size: 20),
+  atError: const Text('Retry'),
+)''',
+          child: Center(
+            child: DrivenBuilder(
+              controller: _controller,
+              builder: (context, events, _) {
+                return Container(
+                  height: 48,
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  decoration: BoxDecoration(
+                    color: colorScheme.primary,
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                  alignment: Alignment.center,
+                  child: DefaultTextStyle(
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                    ),
+                    child: const DrivenSwitcher(
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.shopping_cart_checkout_rounded, color: Colors.white, size: 20),
+                          SizedBox(width: 8),
+                          Text('Place Order'),
+                        ],
+                      ),
+                      atLoading: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          DrivenSpinner(size: 18, width: 2.5, color: Colors.white),
+                          SizedBox(width: 8),
+                          Text('Authorizing Payment...'),
+                        ],
+                      ),
+                      atError: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.replay_rounded, color: Colors.white, size: 20),
+                          SizedBox(width: 8),
+                          Text('Retry Payment'),
+                        ],
+                      ),
+                    ).resolve(events),
+                  ),
+                );
+              },
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}

@@ -1,13 +1,8 @@
 import 'dart:ui';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 /// Defines the visual properties of [DrivenSpinner].
-///
-/// Descendant widgets obtain the current [DrivenSpinnerThemeData] object using
-/// `DrivenSpinnerTheme.of(context)`. Instances of [DrivenSpinnerThemeData]
-/// can be customized with [DrivenSpinnerThemeData.copyWith] or [DrivenSpinnerThemeData.merge].
 class DrivenSpinnerThemeData extends ThemeExtension<DrivenSpinnerThemeData>
     with Diagnosticable {
   /// The size of the spinner.
@@ -49,8 +44,7 @@ class DrivenSpinnerThemeData extends ThemeExtension<DrivenSpinnerThemeData>
         offset = other?.offset ?? fallback.offset,
         rounded = other?.rounded ?? fallback.rounded;
 
-  /// Creates a copy of this [DrivenSpinnerThemeData] but with
-  /// the given fields replaced with the new values.
+  /// Creates a copy of this [DrivenSpinnerThemeData] with replaced fields.
   @override
   DrivenSpinnerThemeData copyWith({
     double? size,
@@ -70,12 +64,23 @@ class DrivenSpinnerThemeData extends ThemeExtension<DrivenSpinnerThemeData>
     );
   }
 
-  /// Creates a copy of this [DrivenSpinnerThemeData] but with
-  /// the given fields replaced with the new values.
-  DrivenSpinnerThemeData merge(DrivenSpinnerThemeData? other) {
-    // if null return current object
+  /// Linearly interpolate with another [DrivenSpinnerThemeData].
+  @override
+  DrivenSpinnerThemeData lerp(DrivenSpinnerThemeData? other, double t) {
     if (other == null) return this;
+    return DrivenSpinnerThemeData(
+      size: lerpDouble(size, other.size, t),
+      color: Color.lerp(color, other.color, t),
+      backgroundColor: Color.lerp(backgroundColor, other.backgroundColor, t),
+      width: lerpDouble(width, other.width, t) ?? width,
+      offset: lerpDouble(offset, other.offset, t) ?? offset,
+      rounded: t < 0.5 ? rounded : other.rounded,
+    );
+  }
 
+  /// Merges this with another [DrivenSpinnerThemeData].
+  DrivenSpinnerThemeData merge(DrivenSpinnerThemeData? other) {
+    if (other == null) return this;
     return copyWith(
       size: other.size,
       color: other.color,
@@ -87,41 +92,36 @@ class DrivenSpinnerThemeData extends ThemeExtension<DrivenSpinnerThemeData>
   }
 
   @override
-  DrivenSpinnerThemeData lerp(DrivenSpinnerThemeData? other, double t) {
-    if (other is! DrivenSpinnerThemeData) return this;
-    return DrivenSpinnerThemeData(
-      size: lerpDouble(size, other.size, t),
-      color: Color.lerp(color, other.color, t),
-      backgroundColor: Color.lerp(backgroundColor, other.backgroundColor, t),
-      width: lerpDouble(width, other.width, t) ?? width,
-      offset: lerpDouble(offset, other.offset, t) ?? offset,
-      rounded: t < 0.5 ? rounded : other.rounded,
-    );
-  }
-
-  Map<String, dynamic> toMap() => {
-        'size': size,
-        'color': color,
-        'backgroundColor': backgroundColor,
-        'width': width,
-        'offset': offset,
-        'rounded': rounded,
-      };
-
-  @override
   bool operator ==(Object other) {
+    if (identical(this, other)) return true;
     if (other.runtimeType != runtimeType) return false;
-    return other is DrivenSpinnerThemeData && mapEquals(other.toMap(), toMap());
+    return other is DrivenSpinnerThemeData &&
+        other.size == size &&
+        other.color == color &&
+        other.backgroundColor == backgroundColor &&
+        other.width == width &&
+        other.offset == offset &&
+        other.rounded == rounded;
   }
 
   @override
-  int get hashCode => Object.hashAll(toMap().values);
+  int get hashCode => Object.hash(
+        size,
+        color,
+        backgroundColor,
+        width,
+        offset,
+        rounded,
+      );
 
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
-    toMap().entries.forEach((el) {
-      properties.add(DiagnosticsProperty(el.key, el.value, defaultValue: null));
-    });
+    properties.add(DiagnosticsProperty<double?>('size', size));
+    properties.add(DiagnosticsProperty<Color?>('color', color));
+    properties.add(DiagnosticsProperty<Color?>('backgroundColor', backgroundColor));
+    properties.add(DiagnosticsProperty<double>('width', width));
+    properties.add(DiagnosticsProperty<double>('offset', offset));
+    properties.add(DiagnosticsProperty<bool>('rounded', rounded));
   }
 }

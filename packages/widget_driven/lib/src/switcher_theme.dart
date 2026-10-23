@@ -2,23 +2,19 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'switcher_theme_data.dart';
 
-/// A Widget that controls how descendant [DrivenSwitcher]s should look like.
+/// A Widget that controls how descendant [DrivenSwitcher]s look and animate.
 class DrivenSwitcherTheme extends InheritedTheme {
-  /// The properties for descendant [DrivenSwitcher]s
+  /// The properties for descendant [DrivenSwitcher]s.
   final DrivenSwitcherThemeData data;
 
-  /// Creates a theme that controls
-  /// how descendant [DrivenSwitcher]s should look like.
+  /// Creates a theme for descendant [DrivenSwitcher]s.
   const DrivenSwitcherTheme({
     super.key,
     required this.data,
     required super.child,
   });
 
-  /// Creates an [DrivenSwitcherTheme] that controls the style of
-  /// descendant widgets, and merges in the current [DrivenSwitcherTheme], if any.
-  ///
-  /// The [style] and [child] arguments must not be null.
+  /// Merges with the nearest [DrivenSwitcherTheme].
   static Widget merge({
     Key? key,
     Duration? duration,
@@ -51,36 +47,16 @@ class DrivenSwitcherTheme extends InheritedTheme {
     );
   }
 
-  /// The [data] from the closest instance of
-  /// this class that encloses the given context.
-  ///
-  /// Typical usage is as follows:
-  ///
-  /// ```dart
-  /// DrivenSwitcherThemeData theme = DrivenSwitcherTheme.of(context);
-  /// ```
+  /// Obtains the [DrivenSwitcherThemeData] from the closest instance in context.
   static DrivenSwitcherThemeData? maybeOf(BuildContext context) {
-    final parentTheme =
-        context.dependOnInheritedWidgetOfExactType<DrivenSwitcherTheme>();
-    if (parentTheme != null) return parentTheme.data;
-
-    final globalTheme = Theme.of(context).extension<DrivenSwitcherThemeData>();
-    return globalTheme;
+    return context.dependOnInheritedWidgetOfExactType<DrivenSwitcherTheme>()?.data;
   }
 
-  /// The [data] from the closest instance of
-  /// this class that encloses the given context.
-  ///
-  /// Typical usage is as follows:
-  ///
-  /// ```dart
-  /// DrivenSwitcherThemeData theme = DrivenSwitcherTheme.of(context);
-  /// ```
+  /// Obtains the [DrivenSwitcherThemeData] from the closest instance in context or default.
   static DrivenSwitcherThemeData of(BuildContext context) {
-    final parentTheme = DrivenSwitcherTheme.maybeOf(context);
-    if (parentTheme != null) return parentTheme;
-
-    return const DrivenSwitcherThemeData();
+    return maybeOf(context) ??
+        Theme.of(context).extension<DrivenSwitcherThemeData>() ??
+        const DrivenSwitcherThemeData();
   }
 
   @override
@@ -89,13 +65,11 @@ class DrivenSwitcherTheme extends InheritedTheme {
   }
 
   @override
-  bool updateShouldNotify(DrivenSwitcherTheme oldWidget) {
-    return oldWidget.data != data;
-  }
+  bool updateShouldNotify(DrivenSwitcherTheme oldWidget) => data != oldWidget.data;
 
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
-    properties.add(DiagnosticsProperty('data', data));
+    properties.add(DiagnosticsProperty<DrivenSwitcherThemeData>('data', data));
   }
 }
