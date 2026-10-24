@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:wx_sheet/wx_sheet.dart';
+import 'style.dart';
 import 'theme_data.dart';
 import 'style_driven.dart';
 
@@ -16,8 +17,7 @@ abstract class WxIconButtonThemePreset extends WxIconButtonThemeData
   final BuildContext context;
 
   @override
-  WxDrivenIconButtonStyle get style =>
-      const WxDrivenIconButtonStyle().merge(super.style);
+  WxIconButtonStyle get style => WxIconButtonStyle.fromAncestor(super.style);
 
   @override
   WxDrivenIconButtonStyle baseStyle(data) {

@@ -3,7 +3,6 @@ import 'package:wx_sheet/wx_sheet.dart';
 import 'theme.dart';
 import 'theme_data.dart';
 import 'style.dart';
-import 'style_driven.dart';
 
 /// The `WxButton` widget serves as the building block for many Widgetarian components,
 /// providing a base layer for customization with a button design.
@@ -229,7 +228,7 @@ class WxButton extends WxSheet<WxButtonThemeData> {
 
   @override
   WxButtonStyle get effectiveStyle {
-    return const WxDrivenButtonStyle().merge(super.effectiveStyle);
+    return WxButtonStyle.fromAncestor(super.effectiveStyle);
   }
 
   @override
@@ -241,9 +240,9 @@ class WxButton extends WxSheet<WxButtonThemeData> {
   WxButtonStyle getInheritedStyle(context, inherits) {
     if (inherits) {
       final parentStyle = getParentStyle(context);
-      return const WxDrivenButtonStyle()
-          .merge(parentStyle)
-          .merge(effectiveStyle);
+      return (parentStyle != null)
+          ? WxButtonStyle.fromAncestor(parentStyle).merge(effectiveStyle)
+          : effectiveStyle;
     }
     return effectiveStyle;
   }

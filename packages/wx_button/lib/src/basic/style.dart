@@ -1,4 +1,6 @@
+import 'package:wx_sheet/wx_event.dart';
 import 'package:wx_sheet/wx_sheet.dart';
+import 'style_driven.dart';
 
 class WxButtonStyle extends WxSheetStyle {
   /// Create a raw [WxButtonStyle].
@@ -253,10 +255,69 @@ class WxButtonStyle extends WxSheetStyle {
     return WxButtonStyle.fromAncestor(ancestor);
   }
 
+  /// Resolves the value for the given set of events
+  /// if `value` is an event driven [WxButtonStyle],
+  /// otherwise returns the value itself.
+  static WxButtonStyle evaluate(
+    WxButtonStyle? value,
+    Set<WidgetEvent> events,
+  ) {
+    return DrivenProperty.evaluate<WxButtonStyle?>(value, events) ??
+        const WxButtonStyle();
+  }
+
+  /// Create a driven [WxButtonStyle] from a resolver callback.
+  static WxButtonStyle resolveWith(
+    DrivenPropertyResolver<WxButtonStyle?> resolver,
+  ) {
+    return WxDrivenButtonStyle.resolver(resolver);
+  }
+
+  /// Create a driven [WxButtonStyle] with event-specific overrides.
+  static WxButtonStyle driven({
+    WxButtonStyle? base,
+    WxButtonStyle? selected,
+    WxButtonStyle? indeterminate,
+    WxButtonStyle? focused,
+    WxButtonStyle? hovered,
+    WxButtonStyle? pressed,
+    WxButtonStyle? loading,
+    WxButtonStyle? disabled,
+    bool? inherits,
+  }) {
+    final style = WxDrivenButtonStyle(
+      inherits: inherits,
+      selectedStyle: selected,
+      indeterminateStyle: indeterminate,
+      focusedStyle: focused,
+      hoveredStyle: hovered,
+      pressedStyle: pressed,
+      loadingStyle: loading,
+      disabledStyle: disabled,
+    );
+    return base != null ? base.merge(style) : style;
+  }
+
   @override
-  WxButtonStyle merge(other) {
+  WxButtonStyle resolve(Set<WidgetEvent> events) {
+    if (!isDriven) return this;
+    final resolved = super.resolve(events);
+    return WxButtonStyle.fromAncestor(resolved);
+  }
+
+  @override
+  WxButtonStyle merge(WxSheetStyle? other) {
     if (other == null) return this;
-    final ancestor = super.merge(other);
+    if (isDriven || other.isDriven) {
+      return WxMergedDrivenButtonStyle(this, other);
+    }
+    return mergeStatic(other);
+  }
+
+  @override
+  WxButtonStyle mergeStatic(WxSheetStyle? other) {
+    if (other == null) return this;
+    final ancestor = super.mergeStatic(other);
     return WxButtonStyle.fromAncestor(ancestor);
   }
 

@@ -1,4 +1,6 @@
+import 'package:wx_sheet/wx_event.dart';
 import 'package:wx_sheet/wx_sheet.dart';
+import 'style_driven.dart';
 
 class WxChipStyle extends WxSheetStyle {
   /// Create a raw [WxChipStyle].
@@ -247,10 +249,73 @@ class WxChipStyle extends WxSheetStyle {
     return WxChipStyle.fromAncestor(ancestor);
   }
 
+  /// Resolves the value for the given set of events
+  /// if `value` is an event driven [WxChipStyle],
+  /// otherwise returns the value itself.
+  static WxChipStyle evaluate(
+    WxChipStyle? value,
+    Set<WidgetEvent> events,
+  ) {
+    return DrivenProperty.evaluate<WxChipStyle?>(value, events) ??
+        const WxChipStyle();
+  }
+
+  /// Create a driven [WxChipStyle] from a resolver callback.
+  static WxChipStyle resolveWith(
+    DrivenPropertyResolver<WxChipStyle?> resolver,
+  ) {
+    return WxDrivenChipStyle.resolver(resolver);
+  }
+
+  /// Create a driven [WxChipStyle] with event-specific overrides.
+  static WxChipStyle driven({
+    WxChipStyle? base,
+    WxSheetStyle? selected,
+    WxSheetStyle? indeterminate,
+    WxSheetStyle? focused,
+    WxSheetStyle? hovered,
+    WxSheetStyle? pressed,
+    WxSheetStyle? loading,
+    WxSheetStyle? disabled,
+    bool? inherits,
+  }) {
+    final style = WxDrivenChipStyle(
+      inherits: inherits,
+      selectedStyle:
+          selected != null ? WxChipStyle.fromAncestor(selected) : null,
+      indeterminateStyle: indeterminate != null
+          ? WxChipStyle.fromAncestor(indeterminate)
+          : null,
+      focusedStyle: focused != null ? WxChipStyle.fromAncestor(focused) : null,
+      hoveredStyle: hovered != null ? WxChipStyle.fromAncestor(hovered) : null,
+      pressedStyle: pressed != null ? WxChipStyle.fromAncestor(pressed) : null,
+      loadingStyle: loading != null ? WxChipStyle.fromAncestor(loading) : null,
+      disabledStyle:
+          disabled != null ? WxChipStyle.fromAncestor(disabled) : null,
+    );
+    return base != null ? base.merge(style) : style;
+  }
+
   @override
-  WxChipStyle merge(other) {
+  WxChipStyle resolve(Set<WidgetEvent> events) {
+    if (!isDriven) return this;
+    final resolved = super.resolve(events);
+    return WxChipStyle.fromAncestor(resolved);
+  }
+
+  @override
+  WxChipStyle merge(WxSheetStyle? other) {
     if (other == null) return this;
-    final ancestor = super.merge(other);
+    if (isDriven || other.isDriven) {
+      return WxMergedDrivenChipStyle(this, other);
+    }
+    return mergeStatic(other);
+  }
+
+  @override
+  WxChipStyle mergeStatic(WxSheetStyle? other) {
+    if (other == null) return this;
+    final ancestor = super.mergeStatic(other);
     return WxChipStyle.fromAncestor(ancestor);
   }
 

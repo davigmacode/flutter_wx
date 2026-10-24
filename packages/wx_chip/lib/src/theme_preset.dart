@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:wx_sheet/wx_sheet.dart';
+import 'style.dart';
 import 'theme_data.dart';
 import 'style_driven.dart';
 import 'types.dart';
@@ -20,9 +21,7 @@ abstract class WxChipThemePreset extends WxChipThemeData
   WxSheetVariant? get variant => WxChipVariant.tonal;
 
   @override
-  WxDrivenChipStyle get style {
-    return const WxDrivenChipStyle().merge(super.style);
-  }
+  WxChipStyle get style => WxChipStyle.fromAncestor(super.style);
 
   @override
   WxDrivenChipStyle baseStyle(data) {

@@ -1,10 +1,16 @@
 import 'package:flutter/foundation.dart';
+import 'package:wx_sheet/wx_event.dart';
 import 'package:wx_sheet/wx_sheet.dart';
 import 'style.dart';
 
 /// Create a [WxChipStyle] when some events occurs
 class WxDrivenChipStyle extends WxChipStyle
     with WxDrivenSheetProperty<WxChipStyle> {
+  final DrivenPropertyResolver<WxChipStyle?>? _resolver;
+
+  @override
+  bool get isDriven => true;
+
   @override
   final bool? inherits;
 
@@ -106,7 +112,7 @@ class WxDrivenChipStyle extends WxChipStyle
     this.selectedStyle,
     this.indeterminateStyle,
     this.inherits,
-  });
+  }) : _resolver = null;
 
   /// Create a [WxDrivenChipStyle] with value
   /// from another [WxChipStyle].
@@ -120,12 +126,14 @@ class WxDrivenChipStyle extends WxChipStyle
     this.selectedStyle,
     this.indeterminateStyle,
     this.inherits,
-  }) : super.from();
+  })  : _resolver = null,
+        super.from();
 
   /// Create a [WxDrivenChipStyle] with value
   /// from another [WxDrivenChipStyle].
   WxDrivenChipStyle.from(WxDrivenChipStyle? super.other)
-      : focusedStyle = other?.focusedStyle,
+      : _resolver = other?._resolver,
+        focusedStyle = other?.focusedStyle,
         hoveredStyle = other?.hoveredStyle,
         pressedStyle = other?.pressedStyle,
         loadingStyle = other?.loadingStyle,
@@ -139,29 +147,42 @@ class WxDrivenChipStyle extends WxChipStyle
   WxDrivenChipStyle.resolver(
     WxDrivenSheetStyleResolver<WxChipStyle?> resolver, {
     this.inherits = false,
-  })  : focusedStyle = resolver({WxSheetEvent.focused}),
+  })  : _resolver = resolver,
+        focusedStyle = resolver({WxSheetEvent.focused}),
         hoveredStyle = resolver({WxSheetEvent.hovered}),
         pressedStyle = resolver({WxSheetEvent.pressed}),
         loadingStyle = resolver({WxSheetEvent.loading}),
         disabledStyle = resolver({WxSheetEvent.disabled}),
         selectedStyle = resolver({WxSheetEvent.selected}),
         indeterminateStyle = resolver({WxSheetEvent.indeterminate}),
-        super.from(resolver({}));
+        super.fromAncestor(resolver({}));
 
   /// Resolves the value for the given set of events
   /// if `value` is an event driven [WxChipStyle],
   /// otherwise returns the value itself.
   static WxChipStyle evaluate(
-    WxChipStyle value,
-    Set<WxSheetEvent> events,
+    WxChipStyle? value,
+    Set<WidgetEvent> events,
   ) {
-    return WxDrivenSheetStyle.evaluate(value, events);
+    return DrivenProperty.evaluate<WxChipStyle?>(value, events) ??
+        const WxChipStyle();
   }
 
   @override
-  resolveInherits(accumulator, style) {
+  WxChipStyle resolve(Set<WidgetEvent> events) {
+    if (_resolver != null) {
+      final evaluated = _resolver(events);
+      if (evaluated != null) {
+        return inherits != false ? mergeStatic(evaluated) : evaluated;
+      }
+    }
+    return super.resolve(events);
+  }
+
+  @override
+  WxChipStyle resolveInherits(WxChipStyle accumulator, WxChipStyle? style) {
     return inherits != false
-        ? accumulator.merge(style)
+        ? accumulator.mergeStatic(style)
         : WxChipStyle.from(style);
   }
 
@@ -353,47 +374,37 @@ class WxDrivenChipStyle extends WxChipStyle
   }
 
   @override
-  WxDrivenChipStyle merge(other) {
+  WxChipStyle merge(other) {
     if (other == null) return this;
-    final ancestor = super.merge(other);
-    final result = WxDrivenChipStyle.fromAncestor(
-      ancestor,
-      inherits: inherits,
-      focusedStyle: focusedStyle,
-      hoveredStyle: hoveredStyle,
-      pressedStyle: pressedStyle,
-      disabledStyle: disabledStyle,
-      selectedStyle: selectedStyle,
-      indeterminateStyle: indeterminateStyle,
-    );
-    if (other is WxDrivenChipStyle) {
-      return result.copyWith(
-        inherits: other.inherits,
-        focusedStyle: other.focusedStyle,
-        hoveredStyle: other.hoveredStyle,
-        pressedStyle: other.pressedStyle,
-        disabledStyle: other.disabledStyle,
-        selectedStyle: other.selectedStyle,
-        indeterminateStyle: other.indeterminateStyle,
-      );
-    }
-    if (other is WxDrivenSheetStyle) {
-      return result.copyWith(
-        inherits: other.inherits,
-        focusedStyle: WxChipStyle.fromAncestor(other.focusedStyle),
-        hoveredStyle: WxChipStyle.fromAncestor(other.hoveredStyle),
-        pressedStyle: WxChipStyle.fromAncestor(other.pressedStyle),
-        disabledStyle: WxChipStyle.fromAncestor(other.disabledStyle),
-        selectedStyle: WxChipStyle.fromAncestor(other.selectedStyle),
-        indeterminateStyle: WxChipStyle.fromAncestor(other.indeterminateStyle),
-      );
-    }
-    return result;
+    return WxMergedDrivenChipStyle(this, other);
   }
 
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
     super.debugFillDrivenStyle(properties);
+  }
+}
+
+/// Internal driven chip style representing a combination of two styles,
+/// at least one of which is dynamic/event-driven.
+class WxMergedDrivenChipStyle extends WxChipStyle {
+  WxMergedDrivenChipStyle(this._a, this._b)
+      : super.fromAncestor(_a
+            .resolve(const <WidgetEvent>{})
+            .mergeStatic(_b?.resolve(const <WidgetEvent>{})));
+
+  final WxChipStyle _a;
+  final WxSheetStyle? _b;
+
+  @override
+  bool get isDriven => true;
+
+  @override
+  WxChipStyle resolve(Set<WidgetEvent> events) {
+    if (events.isEmpty) return this;
+    final resolvedA = _a.resolve(events);
+    final resolvedB = _b?.resolve(events);
+    return resolvedA.mergeStatic(resolvedB);
   }
 }

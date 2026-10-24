@@ -7,6 +7,11 @@ import 'event.dart';
 /// Create a [WxSheetStyle] when some events occurs
 class WxDrivenSheetStyle extends WxSheetStyle
     with WxDrivenSheetProperty<WxSheetStyle> {
+  final DrivenPropertyResolver<WxSheetStyle?>? _resolver;
+
+  @override
+  bool get isDriven => true;
+
   @override
   final bool? inherits;
 
@@ -120,7 +125,7 @@ class WxDrivenSheetStyle extends WxSheetStyle
     this.loadingStyle,
     this.disabledStyle,
     this.inherits,
-  });
+  }) : _resolver = null;
 
   /// [WxDrivenSheetStyle] with a default value for circle shape.
   const WxDrivenSheetStyle.circle({
@@ -206,7 +211,8 @@ class WxDrivenSheetStyle extends WxSheetStyle
     this.loadingStyle,
     this.disabledStyle,
     this.inherits,
-  }) : super.circle();
+  })  : _resolver = null,
+        super.circle();
 
   /// [WxDrivenSheetStyle] with a default value for full width.
   const WxDrivenSheetStyle.block({
@@ -294,7 +300,8 @@ class WxDrivenSheetStyle extends WxSheetStyle
     this.loadingStyle,
     this.disabledStyle,
     this.inherits,
-  }) : super.block();
+  })  : _resolver = null,
+        super.block();
 
   /// Create a [WxDrivenSheetStyle] with value
   /// from another [WxSheetStyle].
@@ -308,12 +315,14 @@ class WxDrivenSheetStyle extends WxSheetStyle
     this.loadingStyle,
     this.disabledStyle,
     this.inherits,
-  }) : super.from();
+  })  : _resolver = null,
+        super.from();
 
   /// Create a [WxDrivenSheetStyle] with value
   /// from another [WxDrivenSheetStyle].
   WxDrivenSheetStyle.from(WxDrivenSheetStyle super.other)
-      : selectedStyle = other.selectedStyle,
+      : _resolver = other._resolver,
+        selectedStyle = other.selectedStyle,
         indeterminateStyle = other.indeterminateStyle,
         focusedStyle = other.focusedStyle,
         hoveredStyle = other.hoveredStyle,
@@ -327,7 +336,8 @@ class WxDrivenSheetStyle extends WxSheetStyle
   WxDrivenSheetStyle.resolver(
     DrivenPropertyResolver<WxSheetStyle?> resolver, {
     this.inherits = false,
-  })  : selectedStyle = resolver({WxSheetEvent.selected}),
+  })  : _resolver = resolver,
+        selectedStyle = resolver({WxSheetEvent.selected}),
         indeterminateStyle = resolver({WxSheetEvent.indeterminate}),
         focusedStyle = resolver({WxSheetEvent.focused}),
         hoveredStyle = resolver({WxSheetEvent.hovered}),
@@ -337,9 +347,20 @@ class WxDrivenSheetStyle extends WxSheetStyle
         super.from(resolver({}));
 
   @override
-  resolveInherits(accumulator, style) {
+  WxSheetStyle resolve(Set<WidgetEvent> events) {
+    if (_resolver != null) {
+      final evaluated = _resolver(events);
+      if (evaluated != null) {
+        return inherits != false ? mergeStatic(evaluated) : evaluated;
+      }
+    }
+    return super.resolve(events);
+  }
+
+  @override
+  WxSheetStyle resolveInherits(WxSheetStyle accumulator, WxSheetStyle? style) {
     return inherits != false
-        ? accumulator.merge(style)
+        ? accumulator.mergeStatic(style)
         : WxSheetStyle.from(style);
   }
 
@@ -355,7 +376,7 @@ class WxDrivenSheetStyle extends WxSheetStyle
   /// Creates a copy of this [WxSheetStyle] but with
   /// [padding] is [EdgeInsets.zero] and squared size.
   @override
-  WxDrivenSheetStyle asCircle({
+  WxSheetStyle asCircle({
     double? radius,
     double? minRadius,
     double? maxRadius,
@@ -371,7 +392,7 @@ class WxDrivenSheetStyle extends WxSheetStyle
   /// Creates a copy of this [WxSheetStyle] but with
   /// the [width] replaced with [double.infinity].
   @override
-  WxDrivenSheetStyle asBlock({
+  WxSheetStyle asBlock({
     bool? tileWrap,
     CrossAxisAlignment? tileAlign,
     MainAxisAlignment? tileJustify,
@@ -574,35 +595,54 @@ class WxDrivenSheetStyle extends WxSheetStyle
   }
 
   @override
-  WxDrivenSheetStyle merge(WxSheetStyle? other) {
-    final ancestor = super.merge(other);
-    final result = WxDrivenSheetStyle.fromAncestor(
-      ancestor,
-      inherits: inherits,
-      selectedStyle: selectedStyle,
-      indeterminateStyle: indeterminateStyle,
-      focusedStyle: focusedStyle,
-      hoveredStyle: hoveredStyle,
-      pressedStyle: pressedStyle,
-      disabledStyle: disabledStyle,
-    );
-    if (other is WxDrivenSheetStyle) {
-      return result.copyWith(
-        inherits: other.inherits,
-        selectedStyle: other.selectedStyle,
-        indeterminateStyle: other.indeterminateStyle,
-        focusedStyle: other.focusedStyle,
-        hoveredStyle: other.hoveredStyle,
-        pressedStyle: other.pressedStyle,
-        disabledStyle: other.disabledStyle,
-      );
-    }
-    return result;
+  WxSheetStyle merge(WxSheetStyle? other) {
+    if (other == null) return this;
+    return WxMergedDrivenSheetStyle(this, other);
   }
 
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
     super.debugFillDrivenStyle(properties);
+  }
+}
+
+/// Internal driven sheet style resolved dynamically via a callback.
+class WxDrivenSheetStyleBy extends WxSheetStyle {
+  WxDrivenSheetStyleBy(this._resolver)
+      : super.from(_resolver(const <WidgetEvent>{}));
+
+  final DrivenPropertyResolver<WxSheetStyle?> _resolver;
+
+  @override
+  bool get isDriven => true;
+
+  @override
+  WxSheetStyle resolve(Set<WidgetEvent> events) {
+    final resolved = _resolver(events);
+    return resolved ?? const WxSheetStyle();
+  }
+}
+
+/// Internal driven sheet style representing a combination of two styles,
+/// at least one of which is dynamic/event-driven.
+class WxMergedDrivenSheetStyle extends WxSheetStyle {
+  WxMergedDrivenSheetStyle(this._a, this._b)
+      : super.from(_a
+            .resolve(const <WidgetEvent>{})
+            .mergeStatic(_b?.resolve(const <WidgetEvent>{})));
+
+  final WxSheetStyle _a;
+  final WxSheetStyle? _b;
+
+  @override
+  bool get isDriven => true;
+
+  @override
+  WxSheetStyle resolve(Set<WidgetEvent> events) {
+    if (events.isEmpty) return this;
+    final resolvedA = _a.resolve(events);
+    final resolvedB = _b?.resolve(events);
+    return resolvedA.mergeStatic(resolvedB);
   }
 }

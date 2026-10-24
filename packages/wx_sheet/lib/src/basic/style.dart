@@ -1,12 +1,14 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/rendering.dart';
+import 'package:wx_sheet/wx_event.dart';
 import 'package:wx_sheet/wx_shape.dart';
 import 'package:wx_sheet/wx_utils.dart';
 import 'types.dart';
+import 'style_driven.dart';
 
 /// The style to be applied to the sheet widget
 @immutable
-class WxSheetStyle with Diagnosticable {
+class WxSheetStyle with Diagnosticable implements DrivenProperty<WxSheetStyle> {
   /// {@template widgetarian.sheet.style.direction}
   /// The direction to use as the main axis.
   /// {@endtemplate}
@@ -1039,10 +1041,75 @@ class WxSheetStyle with Diagnosticable {
     );
   }
 
-  /// Creates a copy of this [WxSheetStyle] but with
-  /// the given fields replaced with the new values.
+  /// Whether this style contains dynamic event-driven properties.
+  bool get isDriven => false;
+
+  /// Resolves the final style based on the given events.
+  ///
+  /// By default, a static style resolves to itself.
+  @override
+  WxSheetStyle resolve(Set<WidgetEvent> events) => this;
+
+  /// Resolves the value for the given set of events
+  /// if `value` is an event driven [WxSheetStyle],
+  /// otherwise returns the value itself or empty style if null.
+  static WxSheetStyle evaluate(
+    WxSheetStyle? value,
+    Set<WidgetEvent> events,
+  ) {
+    return DrivenProperty.evaluate<WxSheetStyle?>(value, events) ??
+        const WxSheetStyle();
+  }
+
+  /// Create a driven [WxSheetStyle] from a dynamic resolver callback.
+  static WxSheetStyle resolveWith(
+    DrivenPropertyResolver<WxSheetStyle?> resolver,
+  ) {
+    return WxDrivenSheetStyleBy(resolver);
+  }
+
+  /// Create a driven [WxSheetStyle] with event-specific overrides.
+  static WxSheetStyle driven({
+    WxSheetStyle? base,
+    WxSheetStyle? selected,
+    WxSheetStyle? indeterminate,
+    WxSheetStyle? focused,
+    WxSheetStyle? hovered,
+    WxSheetStyle? pressed,
+    WxSheetStyle? loading,
+    WxSheetStyle? disabled,
+    bool? inherits,
+  }) {
+    final style = WxDrivenSheetStyle(
+      inherits: inherits,
+      selectedStyle: selected,
+      indeterminateStyle: indeterminate,
+      focusedStyle: focused,
+      hoveredStyle: hovered,
+      pressedStyle: pressed,
+      loadingStyle: loading,
+      disabledStyle: disabled,
+    );
+    return base != null ? base.merge(style) : style;
+  }
+
+  /// Creates a copy of this [WxSheetStyle] merged with [other].
+  ///
+  /// If either this style or [other] is driven by events, a merged driven
+  /// style is returned that resolves both dynamically when events occur.
   WxSheetStyle merge(WxSheetStyle? other) {
     // if null return current object
+    if (other == null) return this;
+
+    if (isDriven || other.isDriven) {
+      return WxMergedDrivenSheetStyle(this, other);
+    }
+
+    return mergeStatic(other);
+  }
+
+  /// Merges static style properties without driven resolution.
+  WxSheetStyle mergeStatic(WxSheetStyle? other) {
     if (other == null) return this;
 
     return copyWith(

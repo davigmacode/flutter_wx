@@ -1,12 +1,24 @@
 import 'package:flutter/foundation.dart';
+import 'package:wx_sheet/wx_event.dart';
 import 'package:wx_sheet/wx_sheet.dart';
 import 'style.dart';
 
 /// Create a [WxButtonStyle] when some events occurs
 class WxDrivenButtonStyle extends WxButtonStyle
     with WxDrivenSheetProperty<WxButtonStyle> {
+  final DrivenPropertyResolver<WxButtonStyle?>? _resolver;
+
+  @override
+  bool get isDriven => true;
+
   @override
   final bool? inherits;
+
+  @override
+  final WxButtonStyle? selectedStyle;
+
+  @override
+  final WxButtonStyle? indeterminateStyle;
 
   @override
   final WxButtonStyle? focusedStyle;
@@ -98,30 +110,38 @@ class WxDrivenButtonStyle extends WxButtonStyle
     super.subtitleMaxLines,
     super.titleWeight,
     super.subtitleWeight,
+    this.selectedStyle,
+    this.indeterminateStyle,
     this.focusedStyle,
     this.hoveredStyle,
     this.pressedStyle,
     this.loadingStyle,
     this.disabledStyle,
     this.inherits,
-  });
+  }) : _resolver = null;
 
   /// Create a [WxDrivenButtonStyle] with value
   /// from another [WxButtonStyle].
   WxDrivenButtonStyle.fromAncestor(
     super.enabled, {
+    this.selectedStyle,
+    this.indeterminateStyle,
     this.focusedStyle,
     this.hoveredStyle,
     this.pressedStyle,
     this.loadingStyle,
     this.disabledStyle,
     this.inherits,
-  }) : super.from();
+  })  : _resolver = null,
+        super.from();
 
   /// Create a [WxDrivenButtonStyle] with value
   /// from another [WxDrivenButtonStyle].
   WxDrivenButtonStyle.from(WxDrivenButtonStyle? super.other)
-      : focusedStyle = other?.focusedStyle,
+      : _resolver = other?._resolver,
+        selectedStyle = other?.selectedStyle,
+        indeterminateStyle = other?.indeterminateStyle,
+        focusedStyle = other?.focusedStyle,
         hoveredStyle = other?.hoveredStyle,
         pressedStyle = other?.pressedStyle,
         loadingStyle = other?.loadingStyle,
@@ -133,7 +153,10 @@ class WxDrivenButtonStyle extends WxButtonStyle
   WxDrivenButtonStyle.resolver(
     WxDrivenSheetStyleResolver<WxButtonStyle?> resolver, {
     this.inherits = false,
-  })  : focusedStyle = resolver({WxSheetEvent.focused}),
+  })  : _resolver = resolver,
+        selectedStyle = resolver({WxSheetEvent.selected}),
+        indeterminateStyle = resolver({WxSheetEvent.indeterminate}),
+        focusedStyle = resolver({WxSheetEvent.focused}),
         hoveredStyle = resolver({WxSheetEvent.hovered}),
         pressedStyle = resolver({WxSheetEvent.pressed}),
         loadingStyle = resolver({WxSheetEvent.loading}),
@@ -144,16 +167,29 @@ class WxDrivenButtonStyle extends WxButtonStyle
   /// if `value` is an event driven [WxButtonStyle],
   /// otherwise returns the value itself.
   static WxButtonStyle evaluate(
-    WxButtonStyle value,
-    Set<WxSheetEvent> events,
+    WxButtonStyle? value,
+    Set<WidgetEvent> events,
   ) {
-    return WxDrivenSheetStyle.evaluate(value, events);
+    return DrivenProperty.evaluate<WxButtonStyle?>(value, events) ??
+        const WxButtonStyle();
   }
 
   @override
-  resolveInherits(accumulator, style) {
+  WxButtonStyle resolve(Set<WidgetEvent> events) {
+    if (_resolver != null) {
+      final evaluated = _resolver(events);
+      if (evaluated != null) {
+        return inherits != false ? mergeStatic(evaluated) : evaluated;
+      }
+    }
+    return super.resolve(events);
+  }
+
+  @override
+  WxButtonStyle resolveInherits(
+      WxButtonStyle accumulator, WxButtonStyle? style) {
     return inherits != false
-        ? accumulator.merge(style)
+        ? accumulator.mergeStatic(style)
         : WxButtonStyle.from(style);
   }
 
@@ -340,44 +376,37 @@ class WxDrivenButtonStyle extends WxButtonStyle
   }
 
   @override
-  WxDrivenButtonStyle merge(other) {
+  WxButtonStyle merge(other) {
     if (other == null) return this;
-    final ancestor = super.merge(other);
-    final result = WxDrivenButtonStyle.fromAncestor(
-      ancestor,
-      inherits: inherits,
-      focusedStyle: focusedStyle,
-      hoveredStyle: hoveredStyle,
-      pressedStyle: pressedStyle,
-      loadingStyle: loadingStyle,
-      disabledStyle: disabledStyle,
-    );
-    if (other is WxDrivenButtonStyle) {
-      return result.copyWith(
-        inherits: other.inherits,
-        focusedStyle: other.focusedStyle,
-        hoveredStyle: other.hoveredStyle,
-        pressedStyle: other.pressedStyle,
-        loadingStyle: other.loadingStyle,
-        disabledStyle: other.disabledStyle,
-      );
-    }
-    if (other is WxDrivenSheetStyle) {
-      return result.copyWith(
-        inherits: other.inherits,
-        focusedStyle: WxButtonStyle.fromAncestor(other.focusedStyle),
-        hoveredStyle: WxButtonStyle.fromAncestor(other.hoveredStyle),
-        pressedStyle: WxButtonStyle.fromAncestor(other.pressedStyle),
-        loadingStyle: WxButtonStyle.fromAncestor(other.loadingStyle),
-        disabledStyle: WxButtonStyle.fromAncestor(other.disabledStyle),
-      );
-    }
-    return result;
+    return WxMergedDrivenButtonStyle(this, other);
   }
 
   @override
   void debugFillProperties(DiagnosticPropertiesBuilder properties) {
     super.debugFillProperties(properties);
     super.debugFillDrivenStyle(properties);
+  }
+}
+
+/// Internal driven button style representing a combination of two styles,
+/// at least one of which is dynamic/event-driven.
+class WxMergedDrivenButtonStyle extends WxButtonStyle {
+  WxMergedDrivenButtonStyle(this._a, this._b)
+      : super.fromAncestor(_a
+            .resolve(const <WidgetEvent>{})
+            .mergeStatic(_b?.resolve(const <WidgetEvent>{})));
+
+  final WxButtonStyle _a;
+  final WxSheetStyle? _b;
+
+  @override
+  bool get isDriven => true;
+
+  @override
+  WxButtonStyle resolve(Set<WidgetEvent> events) {
+    if (events.isEmpty) return this;
+    final resolvedA = _a.resolve(events);
+    final resolvedB = _b?.resolve(events);
+    return resolvedA.mergeStatic(resolvedB);
   }
 }

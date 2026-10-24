@@ -3,8 +3,10 @@ import 'package:wx_sheet/wx_event.dart';
 import 'style.dart';
 import 'event.dart';
 
-mixin WxDrivenSheetProperty<T extends WxSheetStyle> on WxSheetStyle
-    implements DrivenProperty<T> {
+mixin WxDrivenSheetProperty<T extends WxSheetStyle> on WxSheetStyle {
+  @override
+  bool get isDriven => true;
+
   /// Whether the resolved style should be merged with the previous resolved style.
   ///
   /// If `true`, the resolved style will be combined with the previous style.

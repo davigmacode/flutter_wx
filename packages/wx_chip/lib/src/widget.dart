@@ -1,6 +1,5 @@
 import 'package:wx_sheet/wx_event.dart';
 import 'package:wx_sheet/wx_sheet.dart';
-import 'style_driven.dart';
 import 'style.dart';
 import 'theme.dart';
 import 'theme_data.dart';
@@ -116,7 +115,7 @@ class WxChip extends WxSheet<WxChipThemeData> {
 
   @override
   WxChipStyle get effectiveStyle {
-    return const WxDrivenChipStyle().merge(super.effectiveStyle);
+    return WxChipStyle.fromAncestor(super.effectiveStyle);
   }
 
   @override
@@ -128,7 +127,9 @@ class WxChip extends WxSheet<WxChipThemeData> {
   WxChipStyle getInheritedStyle(context, inherits) {
     if (inherits) {
       final parentStyle = getParentStyle(context);
-      return const WxDrivenChipStyle().merge(parentStyle).merge(effectiveStyle);
+      return (parentStyle != null)
+          ? WxChipStyle.fromAncestor(parentStyle).merge(effectiveStyle)
+          : effectiveStyle;
     }
     return effectiveStyle;
   }

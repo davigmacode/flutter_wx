@@ -802,7 +802,7 @@ class WxSheet<T extends WxSheetThemeData<T>> extends StatelessWidget {
   ///
   /// Returns the calculated `WxSheetStyle` instance.
   WxSheetStyle get effectiveStyle {
-    return const WxDrivenSheetStyle().merge(style).copyWith(
+    final directStyle = WxDrivenSheetStyle(
           direction: direction,
           variant: variant,
           size: size,
@@ -888,6 +888,7 @@ class WxSheet<T extends WxSheetThemeData<T>> extends StatelessWidget {
           disabledStyle: disabledStyle,
           loadingStyle: loadingStyle,
         );
+    return style != null ? style!.merge(directStyle) : directStyle;
   }
 
   /// Retrieves the `WxSheetThemeData` for the given `BuildContext`.

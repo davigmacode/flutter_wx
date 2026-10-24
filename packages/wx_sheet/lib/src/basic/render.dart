@@ -349,7 +349,7 @@ class WxSheetRenderState extends State<WxSheetRender>
   /// overrides based on the current state of the widget (selected, hovered, etc.).
   /// The result is a new `WxSheetStyle` object with the applied overrides.
   WxSheetStyle evaluateDrivenStyle(WxSheetStyle actualStyle) {
-    return WxDrivenSheetStyle.evaluate(actualStyle, widgetEvents.value);
+    return actualStyle.resolve(widgetEvents.value);
   }
 
   /// Prepares a `WxSheetStyle` by resolving properties and applying defaults.

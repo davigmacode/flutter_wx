@@ -114,7 +114,7 @@ class WxCard extends WxSheet<WxCardThemeData> {
 
   @override
   WxCardStyle get effectiveStyle {
-    return const WxCardStyle().merge(super.effectiveStyle);
+    return WxCardStyle.fromAncestor(super.effectiveStyle);
   }
 
   @override
@@ -126,7 +126,9 @@ class WxCard extends WxSheet<WxCardThemeData> {
   WxCardStyle getInheritedStyle(context, inherits) {
     if (inherits) {
       final parentStyle = getParentStyle(context);
-      return const WxCardStyle().merge(parentStyle).merge(effectiveStyle);
+      return (parentStyle != null)
+          ? WxCardStyle.fromAncestor(parentStyle).merge(effectiveStyle)
+          : effectiveStyle;
     }
     return effectiveStyle;
   }

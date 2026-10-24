@@ -1,3 +1,4 @@
+import 'package:wx_sheet/wx_event.dart';
 import 'package:wx_sheet/wx_sheet.dart';
 
 class WxCardStyle extends WxSheetStyle {
@@ -75,6 +76,9 @@ class WxCardStyle extends WxSheetStyle {
 
   /// Create a [WxCardStyle] from another style
   WxCardStyle.from(super.other) : super.from();
+
+  /// Create a [WxCardStyle] from another [WxSheetStyle].
+  WxCardStyle.fromAncestor(super.other) : super.from();
 
   /// Creates a copy of this [WxCardStyle] but with
   /// the given fields replaced with the new values.
@@ -241,18 +245,120 @@ class WxCardStyle extends WxSheetStyle {
       titleWeight: titleWeight,
       subtitleWeight: subtitleWeight,
     );
-    return WxCardStyle.from(ancestor);
+    return WxCardStyle.fromAncestor(ancestor);
+  }
+
+  /// Resolves the value for the given set of events
+  /// if `value` is an event driven [WxCardStyle],
+  /// otherwise returns the value itself.
+  static WxCardStyle evaluate(
+    WxCardStyle? value,
+    Set<WidgetEvent> events,
+  ) {
+    return DrivenProperty.evaluate<WxCardStyle?>(value, events) ??
+        const WxCardStyle();
+  }
+
+  /// Create a driven [WxCardStyle] from a resolver callback.
+  static WxCardStyle resolveWith(
+    DrivenPropertyResolver<WxCardStyle?> resolver,
+  ) {
+    return WxCardStyleDrivenBy(resolver);
+  }
+
+  /// Create a driven [WxCardStyle] with event-specific overrides.
+  static WxCardStyle driven({
+    WxCardStyle? base,
+    WxSheetStyle? selected,
+    WxSheetStyle? indeterminate,
+    WxSheetStyle? focused,
+    WxSheetStyle? hovered,
+    WxSheetStyle? pressed,
+    WxSheetStyle? loading,
+    WxSheetStyle? disabled,
+    bool? inherits,
+  }) {
+    final style = WxDrivenSheetStyle(
+      inherits: inherits,
+      selectedStyle: selected,
+      indeterminateStyle: indeterminate,
+      focusedStyle: focused,
+      hoveredStyle: hovered,
+      pressedStyle: pressed,
+      loadingStyle: loading,
+      disabledStyle: disabled,
+    );
+    return base != null
+        ? base.merge(style)
+        : WxCardStyle.fromAncestor(style);
   }
 
   @override
-  WxCardStyle merge(other) {
-    final ancestor = super.merge(other);
-    return WxCardStyle.from(ancestor);
+  WxCardStyle resolve(Set<WidgetEvent> events) {
+    if (!isDriven) return this;
+    final resolved = super.resolve(events);
+    return WxCardStyle.fromAncestor(resolved);
+  }
+
+  @override
+  WxCardStyle merge(WxSheetStyle? other) {
+    if (other == null) return this;
+    if (isDriven || other.isDriven) {
+      return WxMergedDrivenCardStyle(this, other);
+    }
+    return mergeStatic(other);
+  }
+
+  @override
+  WxCardStyle mergeStatic(WxSheetStyle? other) {
+    if (other == null) return this;
+    final ancestor = super.mergeStatic(other);
+    return WxCardStyle.fromAncestor(ancestor);
   }
 
   /// Linearly interpolate between two [WxCardStyle] objects.
   static WxCardStyle? lerp(WxCardStyle? a, WxCardStyle? b, double t) {
     final ancestor = WxSheetStyle.lerp(a, b, t);
-    return WxCardStyle.from(ancestor);
+    return WxCardStyle.fromAncestor(ancestor);
+  }
+}
+
+/// Internal driven card style resolved dynamically via a callback.
+class WxCardStyleDrivenBy extends WxCardStyle {
+  WxCardStyleDrivenBy(this._resolver)
+      : super.fromAncestor(_resolver(const <WidgetEvent>{}));
+
+  final DrivenPropertyResolver<WxCardStyle?> _resolver;
+
+  @override
+  bool get isDriven => true;
+
+  @override
+  WxCardStyle resolve(Set<WidgetEvent> events) {
+    final resolved = _resolver(events);
+    return resolved ?? const WxCardStyle();
+  }
+}
+
+/// Internal driven card style representing a combination of two styles,
+/// at least one of which is dynamic/event-driven.
+class WxMergedDrivenCardStyle extends WxCardStyle {
+  WxMergedDrivenCardStyle(this._a, this._b)
+      : super.fromAncestor(_a
+            .resolve(const <WidgetEvent>{})
+            .mergeStatic(_b?.resolve(const <WidgetEvent>{})));
+
+  final WxCardStyle _a;
+  final WxSheetStyle? _b;
+
+  @override
+  bool get isDriven => true;
+
+  @override
+  WxCardStyle resolve(Set<WidgetEvent> events) {
+    if (events.isEmpty) return this;
+    final resolvedA = _a.resolve(events);
+    final resolvedB = _b?.resolve(events);
+    return resolvedA.mergeStatic(resolvedB);
   }
 }

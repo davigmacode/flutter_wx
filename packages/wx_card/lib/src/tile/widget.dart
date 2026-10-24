@@ -110,7 +110,7 @@ class WxCardTile extends WxSheet<WxCardTileThemeData> {
 
   @override
   WxCardTileStyle get effectiveStyle {
-    return const WxCardTileStyle().merge(super.effectiveStyle);
+    return WxCardTileStyle.fromAncestor(super.effectiveStyle);
   }
 
   @override
@@ -122,7 +122,9 @@ class WxCardTile extends WxSheet<WxCardTileThemeData> {
   WxCardTileStyle getInheritedStyle(context, inherits) {
     if (inherits) {
       final parentStyle = getParentStyle(context);
-      return const WxCardTileStyle().merge(parentStyle).merge(effectiveStyle);
+      return (parentStyle != null)
+          ? WxCardTileStyle.fromAncestor(parentStyle).merge(effectiveStyle)
+          : effectiveStyle;
     }
     return effectiveStyle;
   }

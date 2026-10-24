@@ -1174,6 +1174,102 @@ WxButton(
             ],
           ),
         ),
+        ShowcaseCard(
+          title: 'Polymorphic Driven Styles & Semantic Colors',
+          subtitle:
+              'Demonstrate single-prop driven styles (WxButtonStyle.driven and WxButtonStyle.resolveWith) and WxColor semantic roles without hardcoding.',
+          codeSnippet: '''
+// 1. Declarative driven slots directly on `style:`
+WxButton(
+  style: WxButtonStyle.driven(
+    hovered: const WxButtonStyle(
+      scale: 1.05,
+      elevation: 6,
+    ),
+    pressed: const WxButtonStyle(
+      scale: 0.95,
+      elevation: 0,
+    ),
+  ),
+  severity: WxColor.danger,
+  onPressed: () {},
+  child: const Text('Hover Scale + Danger'),
+)
+
+// 2. Dynamic resolver callback
+WxButton(
+  style: WxButtonStyle.resolveWith((events) {
+    if (events.contains(WxSheetEvent.pressed)) {
+      return const WxButtonStyle(backgroundColor: Colors.purple, scale: 0.92);
+    }
+    if (events.contains(WxSheetEvent.hovered)) {
+      return const WxButtonStyle(backgroundColor: Colors.deepPurpleAccent);
+    }
+    return const WxButtonStyle(backgroundColor: Colors.indigo);
+  }),
+  onPressed: () {},
+  child: const Text('Dynamic Resolver Callback'),
+)''',
+          child: Wrap(
+            spacing: 16,
+            runSpacing: 12,
+            alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              WxButton(
+                variant: WxButtonVariant.tonal,
+                severity: WxColor.danger,
+                style: WxButtonStyle.driven(
+                  hovered: const WxButtonStyle(
+                    scale: 1.05,
+                    elevation: 6,
+                  ),
+                  pressed: const WxButtonStyle(
+                    scale: 0.95,
+                    elevation: 0,
+                  ),
+                ),
+                leading: const Icon(Icons.flash_on_rounded),
+                onPressed: () {},
+                child: const Text('Hover Scale + Danger'),
+              ),
+              WxButton(
+                variant: WxButtonVariant.filled,
+                style: WxButtonStyle.resolveWith((events) {
+                  if (events.contains(WxSheetEvent.pressed)) {
+                    return const WxButtonStyle(
+                      backgroundColor: Colors.purple,
+                      scale: 0.92,
+                    );
+                  }
+                  if (events.contains(WxSheetEvent.hovered)) {
+                    return const WxButtonStyle(
+                      backgroundColor: Colors.deepPurpleAccent,
+                    );
+                  }
+                  return const WxButtonStyle(
+                    backgroundColor: Colors.indigo,
+                  );
+                }),
+                leading: const Icon(Icons.auto_awesome_rounded),
+                onPressed: () {},
+                child: const Text('Dynamic Resolver Callback'),
+              ),
+              WxButton(
+                variant: WxButtonVariant.outlined,
+                severity: WxColor.success,
+                style: WxButtonStyle.driven(
+                  hovered: const WxButtonStyle(
+                    borderWidth: 2.5,
+                  ),
+                ),
+                leading: const Icon(Icons.verified_rounded),
+                onPressed: () {},
+                child: const Text('WxColor.success'),
+              ),
+            ],
+          ),
+        ),
       ],
     );
   }

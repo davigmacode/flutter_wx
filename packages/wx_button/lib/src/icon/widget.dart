@@ -1,7 +1,6 @@
 import 'package:wx_sheet/wx_sheet.dart';
 import 'theme.dart';
 import 'theme_data.dart';
-import 'style_driven.dart';
 import 'style.dart';
 
 /// The `WxIconButton` widget serves as a customizable button building block for
@@ -81,7 +80,7 @@ class WxIconButton extends WxSheet<WxIconButtonThemeData> {
 
   @override
   WxIconButtonStyle get effectiveStyle {
-    return const WxDrivenIconButtonStyle().merge(super.effectiveStyle);
+    return WxIconButtonStyle.fromAncestor(super.effectiveStyle);
   }
 
   @override
@@ -93,9 +92,9 @@ class WxIconButton extends WxSheet<WxIconButtonThemeData> {
   WxIconButtonStyle getInheritedStyle(context, inherits) {
     if (inherits) {
       final parentStyle = getParentStyle(context);
-      return const WxDrivenIconButtonStyle()
-          .merge(parentStyle)
-          .merge(effectiveStyle);
+      return (parentStyle != null)
+          ? WxIconButtonStyle.fromAncestor(parentStyle).merge(effectiveStyle)
+          : effectiveStyle;
     }
     return effectiveStyle;
   }
