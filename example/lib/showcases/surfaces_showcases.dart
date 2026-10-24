@@ -1178,3 +1178,420 @@ WxButton(
     );
   }
 }
+
+class WxCardShowcase extends StatefulWidget {
+  const WxCardShowcase({super.key});
+
+  @override
+  State<WxCardShowcase> createState() => _WxCardShowcaseState();
+}
+
+class _WxCardShowcaseState extends State<WxCardShowcase> {
+  int _cardTaps = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return ShowcaseScaffold(
+      packageName: 'wx_card',
+      version: '1.0.0',
+      description:
+          'Versatile surface cards and horizontal card tiles built upon WxSheet, featuring header/footer layout composition, elevation, adaptive design tokens, and interactive event feedback.',
+      children: [
+        ShowcaseCard(
+          title: 'Card Variants',
+          subtitle:
+              'Material 3 compliant card hierarchies: elevated, tonal, outlined, and filled.',
+          codeSnippet: '''
+WxCard(
+  variant: WxCardVariant.elevated,
+  padding: const EdgeInsets.all(20),
+  child: Text('Elevated Card'),
+)
+WxCard(
+  variant: WxCardVariant.tonal,
+  padding: const EdgeInsets.all(20),
+  child: Text('Tonal Card'),
+)
+WxCard(
+  variant: WxCardVariant.outlined,
+  padding: const EdgeInsets.all(20),
+  child: Text('Outlined Card'),
+)''',
+          child: Wrap(
+            spacing: 16,
+            runSpacing: 16,
+            alignment: WrapAlignment.center,
+            children: [
+              SizedBox(
+                width: 220,
+                child: WxCard(
+                  variant: WxCardVariant.elevated,
+                  padding: const EdgeInsets.all(18),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(Icons.layers_rounded, color: colorScheme.primary),
+                      const SizedBox(height: 10),
+                      Text('Elevated', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 4),
+                      Text('Subtle ambient shadow elevation', style: theme.textTheme.bodySmall),
+                    ],
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: 220,
+                child: WxCard(
+                  variant: WxCardVariant.tonal,
+                  padding: const EdgeInsets.all(18),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(Icons.palette_rounded, color: colorScheme.secondary),
+                      const SizedBox(height: 10),
+                      Text('Tonal', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 4),
+                      Text('Tinted with secondary container', style: theme.textTheme.bodySmall),
+                    ],
+                  ),
+                ),
+              ),
+              SizedBox(
+                width: 220,
+                child: WxCard(
+                  variant: WxCardVariant.outlined,
+                  padding: const EdgeInsets.all(18),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(Icons.crop_square_rounded, color: colorScheme.outline),
+                      const SizedBox(height: 10),
+                      Text('Outlined', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 4),
+                      Text('Defined crisp outline border', style: theme.textTheme.bodySmall),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        ShowcaseCard(
+          title: 'Structured Header & Footer Composition',
+          subtitle:
+              'Cards can specify dedicated header and footer widgets alongside primary child body.',
+          codeSnippet: '''
+WxCard(
+  variant: WxCardVariant.elevated,
+  header: Row(...),
+  footer: Row(...),
+  child: const Text('Exploring modular architecture with Widgetarian primitives.'),
+)''',
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 480),
+              child: WxCard(
+                variant: WxCardVariant.elevated,
+                padding: const EdgeInsets.all(16),
+                header: Row(
+                  children: [
+                    CircleAvatar(
+                      backgroundColor: colorScheme.primaryContainer,
+                      child: Icon(Icons.person_rounded, color: colorScheme.onPrimaryContainer),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Alex Morgan', style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+                          Text('Senior Flutter Architect • 2h ago', style: theme.textTheme.bodySmall),
+                        ],
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.more_horiz_rounded),
+                      onPressed: () {},
+                    ),
+                  ],
+                ),
+                footer: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () {},
+                      child: const Text('Bookmark'),
+                    ),
+                    const SizedBox(width: 8),
+                    FilledButton.tonal(
+                      onPressed: () => setState(() => _cardTaps++),
+                      child: Text('Like ($_cardTaps)'),
+                    ),
+                  ],
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  child: Text(
+                    'Widgetarian primitives decouple event handling, styling tokens, and layout composition into modular, extensible Flutter components.',
+                    style: theme.textTheme.bodyMedium,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+        ShowcaseCard(
+          title: 'WxCardTile (Horizontal Tiles)',
+          subtitle:
+              'Specialized horizontal sheet tile suitable for list groups, settings, and interactive items.',
+          codeSnippet: '''
+WxCardTile(
+  variant: WxCardVariant.tonal,
+  leading: const Icon(Icons.account_balance_wallet_rounded),
+  title: const Text('Payment Settings'),
+  subtitle: const Text('Manage debit cards, bank accounts, and billing info'),
+  trailing: const Icon(Icons.chevron_right_rounded),
+  onPressed: () {},
+)''',
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 520),
+              child: Column(
+                children: [
+                  WxCardTile(
+                    variant: WxCardVariant.tonal,
+                    leading: const Icon(Icons.account_balance_wallet_rounded),
+                    title: const Text('Payment Settings'),
+                    subtitle: const Text('Manage debit cards, bank accounts, and billing info'),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onPressed: () => setState(() => _cardTaps++),
+                  ),
+                  const SizedBox(height: 10),
+                  WxCardTile(
+                    variant: WxCardVariant.outlined,
+                    leading: const Icon(Icons.security_rounded),
+                    title: const Text('Security & Privacy'),
+                    subtitle: const Text('Two-factor authentication and device sessions'),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onPressed: () => setState(() => _cardTaps++),
+                  ),
+                  const SizedBox(height: 10),
+                  WxCardTile(
+                    variant: WxCardVariant.tonal,
+                    leading: const Icon(Icons.notifications_active_rounded),
+                    title: const Text('Notification Preferences'),
+                    subtitle: const Text('Configure email, push, and SMS notifications'),
+                    trailing: const Icon(Icons.chevron_right_rounded),
+                    onPressed: () => setState(() => _cardTaps++),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class WxChipShowcase extends StatefulWidget {
+  const WxChipShowcase({super.key});
+
+  @override
+  State<WxChipShowcase> createState() => _WxChipShowcaseState();
+}
+
+class _WxChipShowcaseState extends State<WxChipShowcase> {
+  final Set<String> _filters = {'Flutter', 'Dart'};
+  final List<String> _availableTags = [
+    'Flutter',
+    'Dart',
+    'Widgetarian',
+    'Cross-Platform',
+    'M3 Design',
+    'Open Source',
+  ];
+  late List<String> _inputChips;
+
+  @override
+  void initState() {
+    super.initState();
+    _inputChips = ['UI/UX', 'Mobile', 'Desktop', 'Architecture'];
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return ShowcaseScaffold(
+      packageName: 'wx_chip',
+      version: '1.0.2',
+      description:
+          'Lightweight adaptive chips supporting filter toggles, action triggers, leading checkmarks/avatars, and state-driven event styles built on WxSheet.',
+      children: [
+        ShowcaseCard(
+          title: 'Chip Variants',
+          subtitle:
+              'Visual hierarchy across tonal, filled, elevated, and outlined chip appearances.',
+          codeSnippet: '''
+WxChip(
+  variant: WxChipVariant.tonal,
+  leading: const Icon(Icons.star_rounded, size: 18),
+  child: const Text('Tonal'),
+  onPressed: () {},
+)
+WxChip(
+  variant: WxChipVariant.filled,
+  leading: const Icon(Icons.bolt_rounded, size: 18),
+  child: const Text('Filled'),
+  onPressed: () {},
+)
+WxChip(
+  variant: WxChipVariant.elevated,
+  leading: const Icon(Icons.layers_rounded, size: 18),
+  child: const Text('Elevated'),
+  onPressed: () {},
+)
+WxChip(
+  variant: WxChipVariant.outlined,
+  leading: const Icon(Icons.crop_square_rounded, size: 18),
+  child: const Text('Outlined'),
+  onPressed: () {},
+)''',
+          child: Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              WxChip(
+                variant: WxChipVariant.tonal,
+                leading: const Icon(Icons.star_rounded, size: 18),
+                onPressed: () {},
+                child: const Text('Tonal'),
+              ),
+              WxChip(
+                variant: WxChipVariant.filled,
+                leading: const Icon(Icons.bolt_rounded, size: 18),
+                onPressed: () {},
+                child: const Text('Filled'),
+              ),
+              WxChip(
+                variant: WxChipVariant.elevated,
+                leading: const Icon(Icons.layers_rounded, size: 18),
+                onPressed: () {},
+                child: const Text('Elevated'),
+              ),
+              WxChip(
+                variant: WxChipVariant.outlined,
+                leading: const Icon(Icons.crop_square_rounded, size: 18),
+                onPressed: () {},
+                child: const Text('Outlined'),
+              ),
+            ],
+          ),
+        ),
+        ShowcaseCard(
+          title: 'Filter Chips (Tap to Toggle)',
+          subtitle:
+              'Dynamic selection tags with animated checkmark integration and toggled variant tint.',
+          codeSnippet: '''
+WxChip(
+  variant: isSelected ? WxChipVariant.tonal : WxChipVariant.outlined,
+  selected: isSelected,
+  onSelected: (val) => setState(() => ...),
+  child: Text(tag),
+)''',
+          child: Column(
+            children: [
+              Text(
+                'Active Filters: ${_filters.isEmpty ? "None" : _filters.join(", ")}',
+                style: theme.textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: colorScheme.primary,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Wrap(
+                spacing: 10,
+                runSpacing: 10,
+                alignment: WrapAlignment.center,
+                children: _availableTags.map((tag) {
+                  final isSelected = _filters.contains(tag);
+                  return WxChip(
+                    variant: isSelected ? WxChipVariant.tonal : WxChipVariant.outlined,
+                    selected: isSelected,
+                    onSelected: (val) {
+                      setState(() {
+                        if (val) {
+                          _filters.add(tag);
+                        } else {
+                          _filters.remove(tag);
+                        }
+                      });
+                    },
+                    child: Text(tag),
+                  );
+                }).toList(),
+              ),
+            ],
+          ),
+        ),
+        ShowcaseCard(
+          title: 'Removable Input Chips',
+          subtitle:
+              'Chips with trailing delete buttons to remove tags interactively.',
+          codeSnippet: '''
+WxChip(
+  variant: WxChipVariant.tonal,
+  trailing: GestureDetector(
+    onTap: () => setState(() => chips.remove(item)),
+    child: const Icon(Icons.cancel_rounded, size: 18),
+  ),
+  child: Text(item),
+)''',
+          child: Column(
+            children: [
+              if (_inputChips.isEmpty)
+                TextButton.icon(
+                  onPressed: () => setState(() {
+                    _inputChips = ['UI/UX', 'Mobile', 'Desktop', 'Architecture'];
+                  }),
+                  icon: const Icon(Icons.refresh_rounded),
+                  label: const Text('Reset Sample Tags'),
+                )
+              else
+                Wrap(
+                  spacing: 10,
+                  runSpacing: 10,
+                  alignment: WrapAlignment.center,
+                  children: _inputChips.map((chipText) {
+                    return WxChip(
+                      variant: WxChipVariant.tonal,
+                      trailing: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _inputChips.remove(chipText);
+                          });
+                        },
+                        child: Icon(
+                          Icons.cancel_rounded,
+                          size: 18,
+                          color: colorScheme.onSurfaceVariant.withAlpha(180),
+                        ),
+                      ),
+                      child: Text(chipText),
+                    );
+                  }).toList(),
+                ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}

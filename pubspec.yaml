@@ -29,6 +29,8 @@ workspace:
   - packages/wx_badge
   - packages/wx_box
   - packages/wx_button
+  - packages/wx_card
+  - packages/wx_chip
   - packages/wx_divider
   - packages/wx_sheet
   - packages/wx_spoiler

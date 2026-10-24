@@ -1,0 +1,34 @@
+name: wx_card
+description: Provides widgets that are used to create visually appealing cards and their individual tiles.
+version: 1.0.0
+homepage: https://github.com/davigmacode/flutter_wx
+repository: https://github.com/davigmacode/flutter_wx/tree/main/packages/wx_card
+issue_tracker: https://github.com/davigmacode/flutter_wx/issues
+
+topics:
+  - ui
+  - card
+  - event-driven
+  - widgetarian
+
+funding:
+  - https://buymeacoffee.com/davigmacode
+  - https://ko-fi.com/davigmacode
+
+resolution: workspace
+
+environment:
+  sdk: ^3.5.0
+  flutter: '>=3.24.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  wx_sheet: ^4.8.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:

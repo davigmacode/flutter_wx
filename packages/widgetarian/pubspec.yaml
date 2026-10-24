@@ -48,6 +48,8 @@ dependencies:
   wx_badge: ^3.0.0
   wx_box: ^4.2.1
   wx_button: ^2.0.4
+  wx_card: ^1.0.0
+  wx_chip: ^1.0.2
   wx_divider: ^1.0.0
   wx_sheet: ^4.8.0
   wx_spoiler: ^1.0.0

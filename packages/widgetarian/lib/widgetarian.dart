@@ -23,6 +23,8 @@ export 'package:wx_avatar/wx_avatar.dart';
 export 'package:wx_badge/wx_badge.dart';
 export 'package:wx_box/wx_box.dart';
 export 'package:wx_button/wx_button.dart';
+export 'package:wx_card/wx_card.dart';
+export 'package:wx_chip/wx_chip.dart';
 export 'package:wx_divider/wx_divider.dart';
 export 'package:wx_sheet/wx_sheet.dart';
 export 'package:wx_spoiler/wx_spoiler.dart';
