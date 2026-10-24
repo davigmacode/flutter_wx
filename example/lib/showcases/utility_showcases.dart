@@ -199,38 +199,55 @@ ChronoView(
 }
 
 class ThemePatrolShowcase extends StatelessWidget {
-  final ThemeMode themeMode;
-  final Color seedColor;
-  final ValueChanged<ThemeMode> onThemeModeChanged;
-  final ValueChanged<Color> onSeedColorChanged;
-
-  const ThemePatrolShowcase({
-    super.key,
-    required this.themeMode,
-    required this.seedColor,
-    required this.onThemeModeChanged,
-    required this.onSeedColorChanged,
-  });
+  const ThemePatrolShowcase({super.key});
 
   static const List<Color> _palette = [
     Colors.deepPurple,
     Colors.indigo,
-    Colors.blue,
     Colors.teal,
     Colors.green,
-    Colors.amber,
     Colors.deepOrange,
     Colors.pink,
+    Colors.cyan,
+    Colors.amber,
   ];
 
   @override
   Widget build(BuildContext context) {
+    final themeController = ThemeProvider.of(context);
+    final currentColor = themeController.color ?? Colors.deepPurple;
+
     return ShowcaseScaffold(
       packageName: 'theme_patrol',
       version: '3.2.3',
       description:
-          'Effortless multi-theme manager supporting Material 3 color schemes, dark/light/system theme modes, and persistence.',
+          'Effortless multi-theme manager supporting design system presets (M3/M2/iOS), color palettes, and theme modes.',
       children: [
+        ShowcaseCard(
+          title: 'Design System Preset',
+          subtitle: 'Switch between Material 3, Material 2, and iOS Cupertino theme configurations.',
+          child: SegmentedButton<String>(
+            segments: const [
+              ButtonSegment(
+                value: 'm3',
+                label: Text('Material 3'),
+                icon: Icon(Icons.auto_awesome_rounded),
+              ),
+              ButtonSegment(
+                value: 'm2',
+                label: Text('Material 2'),
+                icon: Icon(Icons.layers_rounded),
+              ),
+              ButtonSegment(
+                value: 'ios',
+                label: Text('iOS Cupertino'),
+                icon: Icon(Icons.phone_iphone_rounded),
+              ),
+            ],
+            selected: {themeController.selected},
+            onSelectionChanged: (val) => themeController.select(val.first),
+          ),
+        ),
         ShowcaseCard(
           title: 'Theme Mode Switcher',
           subtitle: 'Toggle live theme mode across the entire showroom application.',
@@ -252,20 +269,20 @@ class ThemePatrolShowcase extends StatelessWidget {
                 icon: Icon(Icons.settings_suggest_rounded),
               ),
             ],
-            selected: {themeMode},
-            onSelectionChanged: (val) => onThemeModeChanged(val.first),
+            selected: {themeController.mode},
+            onSelectionChanged: (val) => themeController.toMode(val.first),
           ),
         ),
         ShowcaseCard(
           title: 'Dynamic Seed Color Palette',
-          subtitle: 'Select any color to regenerate the M3 ColorScheme dynamically.',
+          subtitle: 'Select any color to regenerate the ColorScheme dynamically.',
           child: Wrap(
             spacing: 12,
             runSpacing: 12,
             children: _palette.map((color) {
-              final isSelected = seedColor.toARGB32() == color.toARGB32();
+              final isSelected = currentColor.toARGB32() == color.toARGB32();
               return GestureDetector(
-                onTap: () => onSeedColorChanged(color),
+                onTap: () => themeController.toColor(color),
                 child: Container(
                   width: 44,
                   height: 44,

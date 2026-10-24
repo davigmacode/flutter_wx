@@ -12,60 +12,99 @@ void main() {
   runApp(const WidgetarianShowroomApp());
 }
 
-class WidgetarianShowroomApp extends StatefulWidget {
+class WidgetarianShowroomApp extends StatelessWidget {
   const WidgetarianShowroomApp({super.key});
 
   @override
-  State<WidgetarianShowroomApp> createState() => _WidgetarianShowroomAppState();
-}
-
-class _WidgetarianShowroomAppState extends State<WidgetarianShowroomApp> {
-  ThemeMode _themeMode = ThemeMode.system;
-  Color _seedColor = Colors.deepPurple;
-
-  @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Widgetarian Showroom',
-      debugShowCheckedModeBanner: false,
-      themeMode: _themeMode,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: _seedColor,
-          brightness: Brightness.light,
+    return ThemePatrol(
+      themes: {
+        'm3': ThemeConfig.withMode(
+          description: 'Material 3',
+          light: ThemeData(
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: Colors.deepPurple,
+              brightness: Brightness.light,
+            ),
+            useMaterial3: true,
+          ),
+          dark: ThemeData(
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: Colors.deepPurple,
+              brightness: Brightness.dark,
+            ),
+            useMaterial3: true,
+          ),
+          extensionsBuilder: [
+            (context) => WxStaticSheetThemeM3(context),
+            (context) => WxTapSheetThemeM3(context),
+            (context) => WxToggleSheetThemeM3(context),
+          ],
         ),
-        useMaterial3: true,
-      ),
-      darkTheme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: _seedColor,
-          brightness: Brightness.dark,
+        'm2': ThemeConfig.withMode(
+          description: 'Material 2',
+          light: ThemeData(
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: Colors.deepPurple,
+              brightness: Brightness.light,
+            ),
+            useMaterial3: false,
+          ),
+          dark: ThemeData(
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: Colors.deepPurple,
+              brightness: Brightness.dark,
+            ),
+            useMaterial3: false,
+          ),
+          extensionsBuilder: [
+            (context) => WxStaticSheetThemeM2(context),
+            (context) => WxTapSheetThemeM2(context),
+            (context) => WxToggleSheetThemeM2(context),
+          ],
         ),
-        useMaterial3: true,
-      ),
-      home: ShowroomMainShell(
-        themeMode: _themeMode,
-        seedColor: _seedColor,
-        onThemeModeChanged: (mode) => setState(() => _themeMode = mode),
-        onSeedColorChanged: (color) => setState(() => _seedColor = color),
-      ),
+        'ios': ThemeConfig.withMode(
+          description: 'iOS Cupertino',
+          light: ThemeData(
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: Colors.deepPurple,
+              brightness: Brightness.light,
+            ),
+            useMaterial3: false,
+          ),
+          dark: ThemeData(
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: Colors.deepPurple,
+              brightness: Brightness.dark,
+            ),
+            useMaterial3: false,
+          ),
+          extensionsBuilder: [
+            (context) => WxStaticSheetThemeIOS(context),
+            (context) => WxTapSheetThemeIOS(context),
+            (context) => WxToggleSheetThemeIOS(context),
+          ],
+        ),
+      },
+      initialTheme: 'm3',
+      initialMode: ThemeMode.system,
+      builder: (context, theme, child) {
+        return MaterialApp(
+          title: 'Widgetarian Showroom',
+          debugShowCheckedModeBanner: false,
+          themeMode: theme.mode,
+          theme: theme.lightData,
+          darkTheme: theme.darkData,
+          builder: theme.bootstrap(),
+          home: const ShowroomMainShell(),
+        );
+      },
     );
   }
 }
 
 class ShowroomMainShell extends StatefulWidget {
-  final ThemeMode themeMode;
-  final Color seedColor;
-  final ValueChanged<ThemeMode> onThemeModeChanged;
-  final ValueChanged<Color> onSeedColorChanged;
-
-  const ShowroomMainShell({
-    super.key,
-    required this.themeMode,
-    required this.seedColor,
-    required this.onThemeModeChanged,
-    required this.onSeedColorChanged,
-  });
+  const ShowroomMainShell({super.key});
 
   @override
   State<ShowroomMainShell> createState() => _ShowroomMainShellState();
@@ -311,15 +350,10 @@ class _ShowroomMainShellState extends State<ShowroomMainShell> {
         id: 'theme_patrol',
         name: 'theme_patrol',
         version: '3.2.3',
-        summary: 'Multi-theme manager supporting M3 color schemes and theme modes.',
+        summary: 'Multi-theme manager supporting design system presets, color schemes, and theme modes.',
         category: PackageCategory.utilities,
         icon: Icons.palette_outlined,
-        builder: (context) => ThemePatrolShowcase(
-          themeMode: widget.themeMode,
-          seedColor: widget.seedColor,
-          onThemeModeChanged: widget.onThemeModeChanged,
-          onSeedColorChanged: widget.onSeedColorChanged,
-        ),
+        builder: (context) => const ThemePatrolShowcase(),
       ),
       PackageItem(
         id: 'widget_driven',
@@ -373,10 +407,32 @@ class _ShowroomMainShellState extends State<ShowroomMainShell> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final themeController = ThemeProvider.of(context);
     final isDesktop = MediaQuery.of(context).size.width >= 850;
 
     return Scaffold(
       appBar: AppBar(
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        backgroundColor: Colors.transparent,
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                theme.colorScheme.surface,
+                theme.colorScheme.surfaceContainerHighest.withAlpha(120),
+              ],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
+            border: Border(
+              bottom: BorderSide(
+                color: theme.colorScheme.outlineVariant.withAlpha(90),
+                width: 1,
+              ),
+            ),
+          ),
+        ),
         title: Row(
           children: [
             Container(
@@ -395,17 +451,107 @@ class _ShowroomMainShellState extends State<ShowroomMainShell> {
           ],
         ),
         actions: [
-          IconButton(
-            tooltip: 'Toggle Theme',
-            icon: Icon(
-              widget.themeMode == ThemeMode.dark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
+          // Theme Preset: M3 / M2 / iOS
+          if (isDesktop)
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: SegmentedButton<String>(
+                showSelectedIcon: false,
+                style: const ButtonStyle(
+                  visualDensity: VisualDensity.compact,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+                segments: const [
+                  ButtonSegment(
+                    value: 'm3',
+                    label: Text('M3'),
+                    tooltip: 'Material 3 Preset',
+                  ),
+                  ButtonSegment(
+                    value: 'm2',
+                    label: Text('M2'),
+                    tooltip: 'Material 2 Preset',
+                  ),
+                  ButtonSegment(
+                    value: 'ios',
+                    label: Text('iOS'),
+                    tooltip: 'iOS Cupertino Preset',
+                  ),
+                ],
+                selected: {themeController.selected},
+                onSelectionChanged: (state) => themeController.select(state.first),
+              ),
+            )
+          else
+            PopupMenuButton<String>(
+              tooltip: 'Design System Preset',
+              icon: const Icon(Icons.style_rounded),
+              initialValue: themeController.selected,
+              onSelected: (val) => themeController.select(val),
+              itemBuilder: (context) => const [
+                PopupMenuItem(value: 'm3', child: Text('Material 3')),
+                PopupMenuItem(value: 'm2', child: Text('Material 2')),
+                PopupMenuItem(value: 'ios', child: Text('iOS Cupertino')),
+              ],
             ),
-            onPressed: () {
-              widget.onThemeModeChanged(
-                widget.themeMode == ThemeMode.dark ? ThemeMode.light : ThemeMode.dark,
-              );
+          const SizedBox(width: 6),
+
+          // Theme Preset: Color Palette Presets
+          PopupMenuButton<Color>(
+            tooltip: 'Color Palette Presets',
+            icon: const Icon(Icons.palette_outlined),
+            onSelected: (color) => themeController.toColor(color),
+            itemBuilder: (context) {
+              const presets = [
+                MapEntry('Deep Purple', Colors.deepPurple),
+                MapEntry('Indigo', Colors.indigo),
+                MapEntry('Teal', Colors.teal),
+                MapEntry('Emerald', Colors.green),
+                MapEntry('Sunset Amber', Colors.deepOrange),
+                MapEntry('Rose Berry', Colors.pink),
+                MapEntry('Ocean Cyan', Colors.cyan),
+              ];
+              final currentColor = themeController.color ?? Colors.deepPurple;
+              return presets.map((entry) {
+                final isSelected = currentColor.toARGB32() == entry.value.toARGB32();
+                return PopupMenuItem<Color>(
+                  value: entry.value,
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 18,
+                        height: 18,
+                        decoration: BoxDecoration(
+                          color: entry.value,
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: theme.colorScheme.outlineVariant,
+                            width: 1.5,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(child: Text(entry.key)),
+                      if (isSelected)
+                        Icon(
+                          Icons.check_rounded,
+                          size: 18,
+                          color: theme.colorScheme.primary,
+                        ),
+                    ],
+                  ),
+                );
+              }).toList();
             },
           ),
+
+          // Theme Mode Toggle (Light / Dark / System)
+          IconButton(
+            tooltip: 'Theme Mode (${themeController.mode.name})',
+            icon: Icon(themeController.modeIcon),
+            onPressed: themeController.toggleMode,
+          ),
+
           IconButton(
             tooltip: 'GitHub Repository',
             icon: const Icon(Icons.code_rounded),
