@@ -857,3 +857,324 @@ WxToggleSheet(
     );
   }
 }
+
+class WxButtonShowcase extends StatefulWidget {
+  const WxButtonShowcase({super.key});
+
+  @override
+  State<WxButtonShowcase> createState() => _WxButtonShowcaseState();
+}
+
+class _WxButtonShowcaseState extends State<WxButtonShowcase> {
+  int _counter = 0;
+  bool _isLoading = false;
+  bool _isDisabled = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    return ShowcaseScaffold(
+      packageName: 'wx_button',
+      version: '2.0.4',
+      description:
+          'Comprehensive button foundation built on top of WxSheet, offering adaptive styling (M3, M2, iOS), multi-variant actions, icon buttons, loading spinners, and state-driven events.',
+      children: [
+        ShowcaseCard(
+          title: 'Button Variants',
+          subtitle:
+              'Five distinct visual hierarchy variants matching Material 3 and modern design systems.',
+          codeSnippet: '''
+WxButton(
+  variant: WxButtonVariant.tonal,
+  onPressed: () {},
+  child: const Text('Tonal'),
+)
+WxButton(
+  variant: WxButtonVariant.filled,
+  onPressed: () {},
+  child: const Text('Filled'),
+)
+WxButton(
+  variant: WxButtonVariant.elevated,
+  onPressed: () {},
+  child: const Text('Elevated'),
+)
+WxButton(
+  variant: WxButtonVariant.outlined,
+  onPressed: () {},
+  child: const Text('Outlined'),
+)
+WxButton(
+  variant: WxButtonVariant.text,
+  onPressed: () {},
+  child: const Text('Text'),
+)''',
+          child: Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              WxButton(
+                variant: WxButtonVariant.tonal,
+                onPressed: () => setState(() => _counter++),
+                child: const Text('Tonal'),
+              ),
+              WxButton(
+                variant: WxButtonVariant.filled,
+                onPressed: () => setState(() => _counter++),
+                child: const Text('Filled'),
+              ),
+              WxButton(
+                variant: WxButtonVariant.elevated,
+                onPressed: () => setState(() => _counter++),
+                child: const Text('Elevated'),
+              ),
+              WxButton(
+                variant: WxButtonVariant.outlined,
+                onPressed: () => setState(() => _counter++),
+                child: const Text('Outlined'),
+              ),
+              WxButton(
+                variant: WxButtonVariant.text,
+                onPressed: () => setState(() => _counter++),
+                child: const Text('Text'),
+              ),
+            ],
+          ),
+        ),
+        ShowcaseCard(
+          title: 'Button Sizes & Leading / Trailing',
+          subtitle:
+              'Scale sizes across small, medium, and large with icons and spinners.',
+          codeSnippet: '''
+WxButton(
+  size: WxButtonSize.small,
+  leading: const Icon(Icons.bookmark_border_rounded),
+  child: const Text('Small'),
+  onPressed: () {},
+)
+WxButton(
+  size: WxButtonSize.medium,
+  leading: const Icon(Icons.send_rounded),
+  trailing: const Icon(Icons.arrow_forward_rounded),
+  child: const Text('Medium'),
+  onPressed: () {},
+)
+WxButton(
+  size: WxButtonSize.large,
+  trailing: const Icon(Icons.download_rounded),
+  child: const Text('Large'),
+  onPressed: () {},
+)''',
+          child: Wrap(
+            spacing: 16,
+            runSpacing: 16,
+            alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              WxButton(
+                size: WxButtonSize.small,
+                leading: const Icon(Icons.bookmark_border_rounded),
+                onPressed: () {},
+                child: const Text('Small'),
+              ),
+              WxButton(
+                size: WxButtonSize.medium,
+                leading: const Icon(Icons.send_rounded),
+                trailing: const Icon(Icons.arrow_forward_rounded),
+                onPressed: () {},
+                child: const Text('Medium'),
+              ),
+              WxButton(
+                size: WxButtonSize.large,
+                trailing: const Icon(Icons.download_rounded),
+                onPressed: () {},
+                child: const Text('Large'),
+              ),
+            ],
+          ),
+        ),
+        ShowcaseCard(
+          title: 'Interactive Playground & Loading State',
+          subtitle:
+              'Test real click events, loading spinners, and disabled states.',
+          codeSnippet: '''
+WxButton(
+  loading: _isLoading,
+  disabled: _isDisabled,
+  onPressed: () async {
+    setState(() => _isLoading = true);
+    await Future.delayed(const Duration(seconds: 1));
+    setState(() => _isLoading = false);
+  },
+  child: const Text('Click to Load'),
+)''',
+          child: Column(
+            children: [
+              Text(
+                'Clicks: $_counter',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: colorScheme.primary,
+                ),
+              ),
+              const SizedBox(height: 16),
+              Wrap(
+                spacing: 16,
+                runSpacing: 12,
+                alignment: WrapAlignment.center,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  WxButton(
+                    loading: _isLoading,
+                    disabled: _isDisabled,
+                    onPressed: () async {
+                      setState(() {
+                        _isLoading = true;
+                        _counter++;
+                      });
+                      await Future<void>.delayed(const Duration(milliseconds: 1200));
+                      if (mounted) {
+                        setState(() => _isLoading = false);
+                      }
+                    },
+                    leading: const Icon(Icons.sync_rounded),
+                    child: Text(_isLoading ? 'Processing...' : 'Simulate Async Action'),
+                  ),
+                  OutlinedButton.icon(
+                    onPressed: () => setState(() => _isDisabled = !_isDisabled),
+                    icon: Icon(_isDisabled ? Icons.lock_open_rounded : Icons.lock_rounded),
+                    label: Text(_isDisabled ? 'Enable Button' : 'Disable Button'),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        ShowcaseCard(
+          title: 'WxIconButton',
+          subtitle:
+              'Compact circular and rounded icon buttons sharing the same surface architecture.',
+          codeSnippet: '''
+WxIconButton(
+  variant: WxButtonVariant.tonal,
+  onPressed: () {},
+  child: const Icon(Icons.favorite_rounded),
+)
+WxIconButton(
+  variant: WxButtonVariant.filled,
+  onPressed: () {},
+  child: const Icon(Icons.thumb_up_rounded),
+)
+WxIconButton(
+  variant: WxButtonVariant.elevated,
+  onPressed: () {},
+  child: const Icon(Icons.share_rounded),
+)
+WxIconButton(
+  variant: WxButtonVariant.outlined,
+  onPressed: () {},
+  child: const Icon(Icons.bookmark_rounded),
+)
+WxIconButton(
+  variant: WxButtonVariant.text,
+  onPressed: () {},
+  child: const Icon(Icons.more_vert_rounded),
+)''',
+          child: Wrap(
+            spacing: 16,
+            runSpacing: 16,
+            alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              WxIconButton(
+                variant: WxButtonVariant.tonal,
+                onPressed: () => setState(() => _counter++),
+                child: const Icon(Icons.favorite_rounded),
+              ),
+              WxIconButton(
+                variant: WxButtonVariant.filled,
+                onPressed: () => setState(() => _counter++),
+                child: const Icon(Icons.thumb_up_rounded),
+              ),
+              WxIconButton(
+                variant: WxButtonVariant.elevated,
+                onPressed: () => setState(() => _counter++),
+                child: const Icon(Icons.share_rounded),
+              ),
+              WxIconButton(
+                variant: WxButtonVariant.outlined,
+                onPressed: () => setState(() => _counter++),
+                child: const Icon(Icons.bookmark_rounded),
+              ),
+              WxIconButton(
+                variant: WxButtonVariant.text,
+                onPressed: () => setState(() => _counter++),
+                child: const Icon(Icons.more_vert_rounded),
+              ),
+            ],
+          ),
+        ),
+        ShowcaseCard(
+          title: 'Semantic Severities & Colors',
+          subtitle:
+              'Apply color severity overrides for dangerous, successful, or warning actions.',
+          codeSnippet: '''
+WxButton(
+  variant: WxButtonVariant.tonal,
+  severity: Colors.red,
+  leading: const Icon(Icons.delete_forever_rounded),
+  onPressed: () {},
+  child: const Text('Delete Item'),
+)
+WxButton(
+  variant: WxButtonVariant.tonal,
+  severity: Colors.green,
+  leading: const Icon(Icons.check_circle_rounded),
+  onPressed: () {},
+  child: const Text('Approve'),
+)
+WxButton(
+  variant: WxButtonVariant.tonal,
+  severity: Colors.amber,
+  leading: const Icon(Icons.warning_amber_rounded),
+  onPressed: () {},
+  child: const Text('Review Alert'),
+)''',
+          child: Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              WxButton(
+                variant: WxButtonVariant.tonal,
+                severity: Colors.red,
+                leading: const Icon(Icons.delete_forever_rounded),
+                onPressed: () {},
+                child: const Text('Delete Item'),
+              ),
+              WxButton(
+                variant: WxButtonVariant.tonal,
+                severity: Colors.green,
+                leading: const Icon(Icons.check_circle_rounded),
+                onPressed: () {},
+                child: const Text('Approve'),
+              ),
+              WxButton(
+                variant: WxButtonVariant.tonal,
+                severity: Colors.amber,
+                leading: const Icon(Icons.warning_amber_rounded),
+                onPressed: () {},
+                child: const Text('Review Alert'),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}

@@ -28,6 +28,7 @@ workspace:
   - packages/wx_avatar
   - packages/wx_badge
   - packages/wx_box
+  - packages/wx_button
   - packages/wx_divider
   - packages/wx_sheet
   - packages/wx_spoiler

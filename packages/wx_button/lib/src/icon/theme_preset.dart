@@ -35,13 +35,12 @@ class WxIconButtonThemeAdaptive extends WxIconButtonThemePreset {
   });
 
   WxIconButtonThemePreset get platformTheme {
-    WxIconButtonThemePreset theme = WxIconButtonThemeM2(context);
-    if (isAndroid && useMaterial3) {
-      theme = WxIconButtonThemeM3(context);
-    } else if (isIOS) {
-      theme = WxIconButtonThemeIOS(context);
+    if (isIOS) {
+      return WxIconButtonThemeIOS(context);
+    } else if (useMaterial3) {
+      return WxIconButtonThemeM3(context);
     }
-    return theme;
+    return WxIconButtonThemeM2(context);
   }
 
   @override

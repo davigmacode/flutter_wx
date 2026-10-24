@@ -39,6 +39,8 @@ class WidgetarianShowroomApp extends StatelessWidget {
             (context) => WxStaticSheetThemeM3(context),
             (context) => WxTapSheetThemeM3(context),
             (context) => WxToggleSheetThemeM3(context),
+            (context) => WxButtonThemeM3(context),
+            (context) => WxIconButtonThemeM3(context),
           ],
         ),
         'm2': ThemeConfig.withMode(
@@ -61,6 +63,8 @@ class WidgetarianShowroomApp extends StatelessWidget {
             (context) => WxStaticSheetThemeM2(context),
             (context) => WxTapSheetThemeM2(context),
             (context) => WxToggleSheetThemeM2(context),
+            (context) => WxButtonThemeM2(context),
+            (context) => WxIconButtonThemeM2(context),
           ],
         ),
         'ios': ThemeConfig.withMode(
@@ -83,6 +87,8 @@ class WidgetarianShowroomApp extends StatelessWidget {
             (context) => WxStaticSheetThemeIOS(context),
             (context) => WxTapSheetThemeIOS(context),
             (context) => WxToggleSheetThemeIOS(context),
+            (context) => WxButtonThemeIOS(context),
+            (context) => WxIconButtonThemeIOS(context),
           ],
         ),
       },
@@ -195,6 +201,15 @@ class _ShowroomMainShellState extends State<ShowroomMainShell> {
         category: PackageCategory.surfaces,
         icon: Icons.layers_outlined,
         builder: (context) => const WxSheetShowcase(),
+      ),
+      PackageItem(
+        id: 'wx_button',
+        name: 'wx_button',
+        version: '2.0.4',
+        summary: 'Adaptive button components, icon buttons, loading spinners, and multi-variant actions.',
+        category: PackageCategory.surfaces,
+        icon: Icons.smart_button_rounded,
+        builder: (context) => const WxButtonShowcase(),
       ),
       PackageItem(
         id: 'wx_avatar',
@@ -576,7 +591,7 @@ class _ShowroomMainShellState extends State<ShowroomMainShell> {
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
                 child: TextField(
                   decoration: InputDecoration(
-                    hintText: 'Search 25 packages...',
+                    hintText: 'Search ${_packages.length} packages...',
                     prefixIcon: const Icon(Icons.search_rounded),
                     isDense: true,
                     filled: true,

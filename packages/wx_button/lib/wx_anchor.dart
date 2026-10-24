@@ -1,3 +1,3 @@
-library wx_anchor;
+library;
 
 export 'package:wx_sheet/wx_anchor.dart';
